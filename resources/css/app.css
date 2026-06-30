@@ -1,0 +1,77 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* ============================================================
+   Global UI Enhancements
+   ============================================================ */
+
+/* Smooth focus rings */
+*:focus-visible {
+    outline: 2px solid #FF7A00;
+    outline-offset: 2px;
+    border-radius: 8px;
+}
+
+/* Button micro-interactions */
+button, a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Card hover lift effect */
+.card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.12), 0 4px 16px -4px rgba(0, 0, 0, 0.06);
+}
+
+/* Smooth page transitions */
+@keyframes pageIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.page-enter {
+    animation: pageIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Status badge pulse */
+.status-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Table row hover */
+.table-hover-row {
+    transition: background-color 0.15s ease;
+}
+.table-hover-row:hover {
+    background-color: rgba(255, 122, 0, 0.03);
+}
+
+/* Sidebar nav item hover glow */
+.nav-glow:hover {
+    box-shadow: 0 0 0 1px rgba(255, 122, 0, 0.05);
+}
+
+/* Input focus glow */
+.input-focus-glow:focus {
+    box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.1);
+    border-color: #FF7A00;
+}
+
+/* Scrollbar styling for dark sidebar */
+.sidebar-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: #f1f5f9 transparent;
+}
