@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('network_type')->default('all');
             $table->decimal('cost', 12, 2);
             $table->decimal('selling_price', 12, 2)->default(0.00);
-            $table->enum('user_role', ['agent', 'super_agent', 'dealers', 'all'])->default('all');
+            $table->string('user_role')->default('all'); // allowed: agent, super_agent, dealers, all
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 

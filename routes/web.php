@@ -91,7 +91,7 @@ Route::post('/logout', [UserLoginController::class, 'logout'])->name('logout')->
 // Admin Panel
 Route::prefix('admin')->name('admin.')->middleware('admin.auth')->group(function () {
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard.index');
 
     // Orders
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
@@ -206,38 +206,28 @@ Route::prefix('admin')->name('admin.')->middleware('admin.auth')->group(function
     Route::put('/data-integration', [AdminDataIntegrationController::class, 'update'])->name('config.data-integration.update');
 
     // Low Balance Alert
-    Route::get('/low-balance-alert', [AdminLowBalanceAlertController::class, 'index'])->name('low-balance-alert');
     Route::get('/low-balance-alert', [AdminLowBalanceAlertController::class, 'index'])->name('config.low-balance-alert');
-    Route::put('/low-balance-alert', [AdminLowBalanceAlertController::class, 'update'])->name('low-balance-alert.update');
     Route::put('/low-balance-alert', [AdminLowBalanceAlertController::class, 'update'])->name('config.low-balance-alert.update');
 });
 
 // User Dashboard
 Route::prefix('user')->name('user.')->middleware('user.auth')->group(function () {
     Route::get('/', [UserDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/profile', [UserProfileController::class, 'show'])->name('profile');
+    Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard.index');
     Route::get('/profile', [UserProfileController::class, 'show'])->name('profile.index');
     Route::put('/profile', [UserProfileController::class, 'update'])->name('profile.update');
     Route::get('/orders', [UserOrderController::class, 'index'])->name('orders');
-    Route::get('/today-orders', [UserOrderController::class, 'todayOrders'])->name('today-orders');
     Route::get('/today-orders', [UserOrderController::class, 'todayOrders'])->name('orders.today');
-    Route::get('/balance-history', [UserBalanceHistoryController::class, 'index'])->name('balance-history');
     Route::get('/balance-history', [UserBalanceHistoryController::class, 'index'])->name('balance-history.index');
-    Route::get('/api-keys', [UserApiKeyController::class, 'index'])->name('api-keys');
     Route::get('/api-keys', [UserApiKeyController::class, 'index'])->name('api-keys.index');
     Route::post('/api-keys', [UserApiKeyController::class, 'store'])->name('api-keys.store');
     Route::delete('/api-keys/{apiKey}', [UserApiKeyController::class, 'destroy'])->name('api-keys.destroy');
-    Route::delete('/api-keys/{apiKey}', [UserApiKeyController::class, 'destroy'])->name('api-keys.revoke');
     Route::get('/password', [UserPasswordController::class, 'showForm'])->name('password.change');
     Route::put('/password', [UserPasswordController::class, 'update'])->name('password.update');
-    Route::get('/referrals', [UserReferralController::class, 'index'])->name('referrals');
     Route::get('/referrals', [UserReferralController::class, 'index'])->name('referrals.index');
-    Route::get('/shop', [UserShopController::class, 'index'])->name('shop');
     Route::get('/shop', [UserShopController::class, 'index'])->name('shop.index');
     Route::put('/shop', [UserShopController::class, 'update'])->name('shop.update');
     Route::get('/shop/pricing', [UserShopController::class, 'pricing'])->name('shop.pricing');
-    Route::get('/shop-profits', [UserShopProfitController::class, 'index'])->name('shop-profits');
     Route::get('/shop-profits', [UserShopProfitController::class, 'index'])->name('shop-profits.index');
     Route::post('/shop-profits/withdraw', [UserShopProfitController::class, 'index'])->name('shop-profits.withdraw');
 

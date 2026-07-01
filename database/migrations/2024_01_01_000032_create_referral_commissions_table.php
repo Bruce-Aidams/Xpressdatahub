@@ -16,7 +16,7 @@ return new class extends Migration
             $table->decimal('order_amount', 12, 2);
             $table->decimal('commission_percentage', 5, 2);
             $table->decimal('commission_amount', 12, 2);
-            $table->enum('status', ['pending', 'credited', 'failed'])->default('pending');
+            $table->string('status')->default('pending'); // allowed: pending, credited, failed
             $table->timestamp('credited_at')->nullable();
             $table->timestamp('created_at')->nullable();
 

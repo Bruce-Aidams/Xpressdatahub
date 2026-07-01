@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('paystack_topup_charge', function (Blueprint $table) {
             $table->id();
             $table->decimal('charge_amount', 12, 2);
-            $table->enum('charge_type', ['fixed', 'percentage'])->default('fixed');
+            $table->string('charge_type')->default('fixed'); // allowed: fixed, percentage
             $table->boolean('is_active')->default(true);
             $table->unsignedBigInteger('admin_id')->nullable();
             $table->timestamps();

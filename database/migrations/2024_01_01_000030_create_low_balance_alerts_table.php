@@ -13,7 +13,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->decimal('threshold_amount', 12, 2);
             $table->timestamp('alert_sent_at')->nullable();
-            $table->enum('status', ['pending', 'sent', 'failed'])->default('pending');
+            $table->string('status')->default('pending'); // allowed: pending, sent, failed
             $table->timestamp('created_at')->nullable();
 
             $table->foreign('user_id')->references('id')->on('agents')->onDelete('cascade');

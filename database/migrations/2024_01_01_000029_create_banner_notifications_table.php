@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('message');
-            $table->enum('type', ['info', 'warning', 'success', 'error'])->default('info');
+            $table->string('type')->default('info'); // allowed: info, warning, success, error
             $table->boolean('is_active')->default(true);
             $table->timestamp('start_date')->nullable();
             $table->timestamp('end_date')->nullable();

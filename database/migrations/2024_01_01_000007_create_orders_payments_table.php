@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('payment_method');
             $table->string('transaction_id');
             $table->string('paystack_reference')->nullable();
-            $table->enum('status', ['pending', 'verified', 'failed'])->default('pending');
+            $table->string('status')->default('pending'); // allowed: pending, verified, failed
             $table->timestamp('verified_at')->nullable();
             $table->timestamps();
 

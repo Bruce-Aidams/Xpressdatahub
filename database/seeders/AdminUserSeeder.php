@@ -20,16 +20,6 @@ class AdminUserSeeder extends Seeder
                 'is_active' => true,
             ]
         );
-
-        AdminUser::updateOrCreate(
-            ['username' => 'moderator'],
-            [
-                'email' => 'moderator@ninasdata.com',
-                'full_name' => 'Moderator',
-                'password_hash' => Hash::make('password'),
-                'role' => 'moderator',
-                'is_active' => true,
-            ]
-        );
+        
     }
 }

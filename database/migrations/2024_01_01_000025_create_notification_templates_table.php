@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('notification_templates', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->enum('type', ['sms', 'email', 'both']);
+            $table->string('type'); // allowed: sms, email, both
             $table->string('subject')->nullable();
             $table->text('body');
             $table->json('variables')->nullable();

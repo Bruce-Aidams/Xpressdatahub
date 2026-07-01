@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('password_hash');
             $table->string('email');
             $table->string('full_name');
-            $table->enum('role', ['super_admin', 'admin', 'moderator'])->default('moderator');
+            $table->string('role')->default('moderator'); // allowed: super_admin, admin, moderator
             $table->boolean('is_active')->default(true);
             $table->timestamp('last_login_at')->nullable();
             $table->string('last_login_ip')->nullable();

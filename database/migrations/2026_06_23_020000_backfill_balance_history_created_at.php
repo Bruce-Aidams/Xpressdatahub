@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 return new class extends Migration
 {
@@ -9,7 +10,7 @@ return new class extends Migration
     {
         DB::table('balance_history')
             ->whereNull('created_at')
-            ->update(['created_at' => DB::raw("datetime('now')")]);
+            ->update(['created_at' => Carbon::now()->toDateTimeString()]);
     }
 
     public function down(): void

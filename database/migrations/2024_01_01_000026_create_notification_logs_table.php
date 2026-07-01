@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('recipient');
             $table->string('subject')->nullable();
             $table->text('body');
-            $table->enum('status', ['sent', 'failed']);
+            $table->string('status'); // allowed: sent, failed
             $table->text('error_message')->nullable();
             $table->timestamp('created_at')->nullable();
 

@@ -14,7 +14,7 @@ return new class extends Migration
             $table->text('message');
             $table->string('type');
             $table->unsignedBigInteger('sender_id')->nullable();
-            $table->enum('recipient_type', ['admin', 'user', 'all'])->default('all');
+            $table->string('recipient_type')->default('all'); // allowed: admin, user, all
             $table->unsignedBigInteger('recipient_id')->nullable();
             $table->boolean('is_read')->default(false);
             $table->json('data')->nullable();

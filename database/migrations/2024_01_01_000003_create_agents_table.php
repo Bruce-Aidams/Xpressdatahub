@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('password_hash');
             $table->decimal('balance', 12, 2)->default(0);
-            $table->enum('role', ['agent', 'super_agent', 'dealers'])->default('agent');
-            $table->enum('status', ['active', 'inactive', 'suspended'])->default('active');
+            $table->string('role')->default('agent'); // allowed: agent, super_agent, dealers
+            $table->string('status')->default('active'); // allowed: active, inactive, suspended
             $table->string('registration_ip')->nullable();
             $table->string('last_login_ip')->nullable();
             $table->string('device_id')->nullable();

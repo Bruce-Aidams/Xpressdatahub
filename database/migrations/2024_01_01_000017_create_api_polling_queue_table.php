@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('api_polling_queue', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('order_id');
-            $table->enum('status', ['pending', 'processing', 'completed', 'failed'])->default('pending');
+            $table->string('status')->default('pending'); // allowed: pending, processing, completed, failed
             $table->integer('attempts')->default(0);
             $table->integer('max_attempts')->default(10);
             $table->timestamp('last_attempt_at')->nullable();

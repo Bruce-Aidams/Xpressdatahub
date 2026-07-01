@@ -15,10 +15,7 @@ return new class extends Migration
             $table->string('network_type');
             $table->string('package_size');
             $table->decimal('amount', 12, 2);
-            $table->enum('status', [
-                'pending', 'payment_pending', 'processing', 'verified', 'delivered',
-                'failed', 'cancelled', 'paid', 'owner_insufficient_balance', 'delivery_failed'
-            ])->default('pending');
+            $table->string('status')->default('pending'); // allowed: pending, payment_pending, processing, verified, delivered, failed, cancelled, paid, owner_insufficient_balance, delivery_failed
             $table->string('payment_method')->nullable();
             $table->string('transaction_id')->nullable();
             $table->unsignedBigInteger('shop_id')->nullable();
