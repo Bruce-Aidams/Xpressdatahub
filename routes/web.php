@@ -60,9 +60,11 @@ Route::post('/shop/{slug}/order', [GuestShopController::class, 'order'])->name('
 
 // Auth routes - Guest
 Route::middleware('guest')->group(function () {
+    $adminPath = env('ADMIN_PATH', 'admin');
+    
     // Admin Login
-    Route::get('/admin/login', [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
-    Route::post('/admin/login', [AdminLoginController::class, 'login'])->name('admin.login.submit');
+    Route::get('/' . $adminPath . '/login', [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
+    Route::post('/' . $adminPath . '/login', [AdminLoginController::class, 'login'])->name('admin.login.submit');
 
     // User Login
     Route::get('/login', [UserLoginController::class, 'showLoginForm'])->name('login');
@@ -83,13 +85,14 @@ Route::middleware('guest')->group(function () {
 });
 
 // Admin Logout
-Route::post('/admin/logout', [AdminLoginController::class, 'logout'])->name('admin.logout')->middleware('admin.auth');
+$adminPath = env('ADMIN_PATH', 'admin');
+Route::post('/' . $adminPath . '/logout', [AdminLoginController::class, 'logout'])->name('admin.logout')->middleware('admin.auth');
 
 // User Logout
 Route::post('/logout', [UserLoginController::class, 'logout'])->name('logout')->middleware('user.auth');
 
 // Admin Panel
-Route::prefix('admin')->name('admin.')->middleware('admin.auth')->group(function () {
+Route::prefix(env('ADMIN_PATH', 'admin'))->name('admin.')->middleware('admin.auth')->group(function () {
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard.index');
 
