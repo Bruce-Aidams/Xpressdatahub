@@ -9,7 +9,7 @@
         <div class="flex gap-2 text-[10px] sm:text-xs">
             <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 font-medium">Completed: {{ $todayCompleted }}</span>
             <span class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 font-medium">Pending: {{ $todayPending }}</span>
-            <span class="px-2 py-0.5 rounded-full bg-slate-50 text-slate-600 font-medium">Total: GH₵{{ number_format($todayTotal, 2) }}</span>
+            <span class="px-2 py-0.5 rounded-full bg-slate-50 text-slate-600 font-medium">Total: GH&#8373;{{ number_format($todayTotal, 2) }}</span>
         </div>
     </div>
     <div class="overflow-x-auto">
@@ -44,7 +44,7 @@
                         </td>
                         <td class="px-4 sm:px-5 py-3 text-slate-600 text-xs hidden sm:table-cell">{{ $order->phone_number }}</td>
                         <td class="px-4 sm:px-5 py-3 text-xs sm:text-sm"><x-network-badge :network="$order->network_type" /></td>
-                        <td class="px-4 sm:px-5 py-3 font-bold text-slate-800 text-xs sm:text-sm">GH₵{{ number_format($order->amount, 2) }}</td>
+                        <td class="px-4 sm:px-5 py-3 font-bold text-slate-800 text-xs sm:text-sm">GH&#8373;{{ number_format($order->amount, 2) }}</td>
                         <td class="px-4 sm:px-5 py-3 hidden md:table-cell">
                             <x-status-badge :status="$order->status" />
                         </td>

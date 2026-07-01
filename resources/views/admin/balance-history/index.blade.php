@@ -1,4 +1,4 @@
-�@extends('layouts.admin')
+�@extends('layouts.admin')
 
 @section('page-title', 'Balance History')
 @section('page-description', 'View all balance transactions')
@@ -94,12 +94,12 @@
                             </td>
                             <td class="px-5 py-3.5">
                                 @if($record->change_amount >= 0)
-                                    <span class="text-emerald-600 font-bold">+GH₵{{ number_format(abs($record->change_amount), 2) }}</span>
+                                    <span class="text-emerald-600 font-bold">+GH&#8373;{{ number_format(abs($record->change_amount), 2) }}</span>
                                 @else
-                                    <span class="text-red-500 font-bold">-GH₵{{ number_format(abs($record->change_amount), 2) }}</span>
+                                    <span class="text-red-500 font-bold">-GH&#8373;{{ number_format(abs($record->change_amount), 2) }}</span>
                                 @endif
                             </td>
-                            <td class="px-5 py-3.5 text-slate-600 font-medium">GH₵{{ number_format($record->balance_after, 2) }}</td>
+                            <td class="px-5 py-3.5 text-slate-600 font-medium">GH&#8373;{{ number_format($record->balance_after, 2) }}</td>
                             <td class="px-5 py-3.5">
                                 <span class="text-slate-400 text-xs leading-relaxed">{{ $record->description ?? 'N/A' }}</span>
                             </td>

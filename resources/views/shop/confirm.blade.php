@@ -41,7 +41,7 @@
                 </div>
                 <div class="flex justify-between items-center">
                     <span class="text-xs text-slate-400">Amount Paid</span>
-                    <span class="text-sm font-bold text-[#FF7A00]">GH₵{{ number_format($order->amount ?? 0, 2) }}</span>
+                    <span class="text-sm font-bold text-[#FF7A00]">GH&#8373;{{ number_format($order->amount ?? 0, 2) }}</span>
                 </div>
                 <div class="flex justify-between items-center">
                     <span class="text-xs text-slate-400">Date</span>

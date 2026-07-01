@@ -22,7 +22,7 @@
     <div class="bg-white border border-slate-100/80 rounded-2xl p-5 shadow-sm flex items-center justify-between">
         <div>
             <p class="text-xs text-slate-400 font-medium">Total Earnings</p>
-            <p class="text-2xl font-black text-slate-800 mt-1">GH₵{{ number_format($totalEarnings ?? 0, 2) }}</p>
+            <p class="text-2xl font-black text-slate-800 mt-1">GH&#8373;{{ number_format($totalEarnings ?? 0, 2) }}</p>
         </div>
         <div class="bg-[#EA580C]/10 p-3 rounded-xl">
             <x-heroicon-o-currency-dollar class="w-6 h-6 text-[#EA580C]" />

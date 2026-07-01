@@ -8,7 +8,7 @@
     <div class="bg-white border border-slate-100/80 rounded-2xl p-4 sm:p-6 shadow-sm flex items-center justify-between">
         <div>
             <p class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider">Revenue</p>
-            <p class="text-lg sm:text-2xl font-black text-slate-800 mt-1 sm:mt-2">GH₵{{ number_format($stats['revenue'] ?? 0, 2) }}</p>
+            <p class="text-lg sm:text-2xl font-black text-slate-800 mt-1 sm:mt-2">GH&#8373;{{ number_format($stats['revenue'] ?? 0, 2) }}</p>
             <div class="flex items-center gap-1 mt-1.5 sm:mt-2.5">
                 <span class="text-[10px] sm:text-xs font-bold {{ $revenueChange >= 0 ? 'text-emerald-500' : 'text-red-500' }}">
                     {{ $revenueChange >= 0 ? '+' : '' }}{{ $revenueChange }}%
@@ -365,7 +365,7 @@
                             </div>
                         </td>
                         <td class="px-4 sm:px-6 py-3 font-medium text-slate-500 text-xs sm:text-sm">{{ $order->network_type ?? 'N/A' }}</td>
-                        <td class="px-4 sm:px-6 py-3 font-bold text-slate-800 text-xs sm:text-sm">GH₵{{ number_format($order->amount ?? 0, 2) }}</td>
+                        <td class="px-4 sm:px-6 py-3 font-bold text-slate-800 text-xs sm:text-sm">GH&#8373;{{ number_format($order->amount ?? 0, 2) }}</td>
                         <td class="px-4 sm:px-6 py-3 hidden md:table-cell">
                             <span class="px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold tracking-wide uppercase 
                                 {{ $status === 'delivered' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 

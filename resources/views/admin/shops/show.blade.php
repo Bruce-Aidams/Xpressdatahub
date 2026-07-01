@@ -66,7 +66,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Total Earnings</p>
-                <p class="text-xl font-black text-slate-800">GH₵{{ number_format($totalEarnings, 2) }}</p>
+                <p class="text-xl font-black text-slate-800">GH&#8373;{{ number_format($totalEarnings, 2) }}</p>
             </div>
             <div class="w-10 h-10 rounded-xl bg-[#2563EB]/10 flex items-center justify-center">
                 <x-heroicon-o-currency-dollar class="w-5 h-5 text-[#2563EB]" />
@@ -77,7 +77,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Pending Earnings</p>
-                <p class="text-xl font-black text-amber-600">GH₵{{ number_format($pendingEarnings, 2) }}</p>
+                <p class="text-xl font-black text-amber-600">GH&#8373;{{ number_format($pendingEarnings, 2) }}</p>
             </div>
             <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
                 <x-heroicon-o-clock class="w-5 h-5 text-amber-500" />
@@ -88,7 +88,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Total Withdrawn</p>
-                <p class="text-xl font-black text-blue-600">GH₵{{ number_format($totalWithdrawn, 2) }}</p>
+                <p class="text-xl font-black text-blue-600">GH&#8373;{{ number_format($totalWithdrawn, 2) }}</p>
             </div>
             <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
                 <x-heroicon-o-arrow-up-right class="w-5 h-5 text-blue-500" />
@@ -99,7 +99,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Available Balance</p>
-                <p class="text-xl font-black {{ $availableBalance >= 0 ? 'text-emerald-600' : 'text-red-500' }}">GH₵{{ number_format($availableBalance, 2) }}</p>
+                <p class="text-xl font-black {{ $availableBalance >= 0 ? 'text-emerald-600' : 'text-red-500' }}">GH&#8373;{{ number_format($availableBalance, 2) }}</p>
             </div>
             <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
                 <x-heroicon-o-banknotes class="w-5 h-5 text-emerald-500" />
@@ -144,7 +144,7 @@
         </div>
         <div>
             <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Revenue</p>
-            <p class="text-sm font-bold text-slate-800">GH₵{{ number_format($totalEarnings, 2) }}</p>
+            <p class="text-sm font-bold text-slate-800">GH&#8373;{{ number_format($totalEarnings, 2) }}</p>
         </div>
         <div>
             <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">WhatsApp</p>
@@ -229,10 +229,10 @@
                                 <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-600">{{ $p->network_type }}</span>
                             </td>
                             <td class="px-6 py-3.5 font-semibold text-slate-700 text-xs">{{ $p->package_size ?? $p->package_size_gb . ' GB' }}</td>
-                            <td class="px-6 py-3.5 text-slate-500 text-right text-xs">GH₵{{ number_format($p->base_price, 2) }}</td>
-                            <td class="px-6 py-3.5 text-slate-800 font-bold text-right text-xs">GH₵{{ number_format($p->selling_price, 2) }}</td>
+                            <td class="px-6 py-3.5 text-slate-500 text-right text-xs">GH&#8373;{{ number_format($p->base_price, 2) }}</td>
+                            <td class="px-6 py-3.5 text-slate-800 font-bold text-right text-xs">GH&#8373;{{ number_format($p->selling_price, 2) }}</td>
                             <td class="px-6 py-3.5 text-right text-xs">
-                                <span class="font-bold {{ $p->profit > 0 ? 'text-emerald-600' : 'text-slate-500' }}">GH₵{{ number_format($p->profit, 2) }}</span>
+                                <span class="font-bold {{ $p->profit > 0 ? 'text-emerald-600' : 'text-slate-500' }}">GH&#8373;{{ number_format($p->profit, 2) }}</span>
                             </td>
                             <td class="px-6 py-3.5 text-right">
                                 <button onclick="openEditPricingModal({{ $p->id }}, '{{ $p->network_type }}', '{{ addslashes($p->package_size ?? $p->package_size_gb . ' GB') }}', {{ $p->base_price }}, {{ $p->selling_price }})"
@@ -280,9 +280,9 @@
                         <tr class="hover:bg-blue-50/20 transition">
                             <td class="px-6 py-3.5 font-bold text-slate-800 text-xs">#{{ $e->order_reference ?? $e->order_id ?? 'N/A' }}</td>
                             <td class="px-6 py-3.5 text-slate-600 text-xs">{{ $e->package_size ?? 'N/A' }}</td>
-                            <td class="px-6 py-3.5 text-slate-800 font-bold text-right text-xs">GH₵{{ number_format($e->selling_price, 2) }}</td>
+                            <td class="px-6 py-3.5 text-slate-800 font-bold text-right text-xs">GH&#8373;{{ number_format($e->selling_price, 2) }}</td>
                             <td class="px-6 py-3.5 text-right text-xs">
-                                <span class="font-bold {{ $e->profit > 0 ? 'text-emerald-600' : 'text-slate-500' }}">GH₵{{ number_format($e->profit, 2) }}</span>
+                                <span class="font-bold {{ $e->profit > 0 ? 'text-emerald-600' : 'text-slate-500' }}">GH&#8373;{{ number_format($e->profit, 2) }}</span>
                             </td>
                             <td class="px-6 py-3.5">
                                 @if($es === 'credited')
@@ -343,7 +343,7 @@
                     @forelse($shop->withdrawals->take(20) as $w)
                         @php $ws = $w->status; @endphp
                         <tr class="hover:bg-blue-50/20 transition">
-                            <td class="px-6 py-3.5 font-bold text-slate-800 text-xs">GH₵{{ number_format($w->amount, 2) }}</td>
+                            <td class="px-6 py-3.5 font-bold text-slate-800 text-xs">GH&#8373;{{ number_format($w->amount, 2) }}</td>
                             <td class="px-6 py-3.5 text-slate-600 text-xs">{{ ucfirst(str_replace('_', ' ', $w->payment_method ?? 'N/A')) }}</td>
                             <td class="px-6 py-3.5">
                                 @if($ws === 'delivered')
@@ -475,12 +475,12 @@
                     <p class="text-xs font-semibold text-slate-500 mb-3" id="pricingInfo"></p>
                 </div>
                 <div>
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Base Price (GH₵)</label>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Base Price (GH&#8373;)</label>
                     <input type="text" id="editBasePrice" readonly
                         class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-500 cursor-not-allowed">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Selling Price (GH₵)</label>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Selling Price (GH&#8373;)</label>
                     <input type="number" name="selling_price" id="editSellingPrice" step="0.01" min="0" required
                         class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 transition"
                         placeholder="Enter selling price">

@@ -1,4 +1,4 @@
-¿@extends('layouts.admin')
+ï¿½@extends('layouts.admin')
 @section('page-title', 'Shop Orders')
 @section('page-description', 'Verify shop orders')
 @section('content')
@@ -31,7 +31,7 @@
                         <td class="px-5 py-3 text-slate-800">#{{ $order->id }}</td>
                         <td class="px-5 py-3 text-slate-600">{{ $order->shop->name ?? 'N/A' }}</td>
                         <td class="px-5 py-3 text-slate-600">{{ $order->agent->username ?? 'N/A' }}</td>
-                        <td class="px-5 py-3 text-slate-600">GHâ‚µ{{ number_format($order->amount, 2) }}</td>
+                        <td class="px-5 py-3 text-slate-600">GH&#8373;{{ number_format($order->amount, 2) }}</td>
                         <td class="px-5 py-3">
                             <x-status-badge :status="$order->status" />
                         </td>

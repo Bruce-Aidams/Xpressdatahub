@@ -9,42 +9,50 @@ class DataIntegrationService
 {
     public function getConfig(): ?array
     {
-        $config = DataIntegrationConfig::first();
-        return $config ? $config->toArray() : null;
+        $rows = DataIntegrationConfig::all();
+        if ($rows->isEmpty()) {
+            return null;
+        }
+        $config = [];
+        foreach ($rows as $row) {
+            $config[$row->config_key] = $row->config_value;
+        }
+        return $config;
     }
 
     public function isEnabled(): bool
     {
-        $config = $this->getConfig();
-        return $config && !empty($config['enabled']) && !empty($config['data_website_api_key']);
+        $enabled = $this->getValue('enabled');
+        return $enabled === '1' || $enabled === 'true';
     }
 
     public function getDataWebsiteUrl(): string
     {
-        $config = $this->getConfig();
-        return $config ? rtrim($config['data_website_url'] ?? '', '/') : '';
+        return $this->getValue('data_website_url');
     }
 
     public function getApiKey(): string
     {
-        $config = $this->getConfig();
-        return $config ? $config['data_website_api_key'] ?? '' : '';
+        return $this->getValue('data_website_api_key');
     }
 
     public function getWebhookUrl(): string
     {
-        $config = $this->getConfig();
-        return $config ? $config['webhook_url'] ?? '' : '';
+        return $this->getValue('webhook_url');
     }
 
-    public function updateConfig(string $key, string $value): bool
+    public function getValue(string $key, string $default = ''): string
     {
-        $config = DataIntegrationConfig::firstOrCreate(
-            ['id' => 1],
-            [$key => $value]
-        );
+        $row = DataIntegrationConfig::where('config_key', $key)->first();
+        return $row ? $row->config_value : $default;
+    }
 
-        $config->update([$key => $value]);
+    public function updateConfig(string $key, $value): bool
+    {
+        DataIntegrationConfig::updateOrCreate(
+            ['config_key' => $key],
+            ['config_value' => (string) $value]
+        );
         return true;
     }
 }

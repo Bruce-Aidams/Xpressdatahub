@@ -12,7 +12,7 @@ Welcome back, {{ $currentUser->username ?? '' }}
     <div class="bg-white border border-slate-100/80 rounded-2xl p-4 sm:p-6 shadow-sm flex items-center justify-between">
         <div>
             <p class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider">Balance</p>
-            <p class="text-lg sm:text-2xl font-black text-slate-800 mt-1 sm:mt-2">GH₵{{ number_format($agent->balance ?? 0, 2) }}</p>
+            <p class="text-lg sm:text-2xl font-black text-slate-800 mt-1 sm:mt-2">GH&#8373;{{ number_format($agent->balance ?? 0, 2) }}</p>
             <div class="flex items-center gap-1 mt-1 sm:mt-2">
                 <span class="text-[10px] sm:text-xs font-bold {{ $spendChange >= 0 ? 'text-emerald-500' : 'text-red-500' }}">
                     {{ $spendChange >= 0 ? '+' : '' }}{{ $spendChange }}% this week
@@ -30,7 +30,7 @@ Welcome back, {{ $currentUser->username ?? '' }}
             <p class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider">Today</p>
             <p class="text-lg sm:text-2xl font-black text-slate-800 mt-1 sm:mt-2">{{ $todayOrders }}</p>
             <div class="flex items-center gap-1 mt-1 sm:mt-2">
-                <span class="text-[10px] sm:text-xs font-bold text-slate-400">GH₵{{ number_format($todaySpent, 2) }} spent</span>
+                <span class="text-[10px] sm:text-xs font-bold text-slate-400">GH&#8373;{{ number_format($todaySpent, 2) }} spent</span>
             </div>
         </div>
         <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-blue-50 flex items-center justify-center">
@@ -60,7 +60,7 @@ Welcome back, {{ $currentUser->username ?? '' }}
             <p class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider">Referrals</p>
             <p class="text-lg sm:text-2xl font-black text-slate-800 mt-1 sm:mt-2">{{ $referralCount }}</p>
             <div class="flex items-center gap-1 mt-1 sm:mt-2">
-                <span class="text-[10px] sm:text-xs font-bold text-[#EA580C]">GH₵{{ number_format($referralEarnings, 2) }} earned</span>
+                <span class="text-[10px] sm:text-xs font-bold text-[#EA580C]">GH&#8373;{{ number_format($referralEarnings, 2) }} earned</span>
             </div>
         </div>
         <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-purple-50 flex items-center justify-center">
@@ -309,7 +309,7 @@ Welcome back, {{ $currentUser->username ?? '' }}
                             </div>
                         </td>
                         <td class="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm"><x-network-badge :network="$order->network_type" /></td>
-                        <td class="px-3 sm:px-6 py-3 sm:py-4 font-bold text-slate-800 text-xs sm:text-sm">GH₵{{ number_format($order->amount, 2) }}</td>
+                        <td class="px-3 sm:px-6 py-3 sm:py-4 font-bold text-slate-800 text-xs sm:text-sm">GH&#8373;{{ number_format($order->amount, 2) }}</td>
                         <td class="px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
                             <x-status-badge :status="$order->status" />
                         </td>

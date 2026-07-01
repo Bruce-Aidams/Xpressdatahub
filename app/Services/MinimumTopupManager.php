@@ -9,7 +9,7 @@ class MinimumTopupManager
 {
     public function getConfig(): array
     {
-        $config = MinimumTopupConfig::where('is_active', true)
+        $config = MinimumTopupConfig::where('is_enabled', true)
             ->orderByDesc('id')
             ->first();
 
@@ -17,7 +17,8 @@ class MinimumTopupManager
             return [
                 'id' => 0,
                 'minimum_amount' => 10.00,
-                'is_active' => false,
+                'maximum_amount' => null,
+                'is_enabled' => false,
                 'created_by' => 0,
                 'created_at' => now()->toDateTimeString(),
                 'updated_at' => now()->toDateTimeString(),
@@ -30,17 +31,23 @@ class MinimumTopupManager
     public function updateConfig(array $data): array
     {
         $minimumAmount = floatval($data['minimum_amount'] ?? 0);
+        $maximumAmount = !empty($data['maximum_amount']) ? floatval($data['maximum_amount']) : null;
         $adminId = $data['admin_id'] ?? 0;
 
         if ($minimumAmount < 0) {
             return ['success' => false, 'message' => 'Invalid minimum amount'];
         }
 
-        MinimumTopupConfig::where('is_active', true)->update(['is_active' => false]);
+        if ($maximumAmount !== null && $maximumAmount < $minimumAmount) {
+            return ['success' => false, 'message' => 'Maximum amount must be greater than or equal to minimum amount'];
+        }
+
+        MinimumTopupConfig::where('is_enabled', true)->update(['is_enabled' => false]);
 
         MinimumTopupConfig::create([
             'minimum_amount' => $minimumAmount,
-            'is_active' => true,
+            'maximum_amount' => $maximumAmount,
+            'is_enabled' => true,
             'created_by' => $adminId,
         ]);
 
@@ -51,18 +58,28 @@ class MinimumTopupManager
     {
         $config = $this->getConfig();
 
-        if (!$config['is_active']) {
+        if (!$config['is_enabled']) {
             return ['valid' => true, 'message' => 'Minimum top-up validation is disabled'];
         }
 
         $minimumAmount = floatval($config['minimum_amount']);
+        $maximumAmount = !empty($config['maximum_amount']) ? floatval($config['maximum_amount']) : null;
 
         if ($amount < $minimumAmount) {
             return [
                 'valid' => false,
-                'message' => 'Minimum top-up amount is GH₵ ' . number_format($minimumAmount, 2)
-                    . '. Please enter an amount of GH₵ ' . number_format($minimumAmount, 2) . ' or more.',
+                'message' => 'Minimum top-up amount is GH\u20B5 ' . number_format($minimumAmount, 2)
+                    . '. Please enter an amount of GH\u20B5 ' . number_format($minimumAmount, 2) . ' or more.',
                 'minimum_amount' => $minimumAmount,
+            ];
+        }
+
+        if ($maximumAmount !== null && $amount > $maximumAmount) {
+            return [
+                'valid' => false,
+                'message' => 'Maximum top-up amount is GH\u20B5 ' . number_format($maximumAmount, 2)
+                    . '. Please enter an amount of GH\u20B5 ' . number_format($maximumAmount, 2) . ' or less.',
+                'maximum_amount' => $maximumAmount,
             ];
         }
 
@@ -72,13 +89,22 @@ class MinimumTopupManager
     public function getMinimumAmount(): float
     {
         $config = $this->getConfig();
-        return $config['is_active'] ? floatval($config['minimum_amount']) : 0;
+        return $config['is_enabled'] ? floatval($config['minimum_amount']) : 0;
+    }
+
+    public function getMaximumAmount(): ?float
+    {
+        $config = $this->getConfig();
+        if (!$config['is_enabled'] || empty($config['maximum_amount'])) {
+            return null;
+        }
+        return floatval($config['maximum_amount']);
     }
 
     public function isMinimumTopupEnabled(): bool
     {
         $config = $this->getConfig();
-        return (bool) $config['is_active'];
+        return (bool) $config['is_enabled'];
     }
 
     public function getConfigurationHistory(int $limit = 10): array

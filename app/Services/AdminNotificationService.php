@@ -42,12 +42,14 @@ class AdminNotificationService
         $notification = Notification::create([
             'title' => $title,
             'message' => $message,
+            'type' => $data['type'] ?? 'admin',
             'sender_id' => $senderId,
             'sender_type' => 'admin',
             'recipient_type' => $recipientType,
             'recipient_ids' => $recipientIdsJson,
             'priority' => $priority,
             'expires_at' => $expiresAt,
+            'created_at' => now(),
         ]);
 
         return [

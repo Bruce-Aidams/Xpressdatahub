@@ -24,11 +24,13 @@ class AdminMinimumTopupController extends Controller
     {
         $request->validate([
             'minimum_amount' => 'required|numeric|min:0',
+            'maximum_amount' => 'nullable|numeric|min:0',
         ]);
 
         try {
             $result = $this->topupManager->updateConfig([
                 'minimum_amount' => $request->input('minimum_amount'),
+                'maximum_amount' => $request->input('maximum_amount'),
                 'admin_id' => session('admin_id'),
             ]);
 

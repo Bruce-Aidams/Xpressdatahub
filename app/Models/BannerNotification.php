@@ -18,6 +18,7 @@ class BannerNotification extends Model
         'is_active',
         'start_date',
         'end_date',
+        'data',
     ];
 
     protected function casts(): array
@@ -26,6 +27,7 @@ class BannerNotification extends Model
             'is_active' => 'boolean',
             'start_date' => 'datetime',
             'end_date' => 'datetime',
+            'data' => 'array',
         ];
     }
 }

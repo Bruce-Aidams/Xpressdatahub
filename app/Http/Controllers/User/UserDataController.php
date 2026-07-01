@@ -17,6 +17,7 @@ class UserDataController extends Controller
     public function index()
     {
         $isGuest = session('guest_mode');
+        $networks = ['MTN', 'Telecel', 'AirtelTigo'];
 
         if ($isGuest) {
             $agent = (object) [
@@ -45,6 +46,30 @@ class UserDataController extends Controller
                 ->groupBy('network_type');
         }
 
+        // Merge packages: expand 'all'-network packages into every specific network,
+        // combining them with any existing specific-network packages.
+        $expanded = collect();
+        foreach ($networks as $net) {
+            $expanded->put($net, collect());
+        }
+        foreach ($pricing as $network => $packages) {
+            if ($network === 'all') {
+                // Spread 'all'-network packages to every network bucket
+                foreach ($networks as $net) {
+                    $expanded->put($net, $expanded->get($net)->merge($packages));
+                }
+            } else {
+                // Add specific-network packages to their bucket
+                if (isset($expanded[$network])) {
+                    $expanded->put($network, $expanded->get($network)->merge($packages));
+                } else {
+                    $expanded->put($network, $packages);
+                }
+            }
+        }
+        // Remove empty networks so network tabs show N/A correctly
+        $pricing = $expanded->filter(fn($pkgs) => $pkgs->isNotEmpty());
+
         return view('user.buy-data.index', compact('agent', 'pricing', 'isGuest'));
     }
 
@@ -62,7 +87,11 @@ class UserDataController extends Controller
         $packageSize = $request->input('package_size');
         $phoneNumber = $request->input('phone_number');
 
-        $pricingQuery = CustomPricing::where('network_type', $networkType)
+        // Match the exact network OR packages set for 'all' networks
+        $pricingQuery = CustomPricing::where(function ($q) use ($networkType) {
+                $q->where('network_type', $networkType)
+                  ->orWhere('network_type', 'all');
+            })
             ->where('package_size', $packageSize)
             ->where('is_active', true);
 

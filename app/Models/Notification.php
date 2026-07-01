@@ -19,10 +19,15 @@ class Notification extends Model
         'message',
         'type',
         'sender_id',
+        'sender_type',
         'recipient_type',
         'recipient_id',
+        'recipient_ids',
+        'priority',
         'is_read',
         'data',
+        'expires_at',
+        'created_at',
     ];
 
     protected function casts(): array
@@ -30,6 +35,8 @@ class Notification extends Model
         return [
             'is_read' => 'boolean',
             'data' => 'array',
+            'expires_at' => 'datetime',
+            'created_at' => 'datetime',
         ];
     }
 

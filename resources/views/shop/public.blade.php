@@ -72,7 +72,7 @@
                     {{-- Package & Price --}}
                     <div class="mb-4">
                         <p class="text-xl font-black text-slate-800">{{ $product->package_size }}</p>
-                        <p class="text-[#FF7A00] font-bold text-lg">GH₵{{ number_format($product->selling_price, 2) }}</p>
+                        <p class="text-[#FF7A00] font-bold text-lg">GH&#8373;{{ number_format($product->selling_price, 2) }}</p>
                     </div>
 
                     {{-- Order Form --}}
@@ -100,7 +100,7 @@
                             class="w-full bg-[#FF7A00] hover:bg-[#E06B00] text-white text-sm font-bold rounded-xl px-4 py-2.5 transition shadow-md shadow-orange-500/10 flex items-center justify-center gap-2"
                         >
                             <x-heroicon-o-credit-card class="w-4 h-4" />
-                            Pay GH₵{{ number_format($product->selling_price, 2) }}
+                            Pay GH&#8373;{{ number_format($product->selling_price, 2) }}
                         </button>
                     </form>
                 </div>

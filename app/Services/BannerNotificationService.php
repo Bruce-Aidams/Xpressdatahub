@@ -9,7 +9,7 @@ class BannerNotificationService
 {
     public function getActiveBanner(): ?array
     {
-        $banner = BannerNotification::where('is_enabled', true)
+        $banner = BannerNotification::where('is_active', true)
             ->orderByDesc('updated_at')
             ->first();
 
@@ -43,13 +43,16 @@ class BannerNotificationService
             return ['success' => false, 'message' => 'Message is required'];
         }
 
-        if ($speed < 10 || $speed > 200) {
-            return ['success' => false, 'message' => 'Speed must be between 10 and 200'];
+        if ($isEnabled) {
+            BannerNotification::where('is_active', true)->update(['is_active' => false]);
         }
 
-        if ($isEnabled) {
-            BannerNotification::where('is_enabled', true)->update(['is_enabled' => false]);
-        }
+        $extraData = json_encode([
+            'speed' => $speed,
+            'color' => $color,
+            'background_color' => $backgroundColor,
+            'text_color' => $textColor,
+        ]);
 
         if ($id) {
             $banner = BannerNotification::find($id);
@@ -59,20 +62,16 @@ class BannerNotificationService
 
             $banner->update([
                 'message' => $message,
-                'is_enabled' => $isEnabled,
-                'speed' => $speed,
-                'color' => $color,
-                'background_color' => $backgroundColor,
-                'text_color' => $textColor,
+                'is_active' => $isEnabled,
+                'type' => $color,
+                'data' => $extraData,
             ]);
         } else {
             BannerNotification::create([
                 'message' => $message,
-                'is_enabled' => $isEnabled,
-                'speed' => $speed,
-                'color' => $color,
-                'background_color' => $backgroundColor,
-                'text_color' => $textColor,
+                'is_active' => $isEnabled,
+                'type' => $color,
+                'data' => $extraData,
             ]);
         }
 
@@ -82,7 +81,7 @@ class BannerNotificationService
     public function toggleBanner(int $id, bool $enabled): array
     {
         if ($enabled) {
-            BannerNotification::where('is_enabled', true)->update(['is_enabled' => false]);
+            BannerNotification::where('is_active', true)->update(['is_active' => false]);
         }
 
         $banner = BannerNotification::find($id);
@@ -90,7 +89,7 @@ class BannerNotificationService
             return ['success' => false, 'message' => 'Banner not found'];
         }
 
-        $banner->update(['is_enabled' => $enabled]);
+        $banner->update(['is_active' => $enabled]);
 
         return ['success' => true, 'message' => 'Banner status updated'];
     }

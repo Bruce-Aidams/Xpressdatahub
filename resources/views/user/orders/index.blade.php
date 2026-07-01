@@ -53,7 +53,7 @@
                         <th class="text-left px-5 py-3 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">Phone</th>
                         <th class="text-left px-5 py-3 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">Network</th>
                         <th class="text-left px-5 py-3 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">Package</th>
-                        <th class="text-left px-5 py-3 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">Amount (GH₵)</th>
+                        <th class="text-left px-5 py-3 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">Amount (GH&#8373;)</th>
                         <th class="text-left px-5 py-3 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">Status</th>
                         <th class="text-left px-5 py-3 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">Date</th>
                     </tr>
@@ -65,7 +65,7 @@
                             <td class="px-5 py-3 text-slate-600">{{ $order->phone_number }}</td>
                             <td class="px-5 py-3"><x-network-badge :network="$order->network_type" /></td>
                             <td class="px-5 py-3 text-slate-600">{{ $order->package_size ?? 'N/A' }}</td>
-                            <td class="px-5 py-3 font-medium text-slate-700">GH₵{{ number_format($order->amount, 2) }}</td>
+                            <td class="px-5 py-3 font-medium text-slate-700">GH&#8373;{{ number_format($order->amount, 2) }}</td>
                             <td class="px-5 py-3"><x-status-badge :status="$order->status" /></td>
                             <td class="px-5 py-3 text-slate-400 text-xs">{{ $order->created_at?->format('M d, Y H:i') ?? 'N/A' }}</td>
                         </tr>

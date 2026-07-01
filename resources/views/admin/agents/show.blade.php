@@ -1,4 +1,4 @@
-�@extends('layouts.admin')
+�@extends('layouts.admin')
 @section('page-title', $agent->username)
 @section('page-description', 'Agent profile and details')
 @section('content')
@@ -45,7 +45,7 @@
             </div>
             <div class="flex items-center justify-between text-sm">
                 <span class="text-slate-400 text-xs">Balance</span>
-                <span class="text-slate-800 font-black text-sm">GH₵{{ number_format($agent->balance, 2) }}</span>
+                <span class="text-slate-800 font-black text-sm">GH&#8373;{{ number_format($agent->balance, 2) }}</span>
             </div>
             <div class="flex items-center justify-between text-sm">
                 <span class="text-slate-400 text-xs">Referral Code</span>
@@ -127,7 +127,7 @@
                                 <td class="px-5 py-3 font-black text-slate-800">#{{ $order->id }}</td>
                                 <td class="px-5 py-3 text-slate-600 text-xs">{{ $order->phone_number ?? 'N/A' }}</td>
                                 <td class="px-5 py-3"><x-network-badge :network="$order->network_type ?? 'N/A'" /></td>
-                                <td class="px-5 py-3 font-bold text-slate-800 text-xs">GH₵{{ number_format($order->amount, 2) }}</td>
+                                <td class="px-5 py-3 font-bold text-slate-800 text-xs">GH&#8373;{{ number_format($order->amount, 2) }}</td>
                                 <td class="px-5 py-3">
                                     <x-status-badge :status="$s" />
                                 </td>
@@ -166,9 +166,9 @@
                                     </span>
                                 </td>
                                 <td class="px-5 py-3 font-bold text-xs {{ $record->change_amount >= 0 ? 'text-emerald-600' : 'text-red-500' }}">
-                                    {{ $record->change_amount >= 0 ? '+' : '-' }}GH₵{{ number_format(abs($record->change_amount), 2) }}
+                                    {{ $record->change_amount >= 0 ? '+' : '-' }}GH&#8373;{{ number_format(abs($record->change_amount), 2) }}
                                 </td>
-                                <td class="px-5 py-3 text-slate-700 font-semibold text-xs">GH₵{{ number_format($record->balance_after, 2) }}</td>
+                                <td class="px-5 py-3 text-slate-700 font-semibold text-xs">GH&#8373;{{ number_format($record->balance_after, 2) }}</td>
                                 <td class="px-5 py-3 text-slate-400 text-xs">{{ $record->created_at?->format('M d, Y H:i') ?? 'N/A' }}</td>
                             </tr>
                         @empty

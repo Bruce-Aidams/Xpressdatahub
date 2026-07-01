@@ -1,4 +1,4 @@
-¿@extends('layouts.admin')
+ï¿½@extends('layouts.admin')
 @section('page-title', 'Account Management')
 @section('page-description', 'Activate or suspend user accounts')
 @section('content')
@@ -56,7 +56,7 @@
                             </span>
                         </td>
                         <td class="px-5 py-4">
-                            <span class="font-bold text-slate-800 text-xs">GHâ‚µ{{ number_format($account->balance ?? 0, 2) }}</span>
+                            <span class="font-bold text-slate-800 text-xs">GH&#8373;{{ number_format($account->balance ?? 0, 2) }}</span>
                         </td>
                         <td class="px-5 py-4">
                             <span class="px-2.5 py-1 rounded-full text-[10px] font-bold {{ $active ? 'text-emerald-600 bg-emerald-50 border border-emerald-100' : 'text-red-600 bg-red-50 border border-red-100' }}">

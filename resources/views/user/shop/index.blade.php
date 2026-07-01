@@ -53,7 +53,7 @@
             </div>
             <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wide">Revenue</span>
         </div>
-        <p class="text-2xl font-bold text-slate-800 tabular-nums">GH₵{{ number_format($shop->revenue ?? 0, 2) }}</p>
+        <p class="text-2xl font-bold text-slate-800 tabular-nums">GH&#8373;{{ number_format($shop->revenue ?? 0, 2) }}</p>
     </div>
 
     {{-- Available Balance --}}
@@ -64,7 +64,7 @@
             </div>
             <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wide">Available Balance</span>
         </div>
-        <p class="text-2xl font-bold text-emerald-600 tabular-nums">GH₵{{ number_format($earningsSummary['available_balance'] ?? 0, 2) }}</p>
+        <p class="text-2xl font-bold text-emerald-600 tabular-nums">GH&#8373;{{ number_format($earningsSummary['available_balance'] ?? 0, 2) }}</p>
     </div>
 
     {{-- Total Profit --}}
@@ -75,7 +75,7 @@
             </div>
             <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wide">Total Profit</span>
         </div>
-        <p class="text-2xl font-bold text-slate-800 tabular-nums">GH₵{{ number_format($earningsSummary['credited_profit'] ?? 0, 2) }}</p>
+        <p class="text-2xl font-bold text-slate-800 tabular-nums">GH&#8373;{{ number_format($earningsSummary['credited_profit'] ?? 0, 2) }}</p>
     </div>
 </div>
 
@@ -272,19 +272,19 @@
             <div class="p-5 space-y-3.5">
                 <div class="flex items-center justify-between">
                     <span class="text-xs text-slate-500">Credited Profit</span>
-                    <span class="text-sm font-bold text-slate-800 tabular-nums">GH₵{{ number_format($earningsSummary['credited_profit'] ?? 0, 2) }}</span>
+                    <span class="text-sm font-bold text-slate-800 tabular-nums">GH&#8373;{{ number_format($earningsSummary['credited_profit'] ?? 0, 2) }}</span>
                 </div>
                 <div class="flex items-center justify-between">
                     <span class="text-xs text-slate-500">Pending Profit</span>
-                    <span class="text-sm font-bold text-amber-500 tabular-nums">GH₵{{ number_format($earningsSummary['pending_profit'] ?? 0, 2) }}</span>
+                    <span class="text-sm font-bold text-amber-500 tabular-nums">GH&#8373;{{ number_format($earningsSummary['pending_profit'] ?? 0, 2) }}</span>
                 </div>
                 <div class="flex items-center justify-between">
                     <span class="text-xs text-slate-500">Withdrawn</span>
-                    <span class="text-sm font-bold text-blue-500 tabular-nums">GH₵{{ number_format($earningsSummary['withdrawn_or_reserved'] ?? 0, 2) }}</span>
+                    <span class="text-sm font-bold text-blue-500 tabular-nums">GH&#8373;{{ number_format($earningsSummary['withdrawn_or_reserved'] ?? 0, 2) }}</span>
                 </div>
                 <div class="border-t border-slate-100 pt-3 flex items-center justify-between">
                     <span class="text-xs font-semibold text-slate-600">Available Balance</span>
-                    <span class="text-sm font-bold text-emerald-600 tabular-nums">GH₵{{ number_format($earningsSummary['available_balance'] ?? 0, 2) }}</span>
+                    <span class="text-sm font-bold text-emerald-600 tabular-nums">GH&#8373;{{ number_format($earningsSummary['available_balance'] ?? 0, 2) }}</span>
                 </div>
             </div>
         </div>
@@ -344,7 +344,7 @@
                                 <span class="text-xs font-semibold text-slate-700 tabular-nums">GH&#8373;{{ number_format($earning->selling_price ?? 0, 2) }}</span>
                             </td>
                             <td class="px-5 sm:px-6 py-3.5 text-right">
-                                <span class="text-xs font-bold text-emerald-600 tabular-nums">GH₵{{ number_format($earning->profit ?? 0, 2) }}</span>
+                                <span class="text-xs font-bold text-emerald-600 tabular-nums">GH&#8373;{{ number_format($earning->profit ?? 0, 2) }}</span>
                             </td>
                             <td class="px-5 sm:px-6 py-3.5 text-center">
                                 @php

@@ -1,4 +1,4 @@
-¿@extends('layouts.admin')
+ï¿½@extends('layouts.admin')
 @section('page-title', 'Shop Withdrawals')
 @section('page-description', 'Process shop withdrawal requests')
 @section('content')
@@ -18,7 +18,7 @@
                     <tr class="border-b border-slate-100 hover:bg-blue-50/20">
                         <td class="px-5 py-3 text-slate-800">#{{ $w->id }}</td>
                         <td class="px-5 py-3 text-slate-600">{{ $w->shop->name ?? 'N/A' }}</td>
-                        <td class="px-5 py-3 text-slate-600">GHâ‚µ{{ number_format($w->amount, 2) }}</td>
+                        <td class="px-5 py-3 text-slate-600">GH&#8373;{{ number_format($w->amount, 2) }}</td>
                         <td class="px-5 py-3"><x-status-badge :status="$w->status" /></td>
                         <td class="px-5 py-3 text-slate-400 text-xs">{{ $w->created_at?->format('M d, Y H:i') ?? 'N/A' }}</td>
                         <td class="px-5 py-3 flex gap-2">

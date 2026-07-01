@@ -36,9 +36,11 @@ class AdminNotificationController extends Controller
                 'title' => $request->input('title'),
                 'message' => $request->input('message'),
                 'sender_id' => session('admin_id'),
+                'sender_type' => 'admin',
                 'recipient_type' => $request->input('recipient_type'),
                 'recipient_ids' => $request->input('recipient_ids'),
                 'priority' => $request->input('priority', 'normal'),
+                'type' => 'admin',
             ]);
 
             if ($result['success']) {

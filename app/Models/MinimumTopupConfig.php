@@ -13,6 +13,7 @@ class MinimumTopupConfig extends Model
 
     protected $fillable = [
         'minimum_amount',
+        'maximum_amount',
         'is_enabled',
         'admin_id',
     ];
@@ -21,6 +22,7 @@ class MinimumTopupConfig extends Model
     {
         return [
             'minimum_amount' => 'decimal:2',
+            'maximum_amount' => 'decimal:2',
             'is_enabled' => 'boolean',
         ];
     }

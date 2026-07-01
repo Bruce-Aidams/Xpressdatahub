@@ -1,4 +1,4 @@
-¿@extends('layouts.user')
+ï¿½@extends('layouts.user')
 @section('title', 'My Profile')
 @section('page-title', 'My Profile')
 @section('page-description', 'Manage your account settings')
@@ -53,7 +53,7 @@
                     </div>
                     <div>
                         <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Balance</p>
-                        <p class="text-sm font-bold text-slate-800">GHâ‚µ{{ number_format($currentUser->balance ?? 0, 2) }}</p>
+                        <p class="text-sm font-bold text-slate-800">GH&#8373;{{ number_format($currentUser->balance ?? 0, 2) }}</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-4">

@@ -1,4 +1,4 @@
-¿@extends('layouts.admin')
+ï¿½@extends('layouts.admin')
 @section('page-title', 'Shop Management')
 @section('page-description', 'Manage vendor shops, orders, and withdrawals')
 
@@ -163,7 +163,7 @@
 
                         {{-- Revenue --}}
                         <td class="px-6 py-4 text-right">
-                            <span class="text-xs font-bold text-slate-700">GHâ‚µ{{ number_format($shop->total_revenue ?? 0, 2) }}</span>
+                            <span class="text-xs font-bold text-slate-700">GH&#8373;{{ number_format($shop->total_revenue ?? 0, 2) }}</span>
                         </td>
 
                         {{-- Actions --}}

@@ -85,10 +85,10 @@
                                     data-price="{{ $pkg->selling_price }}"
                                     data-cost="{{ $pkg->cost }}"
                                     data-validity="{{ $pkg->data_validity ?? '30 Days' }}"
-                                    class="pkg-option {{ !$loop->parent->first ? 'hidden' : '' }}"
-                                    data-hidden="{{ !$loop->parent->first ? 'true' : 'false' }}"
+                                    class="pkg-option"
+                                    style="{{ !$loop->parent->first ? 'display:none' : '' }}"
                                 >
-                                    {{ $pkg->package_size }} — GH₵{{ number_format($pkg->selling_price, 2) }}
+                                    {{ $pkg->package_size }} — GH&#8373;{{ number_format($pkg->selling_price, 2) }}
                                 </option>
                             @endforeach
                         @endforeach

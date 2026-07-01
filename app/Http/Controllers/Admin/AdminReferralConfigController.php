@@ -25,7 +25,9 @@ class AdminReferralConfigController extends Controller
         ]);
 
         try {
-            $fields = [
+            $existing = ReferralConfig::first();
+
+            $data = [
                 'commission_percentage' => $request->input('commission_percentage'),
                 'min_orders_required' => $request->input('min_orders_required'),
                 'max_commission_per_order' => $request->input('max_commission_per_order'),
@@ -33,11 +35,10 @@ class AdminReferralConfigController extends Controller
                 'admin_id' => session('admin_id'),
             ];
 
-            foreach ($fields as $key => $value) {
-                ReferralConfig::updateOrCreate(
-                    ['config_key' => $key],
-                    ['config_value' => (string) $value, 'updated_at' => now()]
-                );
+            if ($existing) {
+                $existing->update($data);
+            } else {
+                ReferralConfig::create($data);
             }
 
             return redirect()->back()

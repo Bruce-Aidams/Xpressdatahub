@@ -8,7 +8,7 @@
     <div class="bg-white rounded-2xl border border-slate-100 p-3 sm:p-5 shadow-sm flex items-center justify-between">
         <div>
             <p class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">Revenue</p>
-            <p class="text-lg sm:text-2xl font-black text-slate-800 mt-1">GH₵{{ number_format($stats['revenue'] ?? 0, 0) }}</p>
+            <p class="text-lg sm:text-2xl font-black text-slate-800 mt-1">GH&#8373;{{ number_format($stats['revenue'] ?? 0, 0) }}</p>
             <div class="flex items-center gap-1 mt-1">
                 <span class="text-[10px] sm:text-xs font-bold {{ $revenueChange >= 0 ? 'text-emerald-500' : 'text-red-500' }}">{{ $revenueChange >= 0 ? '+' : '' }}{{ $revenueChange }}%</span>
                 <x-dynamic-component :component="$revenueChange >= 0 ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down'" class="{{ $revenueChange >= 0 ? 'text-emerald-500' : 'text-red-500' }} text-[8px] sm:text-[9px]" />
@@ -212,7 +212,7 @@
                                 @endif
                             </div>
                         </td>
-                        <td class="px-3 sm:px-5 py-3 sm:py-4 font-bold text-slate-800 text-xs sm:text-sm">GH₵{{ number_format($order->amount, 2) }}</td>
+                        <td class="px-3 sm:px-5 py-3 sm:py-4 font-bold text-slate-800 text-xs sm:text-sm">GH&#8373;{{ number_format($order->amount, 2) }}</td>
                         <td class="px-3 sm:px-5 py-3 sm:py-4 hidden sm:table-cell">
                             <x-status-badge :status="$s" />
                         </td>

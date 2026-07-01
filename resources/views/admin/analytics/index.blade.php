@@ -8,7 +8,7 @@
             <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#2563EB]/10 flex items-center justify-center"><x-heroicon-o-currency-dollar class="w-5 h-5" /></div>
             <div>
                 <p class="text-[10px] sm:text-xs text-slate-400 font-medium">Today's Revenue</p>
-                <p class="text-lg sm:text-2xl font-bold text-slate-800 mt-0.5">GH₵{{ number_format($analytics['today_revenue'] ?? 0, 2) }}</p>
+                <p class="text-lg sm:text-2xl font-bold text-slate-800 mt-0.5">GH&#8373;{{ number_format($analytics['today_revenue'] ?? 0, 2) }}</p>
             </div>
         </div>
     </div>
@@ -26,7 +26,7 @@
             <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-50 flex items-center justify-center"><x-heroicon-o-calendar class="w-5 h-5" /></div>
             <div>
                 <p class="text-[10px] sm:text-xs text-slate-400 font-medium">This Month</p>
-                <p class="text-lg sm:text-2xl font-bold text-slate-800 mt-0.5">GH₵{{ number_format($analytics['month_revenue'] ?? 0, 2) }}</p>
+                <p class="text-lg sm:text-2xl font-bold text-slate-800 mt-0.5">GH&#8373;{{ number_format($analytics['month_revenue'] ?? 0, 2) }}</p>
             </div>
         </div>
     </div>
@@ -83,7 +83,7 @@
             @if($peak)
                 <circle cx="{{ round($peak['x']) }}" cy="{{ round($peak['y']) }}" r="5" fill="#2563EB"/>
                 <rect x="{{ round($peak['x']) - 30 }}" y="{{ round($peak['y']) - 28 }}" width="60" height="18" rx="9" fill="#2563EB"/>
-                <text x="{{ round($peak['x']) }}" y="{{ round($peak['y']) - 16 }}" text-anchor="middle" fill="white" font-size="9" font-weight="700">GH₵{{ number_format($peak['revenue'], 0) }}</text>
+                <text x="{{ round($peak['x']) }}" y="{{ round($peak['y']) - 16 }}" text-anchor="middle" fill="white" font-size="9" font-weight="700">GH&#8373;{{ number_format($peak['revenue'], 0) }}</text>
             @endif
             @foreach($points as $i => $p)
                 @if($i % $labelStep === 0 || $i === count($points) - 1)
@@ -110,7 +110,7 @@
                 <div>
                     <div class="flex justify-between text-[10px] sm:text-xs mb-1">
                         <span class="font-semibold text-slate-700"><x-network-badge :network="$net->network_type ?? 'Unknown'" /></span>
-                        <span class="text-slate-500">GH₵{{ number_format($net->total, 2) }} ({{ $pct }}%)</span>
+                        <span class="text-slate-500">GH&#8373;{{ number_format($net->total, 2) }} ({{ $pct }}%)</span>
                     </div>
                     <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
                         <div class="h-full bg-[#2563EB] rounded-full transition-all" style="width: {{ $pct }}%"></div>
@@ -135,7 +135,7 @@
                             <p class="text-[9px] sm:text-[10px] text-slate-400">{{ $agent->orders_count ?? 0 }} orders</p>
                         </div>
                     </div>
-                    <span class="text-[10px] sm:text-xs font-black text-slate-700">GH₵{{ number_format($agent->orders_sum_amount ?? 0, 2) }}</span>
+                    <span class="text-[10px] sm:text-xs font-black text-slate-700">GH&#8373;{{ number_format($agent->orders_sum_amount ?? 0, 2) }}</span>
                 </div>
             @empty
                 <p class="text-slate-400 text-xs text-center py-4">No agent data yet</p>

@@ -11,7 +11,7 @@
     </div>
     <div class="bg-white rounded-2xl border border-slate-100 p-3 sm:p-5 shadow-sm">
         <p class="text-[10px] sm:text-xs text-slate-400 font-medium">Total Revenue</p>
-        <p class="text-base sm:text-2xl font-bold text-slate-800 mt-0.5 sm:mt-1">GH₵{{ number_format($totalAmount, 2) }}</p>
+        <p class="text-base sm:text-2xl font-bold text-slate-800 mt-0.5 sm:mt-1">GH&#8373;{{ number_format($totalAmount, 2) }}</p>
     </div>
     <div class="bg-white rounded-2xl border border-slate-100 p-3 sm:p-5 shadow-sm">
         <p class="text-[10px] sm:text-xs text-slate-400 font-medium">Showing</p>
@@ -127,7 +127,7 @@
                                 @endif
                             </div>
                         </td>
-                        <td class="px-3 sm:px-5 py-3 sm:py-4 font-bold text-slate-800 text-xs sm:text-sm">GH₵{{ number_format($order->amount, 2) }}</td>
+                        <td class="px-3 sm:px-5 py-3 sm:py-4 font-bold text-slate-800 text-xs sm:text-sm">GH&#8373;{{ number_format($order->amount, 2) }}</td>
                         <td class="px-3 sm:px-5 py-3 sm:py-4 hidden sm:table-cell">
                             <x-status-badge :status="$s" />
                         </td>

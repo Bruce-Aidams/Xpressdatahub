@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('minimum_topup_config', function (Blueprint $table) {
             $table->id();
             $table->decimal('minimum_amount', 12, 2)->default(1);
+            $table->decimal('maximum_amount', 12, 2)->nullable();
             $table->boolean('is_enabled')->default(true);
             $table->unsignedBigInteger('admin_id')->nullable();
             $table->timestamps();

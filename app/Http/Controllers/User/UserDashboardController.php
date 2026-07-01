@@ -119,7 +119,7 @@ class UserDashboardController extends Controller
                 'label' => str_pad($h, 2, '0', STR_PAD_LEFT),
                 'count' => Order::where('agent_id', $userId)
                     ->whereDate('created_at', today())
-                    ->whereRaw('HOUR(created_at) = ?', [$h])
+                    ->whereHour('created_at', $h)
                     ->count(),
             ]);
         }

@@ -115,16 +115,21 @@
 
             <div class="divide-y divide-slate-100">
                 @forelse($banners as $banner)
+                    @php
+                        $bannerData = is_array($banner->data) ? $banner->data : (json_decode($banner->data, true) ?? []);
+                        $bgColor = $bannerData['background_color'] ?? '#1e40af';
+                        $speed = $bannerData['speed'] ?? 50;
+                    @endphp
                     <div class="px-6 py-4 flex items-center justify-between hover:bg-slate-50/50 transition-colors">
                         <div class="flex items-center gap-3 min-w-0">
-                            <span class="flex-shrink-0 w-3 h-3 rounded-full ring-2 ring-white shadow-sm" style="background-color: {{ $banner->background_color ?? '#1e40af' }}"></span>
+                            <span class="flex-shrink-0 w-3 h-3 rounded-full ring-2 ring-white shadow-sm" style="background-color: {{ $bgColor }}"></span>
                             <div class="min-w-0">
                                 <p class="text-sm font-semibold text-slate-800 truncate">{{ $banner->message }}</p>
-                                <p class="text-xs text-slate-400 mt-0.5">Speed {{ $banner->speed }}</p>
+                                <p class="text-xs text-slate-400 mt-0.5">Speed {{ $speed }}</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-3 ml-4">
-                            @if($banner->is_enabled)
+                            @if($banner->is_active)
                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-emerald-700 bg-emerald-50 rounded-full">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Active
                                 </span>

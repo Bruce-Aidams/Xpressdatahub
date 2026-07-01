@@ -47,11 +47,11 @@
                 </div>
                 <div>
                     <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Amount</p>
-                    <p class="text-sm font-black text-[#2563EB] mt-0.5">GH₵{{ number_format($order->amount, 2) }}</p>
+                    <p class="text-sm font-black text-[#2563EB] mt-0.5">GH&#8373;{{ number_format($order->amount, 2) }}</p>
                 </div>
                 <div>
                     <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Base Amount</p>
-                    <p class="text-sm font-bold text-slate-600 mt-0.5">GH₵{{ number_format($order->base_amount ?? 0, 2) }}</p>
+                    <p class="text-sm font-bold text-slate-600 mt-0.5">GH&#8373;{{ number_format($order->base_amount ?? 0, 2) }}</p>
                 </div>
                 <div>
                     <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Payment Method</p>

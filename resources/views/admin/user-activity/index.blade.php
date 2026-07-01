@@ -24,8 +24,8 @@
                         <td class="px-5 py-3 text-slate-600">{{ $activity->agent->username ?? 'N/A' }}</td>
                         <td class="px-5 py-3 text-slate-600 font-mono text-xs">{{ $activity->ip_address ?? 'N/A' }}</td>
                         <td class="px-5 py-3 text-slate-400 text-xs">{{ $activity->user_agent ?? 'N/A' }}</td>
-                        <td class="px-5 py-3"><span class="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-600">{{ $activity->action ?? 'login' }}</span></td>
-                        <td class="px-5 py-3 text-slate-400 text-xs">{{ $activity->created_at?->format('M d, Y H:i') ?? 'N/A' }}</td>
+                        <td class="px-5 py-3"><span class="px-2 py-0.5 rounded-full text-xs font-medium {{ $activity->login_status === 'success' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600' }}">{{ ucfirst($activity->login_status ?? 'login') }}</span></td>
+                        <td class="px-5 py-3 text-slate-400 text-xs">{{ $activity->login_at?->format('M d, Y H:i') ?? 'N/A' }}</td>
                     </tr>
                 @empty
                     <tr><td colspan="5" class="px-5 py-10 text-center text-slate-500 text-sm">No activity logs found</td></tr>

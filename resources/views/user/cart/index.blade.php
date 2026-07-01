@@ -137,7 +137,7 @@
                         </a>
                     </div>
                 @endif
-                <form method="POST" action="{{ route('user.cart.checkout') }}" onsubmit="return confirm('Place all {{ $cartItems->count() }} order(s) for GH₵{{ number_format($total, 2) }}?')">
+                <form method="POST" action="{{ route('user.cart.checkout') }}" onsubmit="return confirm('Place all {{ $cartItems->count() }} order(s) for GH&#8373;{{ number_format($total, 2) }}?')">
                     @csrf
                     <button type="submit" {{ $agent->balance < $total ? 'disabled' : '' }}
                             class="w-full py-3.5 bg-[#EA580C] hover:bg-[#C2410C] disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-bold text-sm rounded-xl shadow-lg shadow-orange-500/20 transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.98]">

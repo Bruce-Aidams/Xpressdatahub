@@ -1,4 +1,4 @@
-�@extends('layouts.admin')
+�@extends('layouts.admin')
 @section('page-title', 'Agents Management')
 @section('page-description', 'Manage platform agents, super-agents and dealers')
 @section('content')
@@ -100,7 +100,7 @@
                         <td class="px-3 sm:px-5 py-3 sm:py-4 hidden md:table-cell">
                             <span class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[9px] sm:text-[10px] font-bold bg-blue-50 text-blue-600">{{ ucfirst(str_replace('_', ' ', $agent->role)) }}</span>
                         </td>
-                        <td class="px-3 sm:px-5 py-3 sm:py-4 font-bold text-slate-800 text-xs sm:text-sm">GH₵{{ number_format($agent->balance, 2) }}</td>
+                        <td class="px-3 sm:px-5 py-3 sm:py-4 font-bold text-slate-800 text-xs sm:text-sm">GH&#8373;{{ number_format($agent->balance, 2) }}</td>
                         <td class="px-3 sm:px-5 py-3 sm:py-4 text-slate-600 font-semibold text-xs sm:text-sm hidden md:table-cell">{{ $agent->orders_count ?? 0 }}</td>
                         <td class="px-3 sm:px-5 py-3 sm:py-4 hidden sm:table-cell">
                             <span class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[9px] sm:text-[10px] font-bold
@@ -271,7 +271,7 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Balance (GH₵)</label>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Balance (GH&#8373;)</label>
                     <input type="number" name="balance" id="edit_balance" step="0.01" min="0"
                            class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-700 bg-slate-50 focus:outline-none focus:border-[#2563EB] transition">
                 </div>

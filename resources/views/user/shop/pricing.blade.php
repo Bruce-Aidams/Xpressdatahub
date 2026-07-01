@@ -1,4 +1,4 @@
-�@extends('layouts.user')
+�@extends('layouts.user')
 @section('title', 'Shop Pricing')
 
 @section('content')
@@ -38,7 +38,7 @@
             </div>
             <div>
                 <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Average Margin</p>
-                <p class="text-xl font-bold text-slate-800">GH₵{{ number_format($avgMargin, 2) }}</p>
+                <p class="text-xl font-bold text-slate-800">GH&#8373;{{ number_format($avgMargin, 2) }}</p>
             </div>
         </div>
         <div class="bg-white border border-slate-100/80 rounded-2xl shadow-sm p-5 flex items-center gap-4">
@@ -47,7 +47,7 @@
             </div>
             <div>
                 <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Highest Price</p>
-                <p class="text-xl font-bold text-slate-800">GH₵{{ number_format($highestPrice, 2) }}</p>
+                <p class="text-xl font-bold text-slate-800">GH&#8373;{{ number_format($highestPrice, 2) }}</p>
             </div>
         </div>
     </div>
@@ -80,9 +80,9 @@
                                 <x-network-badge :network="$item->network_type" />
                             </td>
                             <td class="px-6 py-4 text-sm font-medium text-slate-700">{{ $item->package_size }}</td>
-                            <td class="px-6 py-4 text-sm text-slate-400">GH₵{{ number_format($item->base_price, 2) }}</td>
-                            <td class="px-6 py-4 text-sm font-semibold text-slate-700">GH₵{{ number_format($item->selling_price, 2) }}</td>
-                            <td class="px-6 py-4 text-sm font-medium text-emerald-500">GH₵{{ number_format($item->profit, 2) }}</td>
+                            <td class="px-6 py-4 text-sm text-slate-400">GH&#8373;{{ number_format($item->base_price, 2) }}</td>
+                            <td class="px-6 py-4 text-sm font-semibold text-slate-700">GH&#8373;{{ number_format($item->selling_price, 2) }}</td>
+                            <td class="px-6 py-4 text-sm font-medium text-emerald-500">GH&#8373;{{ number_format($item->profit, 2) }}</td>
                             <td class="px-6 py-4">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-600 border border-emerald-100">
                                     {{ number_format($marginPercent, 1) }}%

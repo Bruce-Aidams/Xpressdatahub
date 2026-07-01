@@ -1,4 +1,4 @@
-�@extends('layouts.user')
+�@extends('layouts.user')
 @section('title', 'Balance History')
 @section('page-title', 'Balance History')
 @section('page-description', 'View your balance changes')
@@ -47,9 +47,9 @@
                             </span>
                         </td>
                         <td class="px-5 py-4 {{ $isCredit ? 'text-emerald-600' : 'text-red-500' }} font-bold">
-                            {{ $isCredit ? '+' : '-' }}GH₵{{ number_format(abs($record->change_amount ?? 0), 2) }}
+                            {{ $isCredit ? '+' : '-' }}GH&#8373;{{ number_format(abs($record->change_amount ?? 0), 2) }}
                         </td>
-                        <td class="px-5 py-4 text-slate-600">GH₵{{ number_format($record->balance_after ?? 0, 2) }}</td>
+                        <td class="px-5 py-4 text-slate-600">GH&#8373;{{ number_format($record->balance_after ?? 0, 2) }}</td>
                         <td class="px-5 py-4 text-slate-400 text-xs">{{ ucfirst($record->reason ?? 'N/A') }}</td>
                         <td class="px-5 py-4 text-slate-400 text-xs">{{ $record->created_at?->format('M d, Y H:i') ?? 'N/A' }}</td>
                     </tr>
