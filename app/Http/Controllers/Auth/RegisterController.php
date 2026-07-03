@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Agent;
+use App\Services\PasswordResetService;
 use App\Services\ReferralService;
 use App\Services\ShopService;
 use Illuminate\Http\Request;
@@ -13,7 +14,8 @@ class RegisterController extends Controller
 {
     public function __construct(
         private ReferralService $referralService,
-        private ShopService $shopService
+        private ShopService $shopService,
+        private PasswordResetService $passwordService
     ) {}
 
     public function showRegistrationForm()
@@ -39,6 +41,13 @@ class RegisterController extends Controller
             'referral_code' => 'nullable|string',
         ]);
 
+        $passwordCheck = $this->passwordService->validatePasswordStrength($request->input('password'));
+        if (! $passwordCheck['valid']) {
+            return redirect()->back()
+                ->withInput($request->except('password', 'password_confirmation'))
+                ->with('error', implode(' ', $passwordCheck['errors']));
+        }
+
         try {
             $agent = Agent::create([
                 'first_name' => $request->input('first_name'),
@@ -49,6 +58,7 @@ class RegisterController extends Controller
                 'password_hash' => Hash::make($request->input('password')),
                 'role' => 'agent',
                 'status' => 'active',
+                'is_approved' => false,
                 'registration_ip' => $request->ip(),
                 'referral_code' => $this->referralService->generateReferralCode(0),
             ]);
@@ -62,13 +72,8 @@ class RegisterController extends Controller
 
             $this->shopService->createShopForUser($agent->id, $agent->username);
 
-            session()->regenerate();
-            session()->put('user_id', $agent->id);
-            session()->put('username', $agent->username);
-            session()->put('role', $agent->role);
-
-            return redirect()->route('user.dashboard')
-                ->with('success', 'Account created successfully! Welcome aboard.');
+            return redirect()->route('pending.approval')
+                ->with('success', 'Account created successfully! Please wait for admin approval.');
 
         } catch (\Exception $e) {
             return redirect()->back()

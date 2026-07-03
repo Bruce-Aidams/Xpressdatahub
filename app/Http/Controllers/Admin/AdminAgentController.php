@@ -71,6 +71,13 @@ class AdminAgentController extends Controller
             'balance' => 'nullable|numeric|min:0',
         ]);
 
+        $passwordCheck = $this->resetService->validatePasswordStrength($request->input('password'));
+        if (! $passwordCheck['valid']) {
+            return redirect()->back()
+                ->withInput($request->except('password'))
+                ->with('error', implode(' ', $passwordCheck['errors']));
+        }
+
         try {
             $agent = Agent::create([
                 'first_name' => $request->input('first_name'),
@@ -213,6 +220,49 @@ class AdminAgentController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Failed to send reset link. Please try again.');
+        }
+    }
+
+    public function pendingApprovals()
+    {
+        $pendingAgents = Agent::where('is_approved', false)
+            ->orderByDesc('created_at')
+            ->paginate(25);
+
+        return view('admin.agents.pending', compact('pendingAgents'));
+    }
+
+    public function approve(Agent $agent)
+    {
+        try {
+            $agent->update([
+                'is_approved' => true,
+                'updated_at' => now(),
+            ]);
+
+            return redirect()->back()
+                ->with('success', "{$agent->username} has been approved successfully.");
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Failed to approve agent.');
+        }
+    }
+
+    public function reject(Agent $agent)
+    {
+        try {
+            $agent->update([
+                'status' => 'suspended',
+                'updated_at' => now(),
+            ]);
+
+            return redirect()->back()
+                ->with('success', "{$agent->username} has been rejected.");
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Failed to reject agent.');
         }
     }
 }

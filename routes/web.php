@@ -83,6 +83,11 @@ Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
 
+    // Pending Approval
+    Route::get('/pending-approval', function () {
+        return view('auth.pending-approval');
+    })->name('pending.approval');
+
     // Password Reset
     Route::get('/forgot-password', [ForgotPasswordController::class, 'showForm'])->name('password.request');
     Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink'])->name('password.email');
@@ -114,6 +119,9 @@ Route::prefix(config('app.admin_path'))->name('admin.')->middleware('admin.auth'
     Route::put('/agents/{agent}/status', [AdminAgentController::class, 'updateStatus'])->name('agents.toggle-status');
     Route::put('/agents/{agent}/reset-password', [AdminAgentController::class, 'resetPassword'])->name('agents.reset-password');
     Route::post('/agents/{agent}/send-reset-link', [AdminAgentController::class, 'sendResetLink'])->name('agents.send-reset-link');
+    Route::get('/agents/pending/approvals', [AdminAgentController::class, 'pendingApprovals'])->name('agents.pending-approvals');
+    Route::post('/agents/{agent}/approve', [AdminAgentController::class, 'approve'])->name('agents.approve');
+    Route::post('/agents/{agent}/reject', [AdminAgentController::class, 'reject'])->name('agents.reject');
 
     // Pricing
     Route::get('/pricing', [AdminPricingController::class, 'index'])->name('pricing.index');

@@ -9,7 +9,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('minimum_topup_config', function (Blueprint $table) {
-            $table->decimal('maximum_amount', 12, 2)->nullable()->after('minimum_amount');
+            if (!Schema::hasColumn('minimum_topup_config', 'maximum_amount')) {
+                $table->decimal('maximum_amount', 12, 2)->nullable()->after('minimum_amount');
+            }
         });
     }
 

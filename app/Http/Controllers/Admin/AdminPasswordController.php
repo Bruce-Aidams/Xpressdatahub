@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\AdminAuthService;
+use App\Services\PasswordResetService;
 use Illuminate\Http\Request;
 
 class AdminPasswordController extends Controller
 {
     public function __construct(
-        private AdminAuthService $authService
+        private AdminAuthService $authService,
+        private PasswordResetService $passwordService
     ) {}
 
     public function update(Request $request)
@@ -18,6 +20,12 @@ class AdminPasswordController extends Controller
             'current_password' => 'required|string',
             'password' => 'required|string|min:8|confirmed',
         ]);
+
+        $passwordCheck = $this->passwordService->validatePasswordStrength($request->input('password'));
+        if (! $passwordCheck['valid']) {
+            return redirect()->back()
+                ->with('error', implode(' ', $passwordCheck['errors']));
+        }
 
         try {
             $result = $this->authService->changePassword(

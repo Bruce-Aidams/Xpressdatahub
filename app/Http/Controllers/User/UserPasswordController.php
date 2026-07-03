@@ -4,11 +4,16 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Agent;
+use App\Services\PasswordResetService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class UserPasswordController extends Controller
 {
+    public function __construct(
+        private PasswordResetService $passwordService
+    ) {}
+
     public function showForm()
     {
         return view('user.password.change');
@@ -20,6 +25,12 @@ class UserPasswordController extends Controller
             'current_password' => 'required|string',
             'password' => 'required|string|min:8|confirmed',
         ]);
+
+        $passwordCheck = $this->passwordService->validatePasswordStrength($request->input('password'));
+        if (! $passwordCheck['valid']) {
+            return redirect()->back()
+                ->with('error', implode(' ', $passwordCheck['errors']));
+        }
 
         try {
             $user = Agent::find(session('user_id'));

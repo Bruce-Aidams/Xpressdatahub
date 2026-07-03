@@ -1,30 +1,35 @@
 <?php
-
-require __DIR__.'/vendor/autoload.php';
-$app = require_once __DIR__.'/bootstrap/app.php';
-$kernel = $app->make(Kernel::class);
+require __DIR__ . '/vendor/autoload.php';
+$app = require_once __DIR__ . '/bootstrap/app.php';
+$kernel = $app->make(\Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
-use App\Models\CustomPricing;
-use Illuminate\Contracts\Console\Kernel;
+use App\Models\Agent;
+use App\Services\UserLoginTracker;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Hash;
 
-// Create a request and inject admin session manually
-$server = [
-    'HTTP_HOST' => 'localhost',
-    'REQUEST_URI' => '/admin/pricing',
-    'REQUEST_METHOD' => 'GET',
-];
-$request = Request::create('/admin/pricing', 'GET', [], [], [], $server);
+try {
+    // create fake agent
+    $agent = Agent::create([
+        'first_name' => 'Test',
+        'last_name' => 'User',
+        'username' => 'testuser' . time(),
+        'email' => 'test' . time() . '@example.com',
+        'password_hash' => Hash::make('password'),
+        'role' => 'agent',
+        'status' => 'active'
+    ]);
 
-// Manually handle through kernel
-$httpKernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+    $server = ['REMOTE_ADDR' => '127.0.0.1', 'HTTP_USER_AGENT' => 'Testing Browser'];
+    $request = Request::create('/login', 'POST', [], [], [], $server);
 
-// We need to fake auth. Let's check if there's a way
-// Actually, let's just render the blade template directly
-$view = View::make('admin.pricing.index', [
-    'pricingRules' => CustomPricing::orderBy('package_size_gb')->paginate(20),
-]);
-
-echo $view->render();
+    $tracker = app(UserLoginTracker::class);
+    $tracker->logLogin($agent->id, $request->ip(), $request->userAgent());
+    
+    $agent->update(['last_login_ip' => $request->ip()]);
+    
+    echo "Success";
+} catch (\Exception $e) {
+    echo "ERROR: " . $e->getMessage() . "\n" . $e->getTraceAsString();
+}

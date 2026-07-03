@@ -59,6 +59,11 @@ class UserLoginController extends Controller
                 ->with('error', 'Your account has been '.$agent->status.'.');
         }
 
+        if (isset($agent->is_approved) && !$agent->is_approved) {
+            return redirect()->route('pending.approval')
+                ->with('error', 'Your account is pending admin approval.');
+        }
+
         session()->regenerate();
         session()->put('user_id', $agent->id);
         session()->put('username', $agent->username);

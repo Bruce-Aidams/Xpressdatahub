@@ -24,6 +24,7 @@ class Agent extends Model
         'balance',
         'role',
         'status',
+        'is_approved',
         'registration_ip',
         'last_login_ip',
         'device_id',
@@ -39,6 +40,7 @@ class Agent extends Model
     {
         return [
             'balance' => 'decimal:2',
+            'is_approved' => 'boolean',
             'created_at' => 'datetime',
         ];
     }

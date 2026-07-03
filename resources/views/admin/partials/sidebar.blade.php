@@ -59,10 +59,21 @@
                 <div class="pt-4">
                     <p class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-slate-300">Agents</p>
                     <div class="mt-1 space-y-0.5">
+                        <a href="{{ route('admin.agents.pending-approvals') }}"
+                           class="nav-item flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200 {{ request()->routeIs('admin.agents.pending-approvals') ? 'bg-gradient-to-r from-amber-500/10 to-amber-500/5 text-amber-600 shadow-sm shadow-amber-500/10' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700' }}">
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 {{ request()->routeIs('admin.agents.pending-approvals') ? 'bg-amber-500/15' : 'bg-slate-100/80' }}">
+                                <x-heroicon-o-clock class="w-4 h-4 {{ request()->routeIs('admin.agents.pending-approvals') ? 'text-amber-500' : 'text-slate-400' }}" />
+                            </div>
+                            <span>Pending Approvals</span>
+                            @php $pendingCount = \App\Models\Agent::where('is_approved', false)->count(); @endphp
+                            @if($pendingCount > 0)
+                                <span class="ml-auto px-2 py-0.5 text-[10px] font-bold bg-amber-100 text-amber-600 rounded-full">{{ $pendingCount }}</span>
+                            @endif
+                        </a>
                         <a href="{{ route('admin.agents.index') }}"
-                           class="nav-item flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200 {{ request()->routeIs('admin.agents.*') ? 'bg-gradient-to-r from-[#2563EB]/10 to-[#2563EB]/5 text-[#2563EB] shadow-sm shadow-[#2563EB]/10' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700' }}">
-                            <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 {{ request()->routeIs('admin.agents.*') ? 'bg-[#2563EB]/15' : 'bg-slate-100/80' }}">
-                                <x-heroicon-o-users class="w-4 h-4 {{ request()->routeIs('admin.agents.*') ? 'text-[#2563EB]' : 'text-slate-400' }}" />
+                           class="nav-item flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200 {{ request()->routeIs('admin.agents.index') ? 'bg-gradient-to-r from-[#2563EB]/10 to-[#2563EB]/5 text-[#2563EB] shadow-sm shadow-[#2563EB]/10' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700' }}">
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 {{ request()->routeIs('admin.agents.index') ? 'bg-[#2563EB]/15' : 'bg-slate-100/80' }}">
+                                <x-heroicon-o-users class="w-4 h-4 {{ request()->routeIs('admin.agents.index') ? 'text-[#2563EB]' : 'text-slate-400' }}" />
                             </div>
                             <span>Agents</span>
                         </a>

@@ -50,6 +50,10 @@ class EnsureUserAuthenticated
                 ->with('error', 'Your account has been '.$user->status.'.');
         }
 
+        if (isset($user->is_approved) && !$user->is_approved) {
+            return redirect()->route('pending.approval');
+        }
+
         view()->share('currentUser', $user);
         view()->share('userRole', session('role'));
 

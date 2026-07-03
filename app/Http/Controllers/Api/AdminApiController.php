@@ -25,6 +25,7 @@ use App\Services\DataIntegrationService;
 use App\Services\LowBalanceAlertService;
 use App\Services\MinimumTopupManager;
 use App\Services\OrderService;
+use App\Services\PasswordResetService;
 use App\Services\PaymentConfigService;
 use App\Services\PaystackChargeManager;
 use App\Services\ReferralService;
@@ -46,6 +47,7 @@ class AdminApiController extends Controller
         private LowBalanceAlertService $alertService,
         private MinimumTopupManager $topupManager,
         private OrderService $orderService,
+        private PasswordResetService $passwordService,
         private PaystackChargeManager $chargeManager,
         private PaymentConfigService $configService,
         private ReferralService $referralService,
@@ -132,6 +134,11 @@ class AdminApiController extends Controller
             'current_password' => 'required|string',
             'password' => 'required|string|min:8|confirmed',
         ]);
+
+        $passwordCheck = $this->passwordService->validatePasswordStrength($request->input('password'));
+        if (! $passwordCheck['valid']) {
+            return response()->json(['success' => false, 'message' => implode(' ', $passwordCheck['errors'])], 422);
+        }
 
         $result = $this->authService->changePassword(
             $this->admin($request)->id,
@@ -266,6 +273,11 @@ class AdminApiController extends Controller
             'role' => 'required|string|in:agent,super_agent,dealers',
             'balance' => 'nullable|numeric|min:0',
         ]);
+
+        $passwordCheck = $this->passwordService->validatePasswordStrength($request->input('password'));
+        if (! $passwordCheck['valid']) {
+            return response()->json(['success' => false, 'message' => implode(' ', $passwordCheck['errors'])], 422);
+        }
 
         $agent = Agent::create([
             'first_name' => $request->input('first_name'),
