@@ -10,6 +10,8 @@ class NotificationRead extends Model
 {
     use HasFactory;
 
+    public bool $timestamps = false;
+
     protected $table = 'notification_reads';
 
     protected $fillable = [

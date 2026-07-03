@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\UserLoginLog;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Request;
 
 class UserLoginTracker
 {
@@ -25,7 +24,7 @@ class UserLoginTracker
             ->orderByDesc('created_at')
             ->first();
 
-        if (!$log) {
+        if (! $log) {
             return false;
         }
 

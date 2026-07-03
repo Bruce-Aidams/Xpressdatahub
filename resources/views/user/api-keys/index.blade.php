@@ -28,16 +28,16 @@
                     </div>
                     <div class="flex items-center gap-2 mt-1.5">
                         <span class="font-mono text-sm text-slate-600 bg-slate-50 px-3 py-1 rounded-lg">
-                            ••••••{{ substr($key->api_key, -6) }}
+                            â€¢â€¢â€¢â€¢â€¢â€¢{{ substr($key->api_key, -6) }}
                         </span>
                     </div>
                     <p class="text-xs text-slate-400 mt-1">Created {{ $key->created_at?->format('M d, Y') ?? 'N/A' }}</p>
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <x-status-badge :active="$key->is_active" />
+                    <x-status-badge :status="$key->is_active ? 'active' : 'inactive'" />
                     @if($key->is_active)
-                        <form method="POST" action="{{ route('user.api-keys.revoke', $key->id) }}" class="inline">
+                        <form method="POST" action="{{ route('user.api-keys.destroy', $key->id) }}" class="inline">
                             @csrf
                             @method('DELETE')
                             <button

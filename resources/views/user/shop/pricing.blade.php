@@ -1,4 +1,4 @@
-�@extends('layouts.user')
+@extends('layouts.user')
 @section('title', 'Shop Pricing')
 
 @section('content')

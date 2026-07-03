@@ -1,4 +1,4 @@
-�@extends('layouts.admin')
+@extends('layouts.admin')
 @section('page-title', $shop->name ?? 'Shop Detail')
 @section('page-description', 'Manage shop details, pricing, earnings, and withdrawals')
 
@@ -400,7 +400,7 @@
                                         </button>
                                     </form>
                                 @else
-                                    <span class="text-[10px] text-slate-300 font-medium">�</span>
+                                    <span class="text-[10px] text-slate-300 font-medium">—</span>
                                 @endif
                             </td>
                         </tr>
@@ -565,8 +565,8 @@
     // Edit Pricing Modal
     let currentEditBasePrice = 0;
     function openEditPricingModal(id, network, packageSize, basePrice, sellingPrice) {
-        document.getElementById('editPricingForm').action = '{{ url("admin/shop-pricing") }}/' + id;
-        document.getElementById('pricingInfo').textContent = network + ' � ' + packageSize;
+        document.getElementById('editPricingForm').action = '{{ url(config("app.admin_path") . "/shop-pricing") }}/' + id;
+        document.getElementById('pricingInfo').textContent = network + ' — ' + packageSize;
         document.getElementById('editBasePrice').value = 'GH\u20B5' + parseFloat(basePrice).toFixed(2);
         document.getElementById('editSellingPrice').value = sellingPrice;
         currentEditBasePrice = parseFloat(basePrice);
@@ -587,7 +587,7 @@
 
     // Reject Withdrawal Modal
     function openRejectModal(withdrawalId) {
-        document.getElementById('rejectForm').action = '{{ url("admin/shop-withdrawals") }}/' + withdrawalId + '/reject';
+        document.getElementById('rejectForm').action = '{{ url(config("app.admin_path") . "/shop-withdrawals") }}/' + withdrawalId + '/reject';
         document.getElementById('rejectWithdrawalModal').classList.remove('hidden');
     }
 

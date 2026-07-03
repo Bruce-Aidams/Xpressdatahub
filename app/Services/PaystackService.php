@@ -16,7 +16,7 @@ class PaystackService
         return new Client([
             'base_uri' => $baseUrl,
             'headers' => [
-                'Authorization' => 'Bearer ' . $secretKey,
+                'Authorization' => 'Bearer '.$secretKey,
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
             ],
@@ -46,7 +46,7 @@ class PaystackService
             return [
                 'success' => false,
                 'data' => null,
-                'message' => 'Failed to verify transaction: ' . $e->getMessage(),
+                'message' => 'Failed to verify transaction: '.$e->getMessage(),
             ];
         }
     }
@@ -74,7 +74,7 @@ class PaystackService
             return [
                 'success' => false,
                 'data' => null,
-                'message' => 'Failed to initialize transaction: ' . $e->getMessage(),
+                'message' => 'Failed to initialize transaction: '.$e->getMessage(),
             ];
         }
     }
@@ -108,7 +108,7 @@ class PaystackService
                 'success' => false,
                 'data' => [],
                 'meta' => null,
-                'message' => 'Failed to fetch transactions: ' . $e->getMessage(),
+                'message' => 'Failed to fetch transactions: '.$e->getMessage(),
             ];
         }
     }

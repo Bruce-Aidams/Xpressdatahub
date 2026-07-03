@@ -108,11 +108,11 @@
                 <ul class="space-y-3">
                     <li class="flex items-start gap-2.5 text-xs text-slate-500 leading-relaxed">
                         <x-heroicon-o-check-circle class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                        <span>Keep titles short and actionable — ideally under 50 characters.</span>
+                        <span>Keep titles short and actionable â€” ideally under 50 characters.</span>
                     </li>
                     <li class="flex items-start gap-2.5 text-xs text-slate-500 leading-relaxed">
                         <x-heroicon-o-check-circle class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                        <span>Use <strong class="text-slate-700">Urgent</strong> priority sparingly — reserve it for critical system alerts.</span>
+                        <span>Use <strong class="text-slate-700">Urgent</strong> priority sparingly â€” reserve it for critical system alerts.</span>
                     </li>
                     <li class="flex items-start gap-2.5 text-xs text-slate-500 leading-relaxed">
                         <x-heroicon-o-check-circle class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />

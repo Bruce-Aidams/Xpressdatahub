@@ -22,14 +22,14 @@ class UserProfileController extends Controller
         $request->validate([
             'first_name' => 'nullable|string|max:255',
             'last_name' => 'nullable|string|max:255',
-            'email' => 'nullable|email|max:255|unique:agents,email,' . session('user_id'),
+            'email' => 'nullable|email|max:255|unique:agents,email,'.session('user_id'),
             'phone' => 'nullable|string|max:20',
         ]);
 
         try {
             $user = Agent::find(session('user_id'));
 
-            if (!$user) {
+            if (! $user) {
                 return redirect()->back()
                     ->with('error', 'User not found.');
             }

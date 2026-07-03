@@ -1,4 +1,4 @@
-�@extends('layouts.admin')
+@extends('layouts.admin')
 
 @section('page-title', 'Balance History')
 @section('page-description', 'View all balance transactions')

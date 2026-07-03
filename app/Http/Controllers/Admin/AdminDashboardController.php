@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Agent;
 use App\Models\Order;
-use App\Models\Payment;
 use App\Models\Shop;
 use App\Models\ShopWithdrawal;
 use Illuminate\Support\Facades\DB;

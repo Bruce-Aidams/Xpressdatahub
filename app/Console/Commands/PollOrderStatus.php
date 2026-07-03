@@ -7,7 +7,6 @@ use App\Models\Order;
 use App\Services\ExternalApiService;
 use App\Services\OrderService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class PollOrderStatus extends Command
@@ -28,6 +27,7 @@ class PollOrderStatus extends Command
 
         if ($items->isEmpty()) {
             $this->info('No orders to poll.');
+
             return static::SUCCESS;
         }
 
@@ -60,14 +60,16 @@ class PollOrderStatus extends Command
     {
         try {
             $order = Order::find($item->order_id);
-            if (!$order) {
+            if (! $order) {
                 $this->warn("Order #{$item->order_id} not found, skipping.");
                 $item->update(['status' => 'failed', 'attempts' => $item->max_attempts]);
+
                 return 'skipped';
             }
 
             if (in_array($order->status, ['delivered', 'completed', 'failed', 'cancelled'])) {
                 $item->update(['status' => 'completed']);
+
                 return 'skipped';
             }
 
@@ -82,19 +84,21 @@ class PollOrderStatus extends Command
                 );
 
                 $item->update(['status' => 'completed']);
+
                 return 'failed';
             }
 
             $apiService = new ExternalApiService($order->network_type);
             $transactionId = $order->external_transaction_id ?? $order->transaction_id ?? $order->order_reference;
 
-            if (!$transactionId) {
+            if (! $transactionId) {
                 $this->warn("Order #{$order->id} has no transaction ID, skipping.");
                 $item->update(['status' => 'completed']);
+
                 return 'skipped';
             }
 
-            $this->info("Polling order #{$order->id} ({$order->network_type}) - attempt " . ($item->attempts + 1) . "/{$item->max_attempts}");
+            $this->info("Polling order #{$order->id} ({$order->network_type}) - attempt ".($item->attempts + 1)."/{$item->max_attempts}");
 
             $apiResult = $apiService->checkTransactionStatus($transactionId);
 
@@ -106,8 +110,9 @@ class PollOrderStatus extends Command
             ]);
 
             if ($externalStatus === null) {
-                $this->warn("  Could not determine status from API response.");
+                $this->warn('  Could not determine status from API response.');
                 $this->scheduleNextAttempt($item);
+
                 return 'pending';
             }
 
@@ -116,6 +121,7 @@ class PollOrderStatus extends Command
             if ($mappedStatus === null) {
                 $this->warn("  Could not map external status: {$externalStatus}");
                 $this->scheduleNextAttempt($item);
+
                 return 'pending';
             }
 
@@ -136,24 +142,27 @@ class PollOrderStatus extends Command
                 $item->update(['status' => 'completed']);
 
                 $this->info("  Order #{$order->id} updated: {$order->status} → {$mappedStatus}");
+
                 return 'completed';
             }
 
             $this->scheduleNextAttempt($item);
             $this->info("  Order #{$order->id} still {$mappedStatus}, will retry.");
+
             return 'pending';
 
         } catch (\Exception $e) {
             Log::error("Polling error for order #{$item->order_id}: {$e->getMessage()}");
             $this->error("  Error polling order #{$item->order_id}: {$e->getMessage()}");
             $this->scheduleNextAttempt($item);
+
             return 'skipped';
         }
     }
 
     private function extractStatus(array $apiResult): ?string
     {
-        if (!empty($apiResult['data'])) {
+        if (! empty($apiResult['data'])) {
             $data = $apiResult['data'];
 
             $statusFields = ['status', 'state', 'result', 'delivery_status', 'transaction_status'];
@@ -172,7 +181,7 @@ class PollOrderStatus extends Command
             }
         }
 
-        if (!$apiResult['success'] && !empty($apiResult['error'])) {
+        if (! $apiResult['success'] && ! empty($apiResult['error'])) {
             return null;
         }
 
@@ -181,7 +190,7 @@ class PollOrderStatus extends Command
 
     private function mapExternalStatus(?string $externalStatus): ?string
     {
-        if (!$externalStatus) {
+        if (! $externalStatus) {
             return null;
         }
 

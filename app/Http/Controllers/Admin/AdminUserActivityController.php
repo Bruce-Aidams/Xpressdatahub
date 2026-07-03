@@ -30,7 +30,7 @@ class AdminUserActivityController extends Controller
         }
 
         if ($dateTo = $request->input('date_to')) {
-            $query->where('created_at', '<=', $dateTo . ' 23:59:59');
+            $query->where('created_at', '<=', $dateTo.' 23:59:59');
         }
 
         if ($search = $request->input('search')) {

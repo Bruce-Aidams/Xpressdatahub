@@ -3,13 +3,13 @@
 namespace App\Services;
 
 use App\Models\PaymentConfig;
-use Illuminate\Support\Facades\DB;
 
 class ContactService
 {
     public function getConfig(string $key, string $default = ''): string
     {
         $config = PaymentConfig::where('config_key', $key)->first();
+
         return $config ? $config->config_value : $default;
     }
 

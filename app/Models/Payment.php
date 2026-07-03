@@ -20,6 +20,7 @@ class Payment extends Model
         'transaction_id',
         'paystack_reference',
         'status',
+        'verified_at',
     ];
 
     protected function casts(): array

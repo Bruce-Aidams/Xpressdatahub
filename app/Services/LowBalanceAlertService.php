@@ -6,6 +6,7 @@ use App\Models\Agent;
 use App\Models\LowBalanceAlert;
 use App\Models\PaymentConfig;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class LowBalanceAlertService
 {
@@ -40,7 +41,7 @@ class LowBalanceAlertService
     {
         $config = $this->getConfig();
 
-        if (!$config['enabled']) {
+        if (! $config['enabled']) {
             return [];
         }
 
@@ -56,7 +57,7 @@ class LowBalanceAlertService
             $lastAlert = LowBalanceAlert::where('user_id', $user->id)
                 ->max('alert_sent_at');
 
-            if (!$lastAlert || $lastAlert < $cutoffDate) {
+            if (! $lastAlert || $lastAlert < $cutoffDate) {
                 $users[] = [
                     'id' => $user->id,
                     'username' => $user->username,
@@ -75,7 +76,7 @@ class LowBalanceAlertService
     {
         $config = $this->getConfig();
 
-        if (!$config['enabled']) {
+        if (! $config['enabled']) {
             return ['total' => 0, 'sent' => 0, 'failed' => 0];
         }
 
@@ -86,6 +87,7 @@ class LowBalanceAlertService
         foreach ($users as $user) {
             if (empty($user['phone'])) {
                 $failed++;
+
                 continue;
             }
 
@@ -153,35 +155,38 @@ class LowBalanceAlertService
 
         $phoneNumber = preg_replace('/[^0-9+]/', '', $phoneNumber);
         if (strpos($phoneNumber, '0') === 0) {
-            $phoneNumber = '233' . substr($phoneNumber, 1);
+            $phoneNumber = '233'.substr($phoneNumber, 1);
         }
 
         $provider = $smsConfig['provider'] ?? 'generic';
 
         try {
             if ($provider === 'smsonlinegh') {
-                $response = \Illuminate\Support\Facades\Http::withHeaders([
+                $response = Http::withHeaders([
                     'Host' => 'api.smsonlinegh.com',
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
-                    'Authorization' => 'key ' . ($smsConfig['api_key'] ?? ''),
+                    'Authorization' => 'key '.($smsConfig['api_key'] ?? ''),
                 ])->timeout(30)->post('https://api.smsonlinegh.com/v5/sms/send', [
                     'text' => $message,
                     'type' => 0,
                     'sender' => $smsConfig['sender_id'] ?? '',
                     'destinations' => [$phoneNumber],
                 ]);
+
                 return $response->successful();
             }
 
-            $response = \Illuminate\Support\Facades\Http::timeout(30)
+            $response = Http::timeout(30)
                 ->post($smsConfig['api_url'] ?? '', [
                     'phone' => $phoneNumber,
                     'message' => $message,
                 ]);
+
             return $response->successful();
         } catch (\Exception $e) {
             report($e);
+
             return false;
         }
     }

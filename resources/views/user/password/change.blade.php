@@ -24,7 +24,7 @@
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Current Password *</label>
                     <div class="relative">
                         <x-heroicon-o-lock-closed class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" />
-                        <input type="password" name="current_password" required placeholder="••••••••"
+                        <input type="password" name="current_password" required placeholder="Enter password"
                                class="pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 focus:border-[#EA580C] focus:ring-2 focus:ring-[#EA580C]/10 outline-none transition w-full">
                     </div>
                 </div>
@@ -33,7 +33,7 @@
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">New Password *</label>
                     <div class="relative">
                         <x-heroicon-o-key class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" />
-                        <input type="password" name="password" required minlength="6" placeholder="••••••••"
+                        <input type="password" name="password" required minlength="6" placeholder="Enter password"
                                class="pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 focus:border-[#EA580C] focus:ring-2 focus:ring-[#EA580C]/10 outline-none transition w-full">
                     </div>
                 </div>
@@ -42,7 +42,7 @@
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Confirm Password *</label>
                     <div class="relative">
                         <x-heroicon-o-shield-check class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" />
-                        <input type="password" name="password_confirmation" required minlength="6" placeholder="••••••••"
+                        <input type="password" name="password_confirmation" required minlength="6" placeholder="Enter password"
                                class="pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 focus:border-[#EA580C] focus:ring-2 focus:ring-[#EA580C]/10 outline-none transition w-full">
                     </div>
                 </div>
@@ -64,19 +64,19 @@
         <div class="p-6">
             <ul class="space-y-2 text-sm text-slate-500">
                 <li class="flex items-start gap-2">
-                    <span class="text-[#EA580C] mt-0.5">•</span>
+                    <span class="text-[#EA580C] mt-0.5">â€¢</span>
                     Use at least 8 characters for a stronger password
                 </li>
                 <li class="flex items-start gap-2">
-                    <span class="text-[#EA580C] mt-0.5">•</span>
+                    <span class="text-[#EA580C] mt-0.5">â€¢</span>
                     Mix uppercase, lowercase, numbers, and symbols
                 </li>
                 <li class="flex items-start gap-2">
-                    <span class="text-[#EA580C] mt-0.5">•</span>
+                    <span class="text-[#EA580C] mt-0.5">â€¢</span>
                     Avoid using personal information or common words
                 </li>
                 <li class="flex items-start gap-2">
-                    <span class="text-[#EA580C] mt-0.5">•</span>
+                    <span class="text-[#EA580C] mt-0.5">â€¢</span>
                     Don't reuse passwords from other accounts
                 </li>
             </ul>

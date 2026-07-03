@@ -21,7 +21,7 @@ class CartController extends Controller
         $userId = session('user_id');
         $agent = Agent::find($userId);
         $cartItems = CartItem::where('agent_id', $userId)->orderBy('created_at', 'desc')->get();
-        $total = $cartItems->sum(fn($item) => floatval($item->amount) * $item->quantity);
+        $total = $cartItems->sum(fn ($item) => floatval($item->amount) * $item->quantity);
 
         return view('user.cart.index', compact('agent', 'cartItems', 'total'));
     }
@@ -41,7 +41,7 @@ class CartController extends Controller
             ->where('is_active', true)
             ->first();
 
-        if (!$pricing) {
+        if (! $pricing) {
             return redirect()->back()->with('error', 'Package not found or unavailable.');
         }
 
@@ -69,7 +69,7 @@ class CartController extends Controller
         }
 
         return redirect()->route('user.buy-data')
-            ->with('success', $request->package_size . ' ' . $request->network_type . ' added to cart.');
+            ->with('success', $request->package_size.' '.$request->network_type.' added to cart.');
     }
 
     public function update(Request $request, CartItem $cartItem)
@@ -128,11 +128,11 @@ class CartController extends Controller
                 ->with('error', 'Your cart is empty.');
         }
 
-        $total = $cartItems->sum(fn($item) => floatval($item->amount) * $item->quantity);
+        $total = $cartItems->sum(fn ($item) => floatval($item->amount) * $item->quantity);
 
         if (floatval($agent->balance) < $total) {
             return redirect()->route('user.cart.index')
-                ->with('error', 'Insufficient balance. Required: GH₵' . number_format($total, 2) . '. Your balance: GH₵' . number_format($agent->balance, 2));
+                ->with('error', 'Insufficient balance. Required: GH₵'.number_format($total, 2).'. Your balance: GH₵'.number_format($agent->balance, 2));
         }
 
         DB::beginTransaction();
@@ -143,7 +143,7 @@ class CartController extends Controller
 
             foreach ($cartItems as $item) {
                 for ($i = 0; $i < $item->quantity; $i++) {
-                    $reference = 'CART-' . strtoupper(Str::random(8)) . '-' . time();
+                    $reference = 'CART-'.strtoupper(Str::random(8)).'-'.time();
 
                     $result = $orderService->createOrder([
                         'agent_id' => $userId,
@@ -158,10 +158,11 @@ class CartController extends Controller
                         'base_amount' => $item->cost,
                     ]);
 
-                    if (!$result['success']) {
+                    if (! $result['success']) {
                         DB::rollBack();
+
                         return redirect()->route('user.cart.index')
-                            ->with('error', 'Failed to create order for ' . $item->package_size . ' ' . $item->network_type . '. Please try again.');
+                            ->with('error', 'Failed to create order for '.$item->package_size.' '.$item->network_type.'. Please try again.');
                     }
 
                     $createdOrderIds[] = $result['order']['id'];
@@ -173,13 +174,15 @@ class CartController extends Controller
             $agent->update(['balance' => $newBalance]);
 
             BalanceHistoryService::log(
-                $userId, -$total, 'cart_order', null, 'Bulk cart checkout - ' . $cartItems->count() . ' item(s)'
+                $userId, -$total, 'cart_order', null, null, 'Bulk cart checkout - '.$cartItems->count().' item(s)'
             );
 
             // Deliver data for each order
             foreach ($createdOrderIds as $orderId) {
                 $order = Order::find($orderId);
-                if (!$order) continue;
+                if (! $order) {
+                    continue;
+                }
 
                 $externalApi = new ExternalApiService($order->network_type);
                 $capacityMb = $externalApi->convertPackageSize($order->package_size);
@@ -208,11 +211,12 @@ class CartController extends Controller
             DB::commit();
 
             return redirect()->route('user.orders.today')
-                ->with('success', count($createdOrderIds) . ' order(s) placed successfully! Total: GH₵' . number_format($total, 2));
+                ->with('success', count($createdOrderIds).' order(s) placed successfully! Total: GH₵'.number_format($total, 2));
 
         } catch (\Exception $e) {
             DB::rollBack();
             report($e);
+
             return redirect()->route('user.cart.index')
                 ->with('error', 'An error occurred while processing your orders. Please try again.');
         }

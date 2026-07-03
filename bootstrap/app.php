@@ -1,5 +1,17 @@
 <?php
 
+use App\Console\Commands\CheckMissingCommissions;
+use App\Console\Commands\CleanOldLoginLogs;
+use App\Console\Commands\CleanOldPasswordResetTokens;
+use App\Console\Commands\PollOrderStatus;
+use App\Console\Commands\ProcessLowBalanceAlerts;
+use App\Console\Commands\ProcessReferralCommissions;
+use App\Http\Middleware\AdminApiKey;
+use App\Http\Middleware\EnsureAdminAuthenticated;
+use App\Http\Middleware\EnsureUserAuthenticated;
+use App\Http\Middleware\EnsureUserRole;
+use App\Http\Middleware\SetLocale;
+use App\Http\Middleware\ValidateApiKey;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,21 +26,21 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'admin.auth' => \App\Http\Middleware\EnsureAdminAuthenticated::class,
-            'user.auth' => \App\Http\Middleware\EnsureUserAuthenticated::class,
-            'role' => \App\Http\Middleware\EnsureUserRole::class,
-            'set.locale' => \App\Http\Middleware\SetLocale::class,
-            'api.auth' => \App\Http\Middleware\ValidateApiKey::class,
-            'admin.api' => \App\Http\Middleware\AdminApiKey::class,
+            'admin.auth' => EnsureAdminAuthenticated::class,
+            'user.auth' => EnsureUserAuthenticated::class,
+            'role' => EnsureUserRole::class,
+            'set.locale' => SetLocale::class,
+            'api.auth' => ValidateApiKey::class,
+            'admin.api' => AdminApiKey::class,
         ]);
     })
     ->withSchedule(function ($schedule): void {
-        $schedule->call(new \App\Console\Commands\ProcessReferralCommissions)->dailyAt('01:00');
-        $schedule->call(new \App\Console\Commands\CheckMissingCommissions)->everyFiveMinutes();
-        $schedule->call(new \App\Console\Commands\ProcessLowBalanceAlerts)->dailyAt('08:00');
-        $schedule->call(new \App\Console\Commands\CleanOldLoginLogs)->daily();
-        $schedule->call(new \App\Console\Commands\CleanOldPasswordResetTokens)->hourly();
-        $schedule->call(new \App\Console\Commands\PollOrderStatus)->everyMinute();
+        $schedule->call(new ProcessReferralCommissions)->dailyAt('01:00');
+        $schedule->call(new CheckMissingCommissions)->everyFiveMinutes();
+        $schedule->call(new ProcessLowBalanceAlerts)->dailyAt('08:00');
+        $schedule->call(new CleanOldLoginLogs)->daily();
+        $schedule->call(new CleanOldPasswordResetTokens)->hourly();
+        $schedule->call(new PollOrderStatus)->everyMinute();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

@@ -1,8 +1,8 @@
 <?php
 
+use Carbon\Carbon;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 return new class extends Migration
 {

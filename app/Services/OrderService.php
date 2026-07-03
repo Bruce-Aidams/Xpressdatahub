@@ -38,6 +38,7 @@ class OrderService
     {
         $order = Order::with('agent:id,username,email,phone')
             ->find($id);
+
         return $order ? $order->toArray() : null;
     }
 
@@ -45,19 +46,19 @@ class OrderService
     {
         $query = Order::where('agent_id', $agentId);
 
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
 
-        if (!empty($filters['network_type'])) {
+        if (! empty($filters['network_type'])) {
             $query->where('network_type', $filters['network_type']);
         }
 
-        if (!empty($filters['date_from'])) {
+        if (! empty($filters['date_from'])) {
             $query->where('created_at', '>=', $filters['date_from']);
         }
 
-        if (!empty($filters['date_to'])) {
+        if (! empty($filters['date_to'])) {
             $query->where('created_at', '<=', $filters['date_to']);
         }
 
@@ -74,7 +75,7 @@ class OrderService
     public function updateOrderStatus(int $orderId, string $status, ?string $notes = null, ?string $changedBy = 'system'): array
     {
         $order = Order::find($orderId);
-        if (!$order) {
+        if (! $order) {
             return ['success' => false, 'message' => 'Order not found'];
         }
 
@@ -127,12 +128,12 @@ class OrderService
         $externalTransactionId = $data['external_transaction_id'] ?? null;
         $status = $data['status'] ?? null;
 
-        if (!$orderId) {
+        if (! $orderId) {
             return ['success' => false, 'message' => 'Order ID is required'];
         }
 
         $order = Order::find($orderId);
-        if (!$order) {
+        if (! $order) {
             return ['success' => false, 'message' => 'Order not found'];
         }
 
@@ -142,7 +143,7 @@ class OrderService
     private function handleStatusSideEffects(Order $order, string $oldStatus, string $newStatus): void
     {
         try {
-            if (in_array($newStatus, ['delivered', 'completed']) && !in_array($oldStatus, ['delivered', 'completed'])) {
+            if (in_array($newStatus, ['delivered', 'completed']) && ! in_array($oldStatus, ['delivered', 'completed'])) {
                 $this->onOrderDelivered($order);
             }
 

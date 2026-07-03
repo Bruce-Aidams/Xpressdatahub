@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\CustomPricing;
-use Illuminate\Support\Facades\DB;
 
 class CustomPricingService
 {
@@ -17,7 +16,7 @@ class CustomPricingService
         $createdBy = $data['created_by'] ?? null;
 
         $validRoles = ['agent', 'super_agent', 'dealers', 'all'];
-        if (!in_array($userRole, $validRoles)) {
+        if (! in_array($userRole, $validRoles)) {
             return [
                 'success' => false,
                 'message' => 'Invalid user role. Only "agent", "super_agent", "dealers", or "all" are allowed.',
@@ -58,6 +57,7 @@ class CustomPricingService
     public function getCustomPricing(int $id): ?array
     {
         $pricing = CustomPricing::find($id);
+
         return $pricing ? $pricing->toArray() : null;
     }
 
@@ -65,11 +65,11 @@ class CustomPricingService
     {
         $query = CustomPricing::query();
 
-        if (!empty($filters['network_type'])) {
+        if (! empty($filters['network_type'])) {
             $query->where('network_type', $filters['network_type']);
         }
 
-        if (!empty($filters['user_role'])) {
+        if (! empty($filters['user_role'])) {
             $query->where('user_role', $filters['user_role']);
         }
 
@@ -144,15 +144,18 @@ class CustomPricingService
 
         if (stripos($packageSize, 'MB') !== false) {
             $num = floatval(preg_replace('/[^0-9.]/', '', $packageSize));
+
             return round($num / 1024, 4);
         }
 
         if (stripos($packageSize, 'GB') !== false) {
             $num = floatval(preg_replace('/[^0-9.]/', '', $packageSize));
+
             return round($num, 4);
         }
 
         $num = floatval(preg_replace('/[^0-9.]/', '', $packageSize));
+
         return round($num, 4);
     }
 
@@ -175,7 +178,7 @@ class CustomPricingService
                 $successCount++;
             } else {
                 $errorCount++;
-                $errors[] = 'Row ' . ($index + 1) . ': ' . ($result['message'] ?? 'Unknown error');
+                $errors[] = 'Row '.($index + 1).': '.($result['message'] ?? 'Unknown error');
             }
         }
 

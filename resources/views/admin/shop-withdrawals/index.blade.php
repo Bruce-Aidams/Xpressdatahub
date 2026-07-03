@@ -1,4 +1,4 @@
-�@extends('layouts.admin')
+@extends('layouts.admin')
 @section('page-title', 'Shop Withdrawals')
 @section('page-description', 'Process shop withdrawal requests')
 @section('content')

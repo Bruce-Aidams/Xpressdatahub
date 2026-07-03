@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ApiConfig;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class AdminApiConfigController extends Controller
 {
@@ -21,7 +22,7 @@ class AdminApiConfigController extends Controller
             'network_type' => 'required|string|max:50',
             'api_name' => 'required|string|max:255',
             'api_endpoint' => 'required|url|max:500',
-            'status_endpoint' => 'nullable|url|max:500',
+            'status_endpoint' => 'nullable|string|max:500',
             'api_key' => 'required|string|max:500',
             'api_secret' => 'nullable|string|max:500',
             'request_method' => 'nullable|string|in:GET,POST,PUT,PATCH',
@@ -45,12 +46,12 @@ class AdminApiConfigController extends Controller
                 'network_type' => $request->input('network_type'),
                 'api_name' => $request->input('api_name'),
                 'endpoint_url' => $request->input('api_endpoint'),
-                'status_endpoint' => $request->input('status_endpoint'),
+                'status_endpoint' => $request->input('status_endpoint') ?: null,
                 'api_key' => $request->input('api_key'),
-                'api_secret' => $request->input('api_secret'),
+                'api_secret' => $request->input('api_secret') ?: null,
                 'request_method' => $request->input('request_method', 'POST'),
-                'request_headers' => $request->input('request_headers'),
-                'request_body_template' => $request->input('request_body_template'),
+                'request_headers' => $request->input('request_headers') ?: null,
+                'request_body_template' => $request->input('request_body_template') ?: null,
                 'response_success_field' => $request->input('response_success_field', 'success'),
                 'response_data_field' => $request->input('response_data_field', 'data'),
                 'response_error_field' => $request->input('response_error_field', 'error'),
@@ -67,10 +68,17 @@ class AdminApiConfigController extends Controller
 
             return redirect()->back()->with('success', 'API configuration saved successfully.');
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return redirect()->back()->with('error', $e->getMessage());
+        } catch (ValidationException $e) {
+            $errors = $e->errors();
+            if (! empty($errors)) {
+                $first = collect($errors)->map(fn ($msgs) => $msgs[0])->implode(', ');
+            } else {
+                $first = $e->getMessage();
+            }
+
+            return redirect()->back()->with('error', 'Validation failed: '.$first)->withInput();
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to save API configuration.');
+            return redirect()->back()->with('error', 'Failed to save API configuration. '.$e->getMessage())->withInput();
         }
     }
 
@@ -78,14 +86,15 @@ class AdminApiConfigController extends Controller
     {
         try {
             $apiConfig->update([
-                'is_active' => !$apiConfig->is_active,
+                'is_active' => ! $apiConfig->is_active,
             ]);
 
             $status = $apiConfig->is_active ? 'activated' : 'deactivated';
-            return redirect()->back()->with('success', "{$apiConfig->network_type} API {$status} successfully.");
+
+            return redirect()->route('admin.api-config')->with('success', "{$apiConfig->network_type} API {$status} successfully.");
 
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to update API status.');
+            return redirect()->route('admin.api-config')->with('error', 'Failed to update API status.');
         }
     }
 
@@ -93,9 +102,10 @@ class AdminApiConfigController extends Controller
     {
         try {
             $apiConfig->delete();
-            return redirect()->back()->with('success', 'API configuration deleted.');
+
+            return redirect()->route('admin.api-config')->with('success', 'API configuration deleted.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to delete configuration.');
+            return redirect()->route('admin.api-config')->with('error', 'Failed to delete configuration.');
         }
     }
 
@@ -110,7 +120,7 @@ class AdminApiConfigController extends Controller
             $headers[$key] = str_replace('{api_key}', $apiConfig->api_key ?? '', $value ?? '');
         }
 
-        if (!isset($headers['Content-Type'])) {
+        if (! isset($headers['Content-Type'])) {
             $headers['Content-Type'] = 'application/json';
         }
 
@@ -120,8 +130,8 @@ class AdminApiConfigController extends Controller
             'package' => '1024MB',
             'amount' => 1,
             'payment_method' => 'wallet',
-            'order_id' => 'TEST-' . time(),
-            'reference' => 'TEST-' . time(),
+            'order_id' => 'TEST-'.time(),
+            'reference' => 'TEST-'.time(),
         ];
 
         $startTime = microtime(true);
@@ -134,7 +144,7 @@ class AdminApiConfigController extends Controller
                 CURLOPT_TIMEOUT => $timeout,
                 CURLOPT_CONNECTTIMEOUT => min(10, max(3, intval($timeout / 3))),
                 CURLOPT_CUSTOMREQUEST => $method,
-                CURLOPT_HTTPHEADER => array_map(fn($k, $v) => "{$k}: {$v}", array_keys($headers), array_values($headers)),
+                CURLOPT_HTTPHEADER => array_map(fn ($k, $v) => "{$k}: {$v}", array_keys($headers), array_values($headers)),
                 CURLOPT_POSTFIELDS => $method !== 'GET' ? json_encode($testData) : null,
                 CURLOPT_SSL_VERIFYPEER => false,
                 CURLOPT_SSL_VERIFYHOST => false,
@@ -166,9 +176,9 @@ class AdminApiConfigController extends Controller
                     'details' => [
                         'endpoint' => $endpoint,
                         'method' => $method,
-                        'timeout' => $timeout . 's',
+                        'timeout' => $timeout.'s',
                         'http_code' => 0,
-                        'response_time' => $totalTime . 'ms',
+                        'response_time' => $totalTime.'ms',
                         'curl_info' => $curlInfo,
                     ],
                 ]);
@@ -189,9 +199,9 @@ class AdminApiConfigController extends Controller
                 'details' => [
                     'endpoint' => $endpoint,
                     'method' => $method,
-                    'timeout' => $timeout . 's',
+                    'timeout' => $timeout.'s',
                     'http_code' => $httpCode,
-                    'response_time' => $totalTime . 'ms',
+                    'response_time' => $totalTime.'ms',
                     'curl_info' => $curlInfo,
                     'response' => $responseData ? json_encode($responseData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) : $response,
                 ],
@@ -201,11 +211,11 @@ class AdminApiConfigController extends Controller
             return response()->json([
                 'success' => false,
                 'status' => 'error',
-                'message' => 'Exception: ' . $e->getMessage(),
+                'message' => 'Exception: '.$e->getMessage(),
                 'details' => [
                     'endpoint' => $endpoint,
                     'method' => $method,
-                    'timeout' => $timeout . 's',
+                    'timeout' => $timeout.'s',
                 ],
             ]);
         }
@@ -214,13 +224,11 @@ class AdminApiConfigController extends Controller
     private function validateJson(Request $request, string $field): void
     {
         $value = $request->input($field);
-        if ($value && $value !== '') {
+        if ($value && is_string($value) && $value !== '') {
             json_decode($value, true);
             if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new \Illuminate\Validation\ValidationException(
-                    \Illuminate\Support\Facades\Validator::make([], []),
-                    new \Exception(ucfirst(str_replace('_', ' ', $field)) . ' must be valid JSON.')
-                );
+                $label = ucfirst(str_replace('_', ' ', $field));
+                throw new \Exception("{$label} must be valid JSON. Error: ".json_last_error_msg());
             }
         }
     }

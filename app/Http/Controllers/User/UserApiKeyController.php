@@ -29,7 +29,7 @@ class UserApiKeyController extends Controller
             $apiKey = ApiKey::create([
                 'user_id' => session('user_id'),
                 'name' => $request->input('name'),
-                'api_key' => 'mk_' . Str::random(32),
+                'api_key' => 'mk_'.Str::random(32),
                 'api_secret' => Str::random(64),
                 'is_active' => true,
                 'rate_limit' => 100,

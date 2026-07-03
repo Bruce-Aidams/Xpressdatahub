@@ -11,7 +11,7 @@ class WalletApiController extends Controller
     {
         $agent = $request->attributes->get('api_key')->agent ?? null;
 
-        if (!$agent) {
+        if (! $agent) {
             return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
         }
 

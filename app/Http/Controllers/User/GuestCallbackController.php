@@ -16,7 +16,7 @@ class GuestCallbackController extends Controller
     {
         $reference = $request->query('reference') ?? $request->query('trxref');
 
-        if (!$reference) {
+        if (! $reference) {
             return redirect()->route('login')
                 ->with('error', 'Invalid payment callback.');
         }
@@ -28,7 +28,7 @@ class GuestCallbackController extends Controller
             ->orWhere('transaction_id', $reference)
             ->first();
 
-        if (!$order) {
+        if (! $order) {
             return redirect()->route('login')
                 ->with('error', 'Order not found for this payment.');
         }

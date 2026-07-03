@@ -151,6 +151,13 @@
                 <div class="pt-4">
                     <p class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-slate-300">Account</p>
                     <div class="mt-1 space-y-0.5">
+                        <a href="{{ route('user.notifications.index') }}"
+                           class="nav-item flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200 {{ request()->routeIs('user.notifications.*') ? 'bg-gradient-to-r from-[#EA580C]/10 to-[#EA580C]/5 text-[#EA580C] shadow-sm shadow-[#EA580C]/10' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700' }}">
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 {{ request()->routeIs('user.notifications.*') ? 'bg-[#EA580C]/15' : 'bg-slate-100/80' }}">
+                                <x-heroicon-o-bell class="w-4 h-4 {{ request()->routeIs('user.notifications.*') ? 'text-[#EA580C]' : 'text-slate-400' }}" />
+                            </div>
+                            <span>Notifications</span>
+                        </a>
                         <a href="{{ route('user.profile.index') }}"
                            class="nav-item flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200 {{ request()->routeIs('user.profile.*') ? 'bg-gradient-to-r from-[#EA580C]/10 to-[#EA580C]/5 text-[#EA580C] shadow-sm shadow-[#EA580C]/10' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700' }}">
                             <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 {{ request()->routeIs('user.profile.*') ? 'bg-[#EA580C]/15' : 'bg-slate-100/80' }}">

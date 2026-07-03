@@ -13,7 +13,7 @@ class ReferralService
     public function generateReferralCode(int $userId): string
     {
         $agent = Agent::select('referral_code')->find($userId);
-        if ($agent && !empty($agent->referral_code)) {
+        if ($agent && ! empty($agent->referral_code)) {
             return $agent->referral_code;
         }
 
@@ -22,13 +22,13 @@ class ReferralService
         $exists = true;
 
         do {
-            $code = 'REF' . strtoupper(Str::random(8));
+            $code = 'REF'.strtoupper(Str::random(8));
             $exists = Agent::where('referral_code', $code)->exists();
             $attempt++;
         } while ($exists && $attempt < $maxAttempts);
 
         if ($exists) {
-            $code = 'REF' . str_pad($userId, 8, '0', STR_PAD_LEFT);
+            $code = 'REF'.str_pad($userId, 8, '0', STR_PAD_LEFT);
         }
 
         Agent::where('id', $userId)->update(['referral_code' => $code]);
@@ -40,7 +40,7 @@ class ReferralService
     {
         $agent = Agent::select('referral_code')->find($userId);
 
-        if ($agent && !empty($agent->referral_code)) {
+        if ($agent && ! empty($agent->referral_code)) {
             return $agent->referral_code;
         }
 
@@ -54,7 +54,7 @@ class ReferralService
         }
 
         $referrer = Agent::where('referral_code', trim($referralCode))->first();
-        if (!$referrer) {
+        if (! $referrer) {
             return false;
         }
 
@@ -63,17 +63,17 @@ class ReferralService
         }
 
         $newUser = Agent::find($newUserId);
-        if (!$newUser) {
+        if (! $newUser) {
             return false;
         }
 
-        if (!empty($newUser->device_id) && !empty($referrer->device_id)) {
+        if (! empty($newUser->device_id) && ! empty($referrer->device_id)) {
             if ($newUser->device_id === $referrer->device_id) {
                 return false;
             }
         }
 
-        if (!empty($newUser->registration_ip)) {
+        if (! empty($newUser->registration_ip)) {
             if ($newUser->registration_ip === $referrer->registration_ip
                 || $newUser->registration_ip === $referrer->last_login_ip) {
                 return false;
@@ -106,11 +106,11 @@ class ReferralService
             return ['success' => false, 'commission_id' => null, 'message' => 'Invalid inputs'];
         }
 
-        if (!$this->isCommissionEnabled()) {
+        if (! $this->isCommissionEnabled()) {
             return ['success' => false, 'commission_id' => null, 'message' => 'Commission system is disabled'];
         }
 
-        return DB::transaction(function () use ($orderId, $referredUserId, $orderAmount, $orderDate, $triggeredBy) {
+        return DB::transaction(function () use ($orderId, $referredUserId, $orderAmount, $orderDate) {
             $existing = ReferralCommission::where('order_id', $orderId)
                 ->whereIn('status', ['pending', 'paid'])
                 ->lockForUpdate()
@@ -128,7 +128,7 @@ class ReferralService
                 ->lockForUpdate()
                 ->first();
 
-            if (!$user || !$user->referred_by) {
+            if (! $user || ! $user->referred_by) {
                 return ['success' => false, 'commission_id' => null, 'message' => 'No referrer found'];
             }
 
@@ -166,7 +166,7 @@ class ReferralService
     {
         $date = $date ?? date('Y-m-d');
 
-        if (!$this->isCommissionEnabled()) {
+        if (! $this->isCommissionEnabled()) {
             return ['success' => false, 'message' => 'Commission system is disabled'];
         }
 
@@ -187,7 +187,9 @@ class ReferralService
                         $commission->referrer_id,
                         $commission->commission_amount,
                         'commission',
-                        $commission->order_id
+                        $commission->order_id,
+                        null,
+                        'Referral commission earned'
                     );
 
                     $commission->update(['status' => 'paid', 'credited_at' => now()]);
@@ -280,12 +282,14 @@ class ReferralService
     public function getCommissionPercentage(): float
     {
         $config = ReferralConfig::where('config_key', 'commission_percentage')->first();
+
         return $config ? floatval($config->config_value) : 5.0;
     }
 
     public function isCommissionEnabled(): bool
     {
         $config = ReferralConfig::where('config_key', 'commission_enabled')->first();
+
         return $config && $config->config_value === '1';
     }
 
@@ -297,8 +301,8 @@ class ReferralService
                 [
                     'total_orders' => DB::raw('total_orders + 1'),
                     'delivered_orders' => DB::raw('delivered_orders + 1'),
-                    'total_sales' => DB::raw('total_sales + ' . $orderAmount),
-                    'total_commission' => DB::raw('total_commission + ' . $commissionAmount),
+                    'total_sales' => DB::raw('total_sales + '.$orderAmount),
+                    'total_commission' => DB::raw('total_commission + '.$commissionAmount),
                     'updated_at' => now(),
                 ]
             );

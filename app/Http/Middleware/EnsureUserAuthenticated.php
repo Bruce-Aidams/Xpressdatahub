@@ -29,23 +29,25 @@ class EnsureUserAuthenticated
             return $next($request);
         }
 
-        if (!session('user_id')) {
+        if (! session('user_id')) {
             return redirect()->route('login')
                 ->with('error', 'Please log in to continue.');
         }
 
         $user = Agent::find(session('user_id'));
 
-        if (!$user) {
+        if (! $user) {
             session()->forget(['user_id', 'username', 'role', 'user_login_time']);
+
             return redirect()->route('login')
                 ->with('error', 'User account not found.');
         }
 
         if (isset($user->status) && $user->status !== 'active') {
             session()->forget(['user_id', 'username', 'role', 'user_login_time']);
+
             return redirect()->route('login')
-                ->with('error', 'Your account has been ' . $user->status . '.');
+                ->with('error', 'Your account has been '.$user->status.'.');
         }
 
         view()->share('currentUser', $user);

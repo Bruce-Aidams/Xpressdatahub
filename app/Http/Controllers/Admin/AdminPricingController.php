@@ -43,7 +43,7 @@ class AdminPricingController extends Controller
 
             if ($result['success']) {
                 return redirect()->back()
-                    ->with('success', 'Pricing ' . ($result['action'] ?? 'saved') . ' successfully.');
+                    ->with('success', 'Pricing '.($result['action'] ?? 'saved').' successfully.');
             }
 
             return redirect()->back()
@@ -84,7 +84,7 @@ class AdminPricingController extends Controller
     {
         try {
             $customPricing->update([
-                'is_active' => !$customPricing->is_active,
+                'is_active' => ! $customPricing->is_active,
                 'updated_at' => now(),
             ]);
 
@@ -108,5 +108,50 @@ class AdminPricingController extends Controller
             return redirect()->back()
                 ->with('error', 'Failed to delete pricing.');
         }
+    }
+
+    public function bulkToggle(Request $request)
+    {
+        $request->validate([
+            'pricing_ids' => 'required|array|min:1',
+            'pricing_ids.*' => 'integer|exists:custom_pricing,id',
+        ]);
+
+        $pricingIds = $request->input('pricing_ids');
+        $activated = 0;
+        $deactivated = 0;
+
+        foreach ($pricingIds as $id) {
+            $pricing = CustomPricing::find($id);
+            if ($pricing) {
+                $pricing->update([
+                    'is_active' => ! $pricing->is_active,
+                    'updated_at' => now(),
+                ]);
+                if ($pricing->is_active) {
+                    $activated++;
+                } else {
+                    $deactivated++;
+                }
+            }
+        }
+
+        $message = "{$activated} rule(s) activated, {$deactivated} rule(s) deactivated.";
+
+        return redirect()->back()->with('success', $message);
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'pricing_ids' => 'required|array|min:1',
+            'pricing_ids.*' => 'integer|exists:custom_pricing,id',
+        ]);
+
+        $pricingIds = $request->input('pricing_ids');
+        $deleted = CustomPricing::whereIn('id', $pricingIds)->delete();
+
+        return redirect()->back()
+            ->with('success', "{$deleted} pricing rule(s) deleted successfully.");
     }
 }

@@ -734,3 +734,59 @@ All admin panel pages have been migrated from the dark `slate-800` glassmorphism
 ---
 
 *Last updated: June 23, 2026*
+
+---
+
+## Bug Fix & Feature Session — July 2, 2026 (Session 4)
+
+### Critical Bug Fixes
+
+| Issue | Fix | Files |
+|---|---|---|
+| `BadMethodCallException` — `Request::fragment()` does not exist | Removed `request()->fragment('docs')` from sidebar link; JS hash detection handles highlighting client-side | `admin/partials/sidebar.blade.php` |
+| Sidebar "API Documentation" link not working | Changed from `url(config(...))` to `route('admin.api-config')#docs`; JS auto-open runs immediately + listens for `hashchange` | `admin/partials/sidebar.blade.php`, `admin/config/api-config.blade.php` |
+| `ErrorException` — Undefined variable `$status` in `status-badge.blade.php` | Changed `<x-status-badge :active="$key->is_active">` to `<x-status-badge :status="$key->is_active ? 'active' : 'inactive'">` | `user/api-keys/index.blade.php` |
+| `RouteNotFoundException` — `user.api-keys.revoke` not defined | Changed route to `user.api-keys.destroy` (which exists in web.php) | `user/api-keys/index.blade.php` |
+| `BadMethodCallException` — `Request::fragment()` in sidebar | Removed all `request()->fragment()` calls; sidebar link uses static classes | `admin/partials/sidebar.blade.php` |
+
+### Status Badge Component Update
+
+- Added `active` and `inactive` color mappings to `components/status-badge.blade.php`
+- `active` → emerald green (same as `delivered`)
+- `inactive` → slate gray (same as `cancelled`)
+
+### API Documentation — Full Page Added
+
+**File:** `admin/config/api-config.blade.php`
+
+- Documentation section moved **below** the network cards (was above them)
+- Collapsible section with `#docs` hash anchor for deep linking
+- JS auto-open: runs immediately on page load when `#docs` hash is present, plus listens for `hashchange` events
+- Sidebar link added under API section → "API Documentation" (links to `route('admin.api-config')#docs`)
+
+#### Documentation Sections
+
+1. **Overview** — what the page does, one-active-API-per-network rule
+2. **11-Step Setup Guide** — complete walkthrough from clicking "Add Network API" through activation & testing
+3. **Template Placeholders Reference** — table of all 12 placeholders with descriptions and example values
+4. **Complete MTN Example** — full config showing form fields, headers, body template, response mapping, and what gets sent at runtime
+5. **Common Error Codes & Solutions** — with severity-colored badges:
+   - **Critical** (red): cURL errors 6, 7, 8, 28 (host resolution, connection refused, SSL, timeout)
+   - **Error** (orange): HTTP 401, 403, 404, 422, 429, 500, 502/503
+   - **Warning** (yellow): Response field mismatches, JSON validation failures
+   - **Info** (blue): Test vs real orders, processing status
+6. **General Troubleshooting** — common issues and fixes
+
+### Files Modified
+
+| File | Changes |
+|---|---|
+| `admin/partials/sidebar.blade.php` | Added "API Documentation" link under API section; removed `request()->fragment()` calls |
+| `admin/config/api-config.blade.php` | Moved docs below cards; added error codes section; added `openDocs()` function with `hashchange` listener |
+| `components/status-badge.blade.php` | Added `active`/`inactive` color mappings |
+| `user/api-keys/index.blade.php` | Fixed `:active` → `:status` prop; fixed `user.api-keys.revoke` → `user.api-keys.destroy` route |
+| `app/Http/Controllers/Admin/AdminApiConfigController.php` | Fixed `validateJson` to throw `\Exception` instead of broken `ValidationException`; improved catch block error display |
+
+---
+
+*Last updated: July 2, 2026*

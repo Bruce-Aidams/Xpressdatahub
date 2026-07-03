@@ -15,7 +15,7 @@ class ShopController extends Controller
     {
         $shopData = $this->shopService->getShopBySlug($slug);
 
-        if (!$shopData) {
+        if (! $shopData) {
             abort(404, 'Shop not found.');
         }
 
@@ -23,7 +23,7 @@ class ShopController extends Controller
             ->where('shop_slug', $slug)
             ->first();
 
-        if (!$shop || !$shop->is_active) {
+        if (! $shop || ! $shop->is_active) {
             abort(404, 'Shop is not available.');
         }
 

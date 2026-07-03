@@ -27,7 +27,7 @@ return new class extends Migration
         foreach ($configs as $config) {
             $cd = is_string($config->config_data) ? json_decode($config->config_data, true) : ($config->config_data ?? []);
             DB::table('api_config')->where('id', $config->id)->update([
-                'api_name' => $config->network_type . ' API',
+                'api_name' => $config->network_type.' API',
                 'request_method' => $cd['request_method'] ?? 'POST',
                 'request_headers' => is_array($cd['request_headers'] ?? null) ? json_encode($cd['request_headers']) : ($cd['request_headers'] ?? null),
                 'request_body_template' => $cd['request_body_template'] ?? null,

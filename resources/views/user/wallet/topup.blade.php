@@ -1,4 +1,4 @@
-�@extends('layouts.user')
+@extends('layouts.user')
 @section('title', 'Top Up Wallet')
 @section('page-title', 'Top Up Wallet')
 @section('page-description', 'Fund your wallet via Paystack')
@@ -32,7 +32,7 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 mb-1.5">Enter Amount</label>
                         <div class="relative">
-                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-lg">?</span>
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-lg">&#8373;</span>
                             <input
                                 type="number"
                                 name="amount"
@@ -92,6 +92,13 @@
 
 @push('scripts')
 <script>
+    var successAlert = document.querySelector('[data-success-alert]');
+    if (successAlert) {
+        setTimeout(function() {
+            window.location.href = '{{ route("user.wallet.topup") }}';
+        }, 3000);
+    }
+
     var amountInput = document.getElementById('amountInput');
     var amountDisplay = document.getElementById('amountDisplay');
     var feeDisplay = document.getElementById('feeDisplay');

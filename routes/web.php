@@ -1,55 +1,61 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\GuestShopController;
-use App\Http\Controllers\Auth\AdminLoginController;
-use App\Http\Controllers\Auth\UserLoginController;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\Auth\ResetPasswordController;
-use App\Http\Controllers\Admin\AdminDashboardController;
-use App\Http\Controllers\Admin\AdminOrderController;
-use App\Http\Controllers\Admin\AdminAllOrderController;
+use App\Http\Controllers\Admin\AdminAccountManagementController;
 use App\Http\Controllers\Admin\AdminAgentController;
-use App\Http\Controllers\Admin\AdminPricingController;
-use App\Http\Controllers\Admin\AdminPaymentConfigController;
-use App\Http\Controllers\Admin\AdminPaystackChargeController;
-use App\Http\Controllers\Admin\AdminMinimumTopupController;
-use App\Http\Controllers\Admin\AdminReferralConfigController;
+use App\Http\Controllers\Admin\AdminAllOrderController;
+use App\Http\Controllers\Admin\AdminAnalyticsController;
 use App\Http\Controllers\Admin\AdminApiConfigController;
 use App\Http\Controllers\Admin\AdminApiKeyController;
-use App\Http\Controllers\Admin\AdminNotificationController;
-use App\Http\Controllers\Admin\AdminBannerController;
-use App\Http\Controllers\Admin\AdminAccountManagementController;
 use App\Http\Controllers\Admin\AdminBalanceHistoryController;
+use App\Http\Controllers\Admin\AdminBannerController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminDataIntegrationController;
+use App\Http\Controllers\Admin\AdminLowBalanceAlertController;
+use App\Http\Controllers\Admin\AdminMinimumTopupController;
+use App\Http\Controllers\Admin\AdminNotificationController;
+use App\Http\Controllers\Admin\AdminOrderController;
+use App\Http\Controllers\Admin\AdminPasswordController;
+use App\Http\Controllers\Admin\AdminPaymentConfigController;
+use App\Http\Controllers\Admin\AdminPaystackChargeController;
+use App\Http\Controllers\Admin\AdminPricingController;
+use App\Http\Controllers\Admin\AdminProfileController;
+use App\Http\Controllers\Admin\AdminReferralConfigController;
 use App\Http\Controllers\Admin\AdminShopController;
 use App\Http\Controllers\Admin\AdminShopOrderController;
 use App\Http\Controllers\Admin\AdminShopWithdrawalController;
-use App\Http\Controllers\Admin\AdminProfileController;
-use App\Http\Controllers\Admin\AdminPasswordController;
-use App\Http\Controllers\Admin\AdminAnalyticsController;
 use App\Http\Controllers\Admin\AdminUserActivityController;
-use App\Http\Controllers\Admin\AdminDataIntegrationController;
-use App\Http\Controllers\Admin\AdminLowBalanceAlertController;
-use App\Http\Controllers\User\UserDashboardController;
-use App\Http\Controllers\User\UserProfileController;
-use App\Http\Controllers\User\UserOrderController;
-use App\Http\Controllers\User\UserBalanceHistoryController;
+use App\Http\Controllers\Auth\AdminLoginController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Auth\UserLoginController;
+use App\Http\Controllers\GuestShopController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\User\BulkOrderController;
+use App\Http\Controllers\User\CartController;
+use App\Http\Controllers\User\GuestCallbackController;
 use App\Http\Controllers\User\UserApiKeyController;
+use App\Http\Controllers\User\UserBalanceHistoryController;
+use App\Http\Controllers\User\UserDashboardController;
+use App\Http\Controllers\User\UserDataController;
+use App\Http\Controllers\User\UserNotificationController;
+use App\Http\Controllers\User\UserOrderController;
 use App\Http\Controllers\User\UserPasswordController;
+use App\Http\Controllers\User\UserProfileController;
 use App\Http\Controllers\User\UserReferralController;
 use App\Http\Controllers\User\UserShopController;
 use App\Http\Controllers\User\UserShopProfitController;
 use App\Http\Controllers\User\UserWalletController;
-use App\Http\Controllers\User\UserDataController;
+use Illuminate\Support\Facades\Route;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Guest Paystack Callback
-Route::get('/guest/callback', [App\Http\Controllers\User\GuestCallbackController::class, 'handleCallback'])->name('guest.callback');
-Route::get('/guest/order/success', function () { return view('guest.success'); })->name('guest.order.success');
+Route::get('/guest/callback', [GuestCallbackController::class, 'handleCallback'])->name('guest.callback');
+Route::get('/guest/order/success', function () {
+    return view('guest.success');
+})->name('guest.order.success');
 
 // Guest Shop routes — specific routes MUST come before parameterized routes
 Route::get('/shop/callback', [GuestShopController::class, 'callback'])->name('shop.order.callback');
@@ -60,11 +66,11 @@ Route::post('/shop/{slug}/order', [GuestShopController::class, 'order'])->name('
 
 // Auth routes - Guest
 Route::middleware('guest')->group(function () {
-    $adminPath = env('ADMIN_PATH', 'admin');
-    
+    $adminPath = config('app.admin_path');
+
     // Admin Login
-    Route::get('/' . $adminPath . '/login', [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
-    Route::post('/' . $adminPath . '/login', [AdminLoginController::class, 'login'])->name('admin.login.submit');
+    Route::get('/'.$adminPath.'/login', [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
+    Route::post('/'.$adminPath.'/login', [AdminLoginController::class, 'login'])->name('admin.login.submit');
 
     // User Login
     Route::get('/login', [UserLoginController::class, 'showLoginForm'])->name('login');
@@ -85,14 +91,14 @@ Route::middleware('guest')->group(function () {
 });
 
 // Admin Logout
-$adminPath = env('ADMIN_PATH', 'admin');
-Route::post('/' . $adminPath . '/logout', [AdminLoginController::class, 'logout'])->name('admin.logout')->middleware('admin.auth');
+$adminPath = config('app.admin_path');
+Route::post('/'.$adminPath.'/logout', [AdminLoginController::class, 'logout'])->name('admin.logout')->middleware('admin.auth');
 
 // User Logout
 Route::post('/logout', [UserLoginController::class, 'logout'])->name('logout')->middleware('user.auth');
 
 // Admin Panel
-Route::prefix(env('ADMIN_PATH', 'admin'))->name('admin.')->middleware('admin.auth')->group(function () {
+Route::prefix(config('app.admin_path'))->name('admin.')->middleware('admin.auth')->group(function () {
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard.index');
 
@@ -100,11 +106,14 @@ Route::prefix(env('ADMIN_PATH', 'admin'))->name('admin.')->middleware('admin.aut
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::put('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.status');
+    Route::post('/orders/bulk/status', [AdminOrderController::class, 'bulkStatusUpdate'])->name('orders.bulk.status');
     Route::get('/all-orders', [AdminAllOrderController::class, 'index'])->name('orders.all');
 
     // Agents
     Route::resource('agents', AdminAgentController::class)->except(['edit', 'create']);
     Route::put('/agents/{agent}/status', [AdminAgentController::class, 'updateStatus'])->name('agents.toggle-status');
+    Route::put('/agents/{agent}/reset-password', [AdminAgentController::class, 'resetPassword'])->name('agents.reset-password');
+    Route::post('/agents/{agent}/send-reset-link', [AdminAgentController::class, 'sendResetLink'])->name('agents.send-reset-link');
 
     // Pricing
     Route::get('/pricing', [AdminPricingController::class, 'index'])->name('pricing.index');
@@ -112,6 +121,8 @@ Route::prefix(env('ADMIN_PATH', 'admin'))->name('admin.')->middleware('admin.aut
     Route::put('/pricing/{customPricing}', [AdminPricingController::class, 'update'])->name('pricing.update');
     Route::delete('/pricing/{customPricing}', [AdminPricingController::class, 'destroy'])->name('pricing.destroy');
     Route::patch('/pricing/{customPricing}/toggle', [AdminPricingController::class, 'toggle'])->name('pricing.toggle');
+    Route::post('/pricing/bulk/toggle', [AdminPricingController::class, 'bulkToggle'])->name('pricing.bulk.toggle');
+    Route::delete('/pricing/bulk/delete', [AdminPricingController::class, 'bulkDelete'])->name('pricing.bulk.delete');
 
     // Config - Payment
     Route::get('/payment-config', [AdminPaymentConfigController::class, 'index'])->name('payment-config');
@@ -157,9 +168,9 @@ Route::prefix(env('ADMIN_PATH', 'admin'))->name('admin.')->middleware('admin.aut
     Route::post('/notifications', [AdminNotificationController::class, 'send'])->name('notifications.send');
 
     // Banners
-    Route::get('/banners', [AdminBannerController::class, 'index'])->name('banners');
     Route::get('/banners', [AdminBannerController::class, 'index'])->name('banners.index');
     Route::post('/banners', [AdminBannerController::class, 'store'])->name('banners.store');
+    Route::post('/banners/{bannerNotification}/toggle', [AdminBannerController::class, 'toggle'])->name('banners.toggle');
     Route::put('/banners/{bannerNotification}', [AdminBannerController::class, 'update'])->name('banners.update');
     Route::delete('/banners/{bannerNotification}', [AdminBannerController::class, 'destroy'])->name('banners.destroy');
 
@@ -168,6 +179,9 @@ Route::prefix(env('ADMIN_PATH', 'admin'))->name('admin.')->middleware('admin.aut
     Route::put('/accounts/{agent}/status', [AdminAccountManagementController::class, 'updateStatus'])->name('accounts.status');
     Route::put('/accounts/{agent}/status', [AdminAccountManagementController::class, 'updateStatus'])->name('accounts.toggle');
     Route::get('/accounts', [AdminAccountManagementController::class, 'index'])->name('accounts.index');
+    Route::post('/accounts/bulk/credit', [AdminAccountManagementController::class, 'bulkCredit'])->name('accounts.bulk.credit');
+    Route::post('/accounts/bulk/debit', [AdminAccountManagementController::class, 'bulkDebit'])->name('accounts.bulk.debit');
+    Route::post('/accounts/bulk/status', [AdminAccountManagementController::class, 'bulkStatus'])->name('accounts.bulk.status');
 
     // Balance History
     Route::get('/balance-history', [AdminBalanceHistoryController::class, 'index'])->name('balance-history');
@@ -177,6 +191,9 @@ Route::prefix(env('ADMIN_PATH', 'admin'))->name('admin.')->middleware('admin.aut
     Route::get('/shops', [AdminShopController::class, 'index'])->name('shops.index');
     Route::get('/shops/{shop}', [AdminShopController::class, 'show'])->name('shops.show');
     Route::put('/shops/{shop}/status', [AdminShopController::class, 'updateStatus'])->name('shops.status');
+    Route::delete('/shops/{shop}', [AdminShopController::class, 'destroy'])->name('shops.destroy');
+    Route::post('/shops/bulk/status', [AdminShopController::class, 'bulkStatus'])->name('shops.bulk.status');
+    Route::delete('/shops/bulk/delete', [AdminShopController::class, 'bulkDelete'])->name('shops.bulk.delete');
     Route::get('/shop-orders', [AdminShopOrderController::class, 'index'])->name('shop-orders');
     Route::get('/shop-orders', [AdminShopOrderController::class, 'index'])->name('shop-orders.index');
     Route::post('/shop-orders/verify', [AdminShopOrderController::class, 'verifyOrder'])->name('shop-orders.verify');
@@ -244,21 +261,27 @@ Route::prefix('user')->name('user.')->middleware('user.auth')->group(function ()
     Route::post('/buy-data', [UserDataController::class, 'store'])->name('buy-data.store');
 
     // Cart
-    Route::get('/cart', [\App\Http\Controllers\User\CartController::class, 'index'])->name('cart.index');
-    Route::post('/cart', [\App\Http\Controllers\User\CartController::class, 'store'])->name('cart.store');
-    Route::put('/cart/{cartItem}', [\App\Http\Controllers\User\CartController::class, 'update'])->name('cart.update');
-    Route::delete('/cart/{cartItem}', [\App\Http\Controllers\User\CartController::class, 'destroy'])->name('cart.destroy');
-    Route::post('/cart/clear', [\App\Http\Controllers\User\CartController::class, 'clear'])->name('cart.clear');
-    Route::post('/cart/checkout', [\App\Http\Controllers\User\CartController::class, 'checkout'])->name('cart.checkout');
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
+    Route::put('/cart/{cartItem}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/{cartItem}', [CartController::class, 'destroy'])->name('cart.destroy');
+    Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+    Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
+
+    // Notifications
+    Route::get('/notifications', [UserNotificationController::class, 'index'])->name('notifications.index');
+    Route::match(['get', 'post'], '/notifications/{id}/read', [UserNotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+    Route::post('/notifications/read-all', [UserNotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
 
     // Bulk Orders
-    Route::post('/bulk-orders', [\App\Http\Controllers\User\BulkOrderController::class, 'store'])->name('bulk-orders.store');
+    Route::post('/bulk-orders', [BulkOrderController::class, 'store'])->name('bulk-orders.store');
 
     // Guest Logout
     Route::get('/guest/logout', function () {
         session()->forget(['guest_mode', 'guest临时_id', 'user_login_time']);
         session()->invalidate();
         session()->regenerateToken();
+
         return redirect()->route('login')->with('success', 'Guest session ended.');
     })->name('guest.logout');
 });

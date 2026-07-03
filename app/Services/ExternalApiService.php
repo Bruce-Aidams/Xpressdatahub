@@ -5,11 +5,11 @@ namespace App\Services;
 use App\Models\ApiConfig;
 use App\Models\ApiLog;
 use App\Models\PaymentConfig;
-use Illuminate\Support\Facades\DB;
 
 class ExternalApiService
 {
     private ?string $network;
+
     private ?array $apiConfig;
 
     public function __construct(?string $network = null)
@@ -20,8 +20,9 @@ class ExternalApiService
 
     private function loadApiConfig(): void
     {
-        if (!$this->network) {
+        if (! $this->network) {
             $this->apiConfig = null;
+
             return;
         }
 
@@ -39,11 +40,11 @@ class ExternalApiService
 
     public function purchaseData(string $msisdn, string $network, int $capacityMb, string $paymentMethod = 'wallet', ?string $localOrderId = null): array
     {
-        if (!$this->isGlobalApiEnabled()) {
+        if (! $this->isGlobalApiEnabled()) {
             return ['success' => false, 'error' => 'Global API integration is disabled', 'data' => null];
         }
 
-        if (!$this->apiConfig) {
+        if (! $this->apiConfig) {
             return ['success' => false, 'error' => "No active API configuration found for network: {$network}", 'data' => null];
         }
 
@@ -52,7 +53,7 @@ class ExternalApiService
             return ['success' => false, 'error' => "API endpoint is not configured for network: {$network}", 'data' => null];
         }
 
-        if (!filter_var($endpoint, FILTER_VALIDATE_URL)) {
+        if (! filter_var($endpoint, FILTER_VALIDATE_URL)) {
             return ['success' => false, 'error' => "Invalid API endpoint URL: {$endpoint}", 'data' => null];
         }
 
@@ -69,11 +70,11 @@ class ExternalApiService
 
     public function checkTransactionStatus(string $externalTransactionId): array
     {
-        if (!$this->isGlobalApiEnabled()) {
+        if (! $this->isGlobalApiEnabled()) {
             return ['success' => false, 'error' => 'Global API integration is disabled', 'data' => null];
         }
 
-        if (!$this->apiConfig) {
+        if (! $this->apiConfig) {
             return ['success' => false, 'error' => "No active API configuration found for network: {$this->network}", 'data' => null];
         }
 
@@ -89,6 +90,7 @@ class ExternalApiService
                 $value = str_replace('{api_key}', $this->apiConfig['api_key'] ?? '', $value);
                 $value = str_replace('{api_secret}', $this->apiConfig['api_secret'] ?? '', $value);
             }
+
             return $value;
         }, $requestData);
 
@@ -120,6 +122,7 @@ class ExternalApiService
 
         if (preg_match('/(\d+(?:\.\d+)?)/', $bundleLabel, $matches)) {
             $number = floatval($matches[1]);
+
             return $number < 100 ? (int) round($number * 1024) : (int) round($number);
         }
 
@@ -129,12 +132,14 @@ class ExternalApiService
     public function validatePhoneNumber(string $phone): ?string
     {
         $digits = preg_replace('/\D+/', '', $phone);
+
         return strlen($digits) >= 9 ? $digits : null;
     }
 
     private function isGlobalApiEnabled(): bool
     {
         $value = PaymentConfig::where('config_key', 'api_enabled')->value('config_value');
+
         return (bool) $value;
     }
 
@@ -144,12 +149,12 @@ class ExternalApiService
         $capacityGb = round($capacityMb / 1024, 2);
         $reference = $localOrderId;
         if (empty($reference) || strlen($reference) < 6) {
-            $reference = 'ORDER-' . time() . '-' . rand(100, 999);
+            $reference = 'ORDER-'.time().'-'.rand(100, 999);
         }
 
         $data = str_replace(
             ['{phone}', '{package}', '{amount}', '{network}', '{payment_method}', '{order_id}', '{capacity}', '{mb}', '{volume}', '{reference}', '{referrer}', '{webhook}'],
-            [$msisdn, $capacityMb . 'MB', $capacityMb, $network, $paymentMethod, $localOrderId, $capacityGb, $capacityMb, $capacityMb, $reference, $msisdn, ''],
+            [$msisdn, $capacityMb.'MB', $capacityMb, $network, $paymentMethod, $localOrderId, $capacityGb, $capacityMb, $capacityMb, $reference, $msisdn, ''],
             $template
         );
 
@@ -230,13 +235,13 @@ class ExternalApiService
         $errorMessage = null;
         $errorType = 'unknown';
 
-        if (!$isSuccess) {
+        if (! $isSuccess) {
             if ($httpCode >= 400 && $httpCode < 500) {
                 $errorType = 'client_error';
-                $errorMessage = "HTTP {$httpCode}: " . ($responseData['reason'] ?? $responseData['message'] ?? $responseData['error'] ?? 'Client error');
+                $errorMessage = "HTTP {$httpCode}: ".($responseData['reason'] ?? $responseData['message'] ?? $responseData['error'] ?? 'Client error');
             } elseif ($httpCode >= 500) {
                 $errorType = 'server_error';
-                $errorMessage = "HTTP {$httpCode}: " . ($responseData['reason'] ?? $responseData['message'] ?? $responseData['error'] ?? 'Server error');
+                $errorMessage = "HTTP {$httpCode}: ".($responseData['reason'] ?? $responseData['message'] ?? $responseData['error'] ?? 'Server error');
             } elseif (isset($responseData['reason'])) {
                 $errorType = 'api_error';
                 $errorMessage = $responseData['reason'];
@@ -294,7 +299,7 @@ class ExternalApiService
         if ($response === false) {
             return [
                 'success' => false,
-                'error' => 'Connection failed: ' . $curlError,
+                'error' => 'Connection failed: '.$curlError,
                 'data' => null,
                 'http_code' => $httpCode,
                 'raw_response' => null,
@@ -328,6 +333,7 @@ class ExternalApiService
         foreach ($headers as $key => $value) {
             $formatted[] = "{$key}: {$value}";
         }
+
         return $formatted;
     }
 

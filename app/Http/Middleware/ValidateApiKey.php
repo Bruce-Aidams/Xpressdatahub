@@ -7,7 +7,6 @@ use App\Models\ApiUsageLog;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class ValidateApiKey
@@ -24,11 +23,11 @@ class ValidateApiKey
 
         $apiKey = ApiKey::where('api_key', $apiKeyValue)->first();
 
-        if (!$apiKey) {
+        if (! $apiKey) {
             return response()->json(['success' => false, 'message' => 'Invalid API key'], 401);
         }
 
-        if (!$apiKey->is_active) {
+        if (! $apiKey->is_active) {
             return response()->json(['success' => false, 'message' => 'API key is inactive'], 403);
         }
 
@@ -37,13 +36,14 @@ class ValidateApiKey
         }
 
         $rateLimit = $apiKey->rate_limit ?? 60;
-        $limiterKey = 'api_key_' . $apiKey->id;
+        $limiterKey = 'api_key_'.$apiKey->id;
 
         if (RateLimiter::tooManyAttempts($limiterKey, $rateLimit)) {
             $retryAfter = RateLimiter::availableIn($limiterKey);
+
             return response()->json([
                 'success' => false,
-                'message' => 'Rate limit exceeded. Try again in ' . $retryAfter . ' seconds',
+                'message' => 'Rate limit exceeded. Try again in '.$retryAfter.' seconds',
             ], 429)->header('Retry-After', $retryAfter);
         }
 

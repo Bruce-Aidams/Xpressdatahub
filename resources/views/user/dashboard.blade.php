@@ -1,10 +1,57 @@
-�@extends('layouts.user')
+@extends('layouts.user')
 @section('title', 'Dashboard')
 @section('page-title', 'Dashboard')
 @section('page-description')
 Welcome back, {{ $currentUser->username ?? '' }}
 @endsection
 @section('content')
+
+@if($activeBanner)
+@php
+    $bannerData = is_array($activeBanner['data']) ? $activeBanner['data'] : (json_decode($activeBanner['data'], true) ?? []);
+    $bgColor = $bannerData['background_color'] ?? '#1e40af';
+    $textColor = $bannerData['text_color'] ?? '#ffffff';
+    $speed = $bannerData['speed'] ?? 50;
+@endphp
+<div id="bannerPopup" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="display:none;">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm banner-backdrop" onclick="closeBanner()"></div>
+    <div class="relative w-full max-w-md animate-banner-in">
+        <div class="rounded-3xl overflow-hidden shadow-2xl" style="background: {{ $bgColor }};">
+            {{-- Decorative shapes --}}
+            <div class="relative overflow-hidden">
+                <div class="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-10" style="background: {{ $textColor }};"></div>
+                <div class="absolute -bottom-8 -left-8 w-24 h-24 rounded-full opacity-10" style="background: {{ $textColor }};"></div>
+                <div class="absolute top-1/2 right-8 w-16 h-16 rounded-full opacity-5" style="background: {{ $textColor }};"></div>
+
+                <div class="relative px-6 pt-8 pb-6 sm:px-8 sm:pt-10 sm:pb-8">
+                    {{-- Icon --}}
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center mb-4 sm:mb-5" style="background: {{ $textColor }}20;">
+                        <x-heroicon-o-megaphone class="w-6 h-6 sm:w-7 sm:h-7" style="color: {{ $textColor }};" />
+                    </div>
+
+                    {{-- Title --}}
+                    <h3 class="text-lg sm:text-xl font-black mb-2" style="color: {{ $textColor }};">
+                        {{ $activeBanner['title'] ?? 'Announcement' }}
+                    </h3>
+
+                    {{-- Message --}}
+                    <p class="text-sm sm:text-base leading-relaxed opacity-90" style="color: {{ $textColor }};">
+                        {{ $activeBanner['message'] }}
+                    </p>
+
+                    {{-- Divider --}}
+                    <div class="my-5 sm:my-6 h-px opacity-20" style="background: {{ $textColor }};"></div>
+
+                    {{-- Close button --}}
+                    <button onclick="closeBanner()" class="w-full py-2.5 sm:py-3 rounded-xl text-sm font-bold transition-all duration-200 hover:opacity-80" style="background: {{ $textColor }}; color: {{ $bgColor }};">
+                        Got it
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 
 <!-- 4 Top Metric Cards -->
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-5 sm:mb-6 lg:mb-8">
@@ -324,3 +371,60 @@ Welcome back, {{ $currentUser->username ?? '' }}
     </div>
 </div>
 @endsection
+
+@push('styles')
+<style>
+    @keyframes bannerIn {
+        0% { opacity: 0; transform: scale(0.9) translateY(20px); }
+        100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @keyframes bannerOut {
+        0% { opacity: 1; transform: scale(1) translateY(0); }
+        100% { opacity: 0; transform: scale(0.9) translateY(20px); }
+    }
+    @keyframes backdropFadeIn {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+    @keyframes backdropFadeOut {
+        0% { opacity: 1; }
+        100% { opacity: 0; }
+    }
+    .animate-banner-in { animation: bannerIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .animate-banner-out { animation: bannerOut 0.3s cubic-bezier(0.55, 0, 1, 0.45) forwards; }
+    .banner-backdrop { animation: backdropFadeIn 0.3s ease forwards; }
+    .banner-backdrop-out { animation: backdropFadeOut 0.3s ease forwards; }
+</style>
+@endpush
+
+@push('scripts')
+<script>
+(function() {
+    var banner = document.getElementById('bannerPopup');
+    if (!banner) return;
+
+    var dismissed = sessionStorage.getItem('banner_dismissed_{{ $activeBanner["id"] ?? 0 }}');
+    if (dismissed) {
+        banner.style.display = 'none';
+        return;
+    }
+
+    banner.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    window.closeBanner = function() {
+        var popup = document.getElementById('bannerPopup');
+        if (!popup) return;
+        var inner = popup.querySelector('.animate-banner-in');
+        var bd = popup.querySelector('.banner-backdrop');
+        if (inner) { inner.classList.remove('animate-banner-in'); inner.classList.add('animate-banner-out'); }
+        if (bd) { bd.classList.remove('banner-backdrop'); bd.classList.add('banner-backdrop-out'); }
+        setTimeout(function() {
+            popup.style.display = 'none';
+            document.body.style.overflow = '';
+            sessionStorage.setItem('banner_dismissed_{{ $activeBanner["id"] ?? 0 }}', '1');
+        }, 300);
+    };
+})();
+</script>
+@endpush

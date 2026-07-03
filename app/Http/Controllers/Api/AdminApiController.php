@@ -18,15 +18,15 @@ use App\Models\ShopWithdrawal;
 use App\Models\UserLoginLog;
 use App\Services\AccountStatusManager;
 use App\Services\AdminAuthService;
+use App\Services\AdminNotificationService;
 use App\Services\BannerNotificationService;
 use App\Services\CustomPricingService;
 use App\Services\DataIntegrationService;
 use App\Services\LowBalanceAlertService;
 use App\Services\MinimumTopupManager;
-use App\Services\NotificationService;
 use App\Services\OrderService;
-use App\Services\PaystackChargeManager;
 use App\Services\PaymentConfigService;
+use App\Services\PaystackChargeManager;
 use App\Services\ReferralService;
 use App\Services\ShopService;
 use App\Services\UserLoginTracker;
@@ -69,15 +69,15 @@ class AdminApiController extends Controller
 
         $admin = AdminUser::where('username', $request->input('username'))->first();
 
-        if (!$admin || !Hash::check($request->input('password'), $admin->password_hash)) {
+        if (! $admin || ! Hash::check($request->input('password'), $admin->password_hash)) {
             return response()->json(['success' => false, 'message' => 'Invalid credentials.'], 401);
         }
 
-        if (!$admin->is_active) {
+        if (! $admin->is_active) {
             return response()->json(['success' => false, 'message' => 'Account is deactivated.'], 403);
         }
 
-        if (!$admin->api_token) {
+        if (! $admin->api_token) {
             $admin->update(['api_token' => Str::random(64), 'last_login_at' => now()]);
         } else {
             $admin->update(['last_login_at' => now()]);
@@ -99,6 +99,7 @@ class AdminApiController extends Controller
     public function profile(Request $request)
     {
         $admin = $this->admin($request);
+
         return response()->json([
             'success' => true,
             'admin' => [
@@ -116,7 +117,7 @@ class AdminApiController extends Controller
     {
         $request->validate([
             'full_name' => 'nullable|string|max:255',
-            'email' => 'nullable|email|max:255|unique:admin_users,email,' . $this->admin($request)->id,
+            'email' => 'nullable|email|max:255|unique:admin_users,email,'.$this->admin($request)->id,
         ]);
 
         $admin = $this->admin($request);
@@ -160,7 +161,7 @@ class AdminApiController extends Controller
 
         $recentOrders = Order::with('agent:id,username')
             ->orderByDesc('created_at')->limit(10)->get()
-            ->map(fn($o) => [
+            ->map(fn ($o) => [
                 'id' => $o->id, 'status' => $o->status, 'phone_number' => $o->phone_number,
                 'network_type' => $o->network_type, 'package_size' => $o->package_size,
                 'amount' => $o->amount, 'agent' => $o->agent?->username,
@@ -168,7 +169,7 @@ class AdminApiController extends Controller
             ]);
 
         $recentUsers = Agent::orderByDesc('created_at')->limit(10)->get()
-            ->map(fn($u) => [
+            ->map(fn ($u) => [
                 'id' => $u->id, 'username' => $u->username, 'email' => $u->email,
                 'role' => $u->role, 'status' => $u->status,
                 'created_at' => $u->created_at?->format('Y-m-d H:i:s'),
@@ -214,8 +215,12 @@ class AdminApiController extends Controller
     {
         $query = Agent::query();
 
-        if ($s = $request->input('status')) $query->where('status', $s);
-        if ($r = $request->input('role')) $query->where('role', $r);
+        if ($s = $request->input('status')) {
+            $query->where('status', $s);
+        }
+        if ($r = $request->input('role')) {
+            $query->where('role', $r);
+        }
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('username', 'like', "%{$search}%")
@@ -289,7 +294,7 @@ class AdminApiController extends Controller
         $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:agents,email,' . $agent->id,
+            'email' => 'required|email|max:255|unique:agents,email,'.$agent->id,
             'phone' => 'required|string|max:20',
             'role' => 'required|string|in:agent,super_agent,dealers',
             'balance' => 'nullable|numeric|min:0',
@@ -303,6 +308,7 @@ class AdminApiController extends Controller
     public function deleteAgent(Agent $agent)
     {
         $agent->delete();
+
         return response()->json(['success' => true, 'message' => 'Agent deleted.']);
     }
 
@@ -327,17 +333,25 @@ class AdminApiController extends Controller
     {
         $query = Order::with('agent:id,username');
 
-        if ($s = $request->input('status')) $query->where('status', $s);
-        if ($n = $request->input('network_type')) $query->where('network_type', $n);
+        if ($s = $request->input('status')) {
+            $query->where('status', $s);
+        }
+        if ($n = $request->input('network_type')) {
+            $query->where('network_type', $n);
+        }
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('phone_number', 'like', "%{$search}%")
                     ->orWhere('transaction_id', 'like', "%{$search}%")
-                    ->orWhereHas('agent', fn($q2) => $q2->where('username', 'like', "%{$search}%"));
+                    ->orWhereHas('agent', fn ($q2) => $q2->where('username', 'like', "%{$search}%"));
             });
         }
-        if ($df = $request->input('date_from')) $query->where('created_at', '>=', $df);
-        if ($dt = $request->input('date_to')) $query->where('created_at', '<=', $dt . ' 23:59:59');
+        if ($df = $request->input('date_from')) {
+            $query->where('created_at', '>=', $df);
+        }
+        if ($dt = $request->input('date_to')) {
+            $query->where('created_at', '<=', $dt.' 23:59:59');
+        }
 
         $orders = $query->orderByDesc('created_at')->paginate($request->input('per_page', 25));
 
@@ -347,6 +361,7 @@ class AdminApiController extends Controller
     public function showOrder(Order $order)
     {
         $order->load('agent:id,username,phone,email', 'payment', 'statusHistory');
+
         return response()->json(['success' => true, 'order' => $order]);
     }
 
@@ -370,21 +385,35 @@ class AdminApiController extends Controller
     {
         $query = Order::with('agent:id,username,phone');
 
-        if ($s = $request->input('status')) $query->where('status', $s);
-        if ($n = $request->input('network_type')) $query->where('network_type', $n);
-        if ($src = $request->input('order_source')) $query->where('order_source', $src);
+        if ($s = $request->input('status')) {
+            $query->where('status', $s);
+        }
+        if ($n = $request->input('network_type')) {
+            $query->where('network_type', $n);
+        }
+        if ($src = $request->input('order_source')) {
+            $query->where('order_source', $src);
+        }
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('phone_number', 'like', "%{$search}%")
                     ->orWhere('transaction_id', 'like', "%{$search}%")
                     ->orWhere('order_reference', 'like', "%{$search}%")
-                    ->orWhereHas('agent', fn($q2) => $q2->where('username', 'like', "%{$search}%"));
+                    ->orWhereHas('agent', fn ($q2) => $q2->where('username', 'like', "%{$search}%"));
             });
         }
-        if ($df = $request->input('date_from')) $query->where('created_at', '>=', $df);
-        if ($dt = $request->input('date_to')) $query->where('created_at', '<=', $dt . ' 23:59:59');
-        if ($min = $request->input('min_amount')) $query->where('amount', '>=', $min);
-        if ($max = $request->input('max_amount')) $query->where('amount', '<=', $max);
+        if ($df = $request->input('date_from')) {
+            $query->where('created_at', '>=', $df);
+        }
+        if ($dt = $request->input('date_to')) {
+            $query->where('created_at', '<=', $dt.' 23:59:59');
+        }
+        if ($min = $request->input('min_amount')) {
+            $query->where('amount', '>=', $min);
+        }
+        if ($max = $request->input('max_amount')) {
+            $query->where('amount', '<=', $max);
+        }
 
         $orders = $query->orderByDesc('created_at')->paginate($request->input('per_page', 25));
         $totalAmount = (clone $query)->sum('amount');
@@ -426,6 +455,7 @@ class AdminApiController extends Controller
     {
         $request->validate(['is_active' => 'required|boolean']);
         $shop->update(['is_active' => $request->boolean('is_active'), 'updated_at' => now()]);
+
         return response()->json(['success' => true, 'message' => 'Shop status updated.']);
     }
 
@@ -436,17 +466,22 @@ class AdminApiController extends Controller
         $query = Order::with('shop:id,shop_slug', 'agent:id,username')
             ->where('order_source', 'shop');
 
-        if ($s = $request->input('status')) $query->where('status', $s);
-        if ($shopId = $request->input('shop_id')) $query->where('shop_id', $shopId);
+        if ($s = $request->input('status')) {
+            $query->where('status', $s);
+        }
+        if ($shopId = $request->input('shop_id')) {
+            $query->where('shop_id', $shopId);
+        }
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('phone_number', 'like', "%{$search}%")
                     ->orWhere('order_reference', 'like', "%{$search}%")
-                    ->orWhereHas('shop', fn($q2) => $q2->where('shop_slug', 'like', "%{$search}%"));
+                    ->orWhereHas('shop', fn ($q2) => $q2->where('shop_slug', 'like', "%{$search}%"));
             });
         }
 
         $orders = $query->orderByDesc('created_at')->paginate($request->input('per_page', 25));
+
         return response()->json(['success' => true, 'orders' => $orders]);
     }
 
@@ -467,6 +502,7 @@ class AdminApiController extends Controller
         if ($result['success']) {
             return response()->json(['success' => true, 'message' => $result['message']]);
         }
+
         return response()->json(['success' => false, 'message' => $result['message']], 400);
     }
 
@@ -475,12 +511,15 @@ class AdminApiController extends Controller
     public function listShopWithdrawals(Request $request)
     {
         $query = ShopWithdrawal::with('shop:id,shop_slug', 'agent:id,username');
-        if ($s = $request->input('status')) $query->where('status', $s);
+        if ($s = $request->input('status')) {
+            $query->where('status', $s);
+        }
         if ($search = $request->input('search')) {
-            $query->whereHas('agent', fn($q) => $q->where('username', 'like', "%{$search}%"));
+            $query->whereHas('agent', fn ($q) => $q->where('username', 'like', "%{$search}%"));
         }
 
         $withdrawals = $query->orderByDesc('created_at')->paginate($request->input('per_page', 25));
+
         return response()->json(['success' => true, 'withdrawals' => $withdrawals]);
     }
 
@@ -491,6 +530,7 @@ class AdminApiController extends Controller
         if ($result) {
             return response()->json(['success' => true, 'message' => 'Withdrawal approved.']);
         }
+
         return response()->json(['success' => false, 'message' => 'Failed.'], 400);
     }
 
@@ -501,6 +541,7 @@ class AdminApiController extends Controller
         if ($result) {
             return response()->json(['success' => true, 'message' => 'Withdrawal rejected.']);
         }
+
         return response()->json(['success' => false, 'message' => 'Failed.'], 400);
     }
 
@@ -509,6 +550,7 @@ class AdminApiController extends Controller
     public function listPricing(Request $request)
     {
         $pricing = CustomPricing::orderBy('package_size_gb')->paginate($request->input('per_page', 20));
+
         return response()->json(['success' => true, 'pricing' => $pricing]);
     }
 
@@ -534,6 +576,7 @@ class AdminApiController extends Controller
         if ($result['success']) {
             return response()->json(['success' => true, 'message' => 'Pricing saved.'], 201);
         }
+
         return response()->json(['success' => false, 'message' => $result['message']], 400);
     }
 
@@ -557,13 +600,15 @@ class AdminApiController extends Controller
 
     public function togglePricing(CustomPricing $customPricing)
     {
-        $customPricing->update(['is_active' => !$customPricing->is_active, 'updated_at' => now()]);
+        $customPricing->update(['is_active' => ! $customPricing->is_active, 'updated_at' => now()]);
+
         return response()->json(['success' => true, 'message' => 'Pricing status toggled.']);
     }
 
     public function deletePricing(CustomPricing $customPricing)
     {
         $customPricing->delete();
+
         return response()->json(['success' => true, 'message' => 'Pricing deleted.']);
     }
 
@@ -572,8 +617,12 @@ class AdminApiController extends Controller
     public function listAccounts(Request $request)
     {
         $query = Agent::query();
-        if ($s = $request->input('status')) $query->where('status', $s);
-        if ($r = $request->input('role')) $query->where('role', $r);
+        if ($s = $request->input('status')) {
+            $query->where('status', $s);
+        }
+        if ($r = $request->input('role')) {
+            $query->where('role', $r);
+        }
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('username', 'like', "%{$search}%")
@@ -583,6 +632,7 @@ class AdminApiController extends Controller
         }
 
         $accounts = $query->orderByDesc('created_at')->paginate($request->input('per_page', 25));
+
         return response()->json(['success' => true, 'accounts' => $accounts]);
     }
 
@@ -597,6 +647,7 @@ class AdminApiController extends Controller
         if ($result['success']) {
             return response()->json(['success' => true, 'message' => 'Account status updated.']);
         }
+
         return response()->json(['success' => false, 'message' => $result['message']], 400);
     }
 
@@ -605,6 +656,7 @@ class AdminApiController extends Controller
     public function listBanners(Request $request)
     {
         $banners = BannerNotification::orderByDesc('created_at')->get();
+
         return response()->json(['success' => true, 'banners' => $banners]);
     }
 
@@ -631,6 +683,7 @@ class AdminApiController extends Controller
         if ($result['success']) {
             return response()->json(['success' => true, 'message' => 'Banner created.'], 201);
         }
+
         return response()->json(['success' => false, 'message' => $result['message']], 400);
     }
 
@@ -658,6 +711,7 @@ class AdminApiController extends Controller
         if ($result['success']) {
             return response()->json(['success' => true, 'message' => 'Banner updated.']);
         }
+
         return response()->json(['success' => false, 'message' => $result['message']], 400);
     }
 
@@ -667,6 +721,7 @@ class AdminApiController extends Controller
         if ($result['success']) {
             return response()->json(['success' => true, 'message' => 'Banner deleted.']);
         }
+
         return response()->json(['success' => false, 'message' => $result['message']], 400);
     }
 
@@ -676,6 +731,7 @@ class AdminApiController extends Controller
     {
         $keys = ApiKey::with('agent:id,username')->orderByDesc('created_at')
             ->paginate($request->input('per_page', 25));
+
         return response()->json(['success' => true, 'api_keys' => $keys]);
     }
 
@@ -692,7 +748,7 @@ class AdminApiController extends Controller
         $apiKey = ApiKey::create([
             'user_id' => $request->input('user_id'),
             'name' => $request->input('name'),
-            'api_key' => 'mk_' . Str::random(32),
+            'api_key' => 'mk_'.Str::random(32),
             'api_secret' => Str::random(64),
             'is_active' => true,
             'rate_limit' => $request->input('rate_limit', 100),
@@ -716,12 +772,14 @@ class AdminApiController extends Controller
         ]);
 
         $apiKey->update($request->only(['name', 'is_active', 'rate_limit', 'permissions']));
+
         return response()->json(['success' => true, 'message' => 'API key updated.']);
     }
 
     public function deleteApiKey(ApiKey $apiKey)
     {
         $apiKey->delete();
+
         return response()->json(['success' => true, 'message' => 'API key deleted.']);
     }
 
@@ -749,7 +807,7 @@ class AdminApiController extends Controller
 
         $topUsers = Agent::withCount('orders')
             ->withSum('orders', 'amount')
-            ->whereHas('orders', fn($q) => $q->whereIn('status', ['completed', 'delivered']))
+            ->whereHas('orders', fn ($q) => $q->whereIn('status', ['completed', 'delivered']))
             ->orderByDesc('orders_sum_amount')->limit(10)->get();
 
         $chartData = collect();
@@ -773,15 +831,24 @@ class AdminApiController extends Controller
     public function listBalanceHistory(Request $request)
     {
         $query = BalanceHistory::with('agent:id,username');
-        if ($agentId = $request->input('agent_id')) $query->where('agent_id', $agentId);
-        if ($reason = $request->input('reason')) $query->where('reason', $reason);
-        if ($search = $request->input('search')) {
-            $query->whereHas('agent', fn($q) => $q->where('username', 'like', "%{$search}%"));
+        if ($agentId = $request->input('agent_id')) {
+            $query->where('agent_id', $agentId);
         }
-        if ($df = $request->input('date_from')) $query->where('created_at', '>=', $df);
-        if ($dt = $request->input('date_to')) $query->where('created_at', '<=', $dt . ' 23:59:59');
+        if ($reason = $request->input('reason')) {
+            $query->where('reason', $reason);
+        }
+        if ($search = $request->input('search')) {
+            $query->whereHas('agent', fn ($q) => $q->where('username', 'like', "%{$search}%"));
+        }
+        if ($df = $request->input('date_from')) {
+            $query->where('created_at', '>=', $df);
+        }
+        if ($dt = $request->input('date_to')) {
+            $query->where('created_at', '<=', $dt.' 23:59:59');
+        }
 
         $history = $query->orderByDesc('created_at')->paginate($request->input('per_page', 25));
+
         return response()->json(['success' => true, 'history' => $history]);
     }
 
@@ -790,12 +857,20 @@ class AdminApiController extends Controller
     public function listUserActivity(Request $request)
     {
         $query = UserLoginLog::with('agent:id,username,email,role');
-        if ($userId = $request->input('user_id')) $query->where('user_id', $userId);
-        if ($status = $request->input('status')) $query->where('login_status', $status);
-        if ($df = $request->input('date_from')) $query->where('created_at', '>=', $df);
-        if ($dt = $request->input('date_to')) $query->where('created_at', '<=', $dt . ' 23:59:59');
+        if ($userId = $request->input('user_id')) {
+            $query->where('user_id', $userId);
+        }
+        if ($status = $request->input('status')) {
+            $query->where('login_status', $status);
+        }
+        if ($df = $request->input('date_from')) {
+            $query->where('created_at', '>=', $df);
+        }
+        if ($dt = $request->input('date_to')) {
+            $query->where('created_at', '<=', $dt.' 23:59:59');
+        }
         if ($search = $request->input('search')) {
-            $query->whereHas('agent', fn($q) => $q->where('username', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"));
+            $query->whereHas('agent', fn ($q) => $q->where('username', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"));
         }
 
         $activities = $query->orderByDesc('created_at')->paginate($request->input('per_page', 25));
@@ -812,8 +887,9 @@ class AdminApiController extends Controller
 
     public function listNotifications(Request $request)
     {
-        $service = app(\App\Services\AdminNotificationService::class);
+        $service = app(AdminNotificationService::class);
         $notifications = $service->getAllNotifications(['limit' => $request->input('limit', 50)]);
+
         return response()->json(['success' => true, 'notifications' => $notifications]);
     }
 
@@ -827,7 +903,7 @@ class AdminApiController extends Controller
             'priority' => 'nullable|string|in:low,normal,high,urgent',
         ]);
 
-        $service = app(\App\Services\AdminNotificationService::class);
+        $service = app(AdminNotificationService::class);
         $result = $service->sendNotification([
             'title' => $request->input('title'),
             'message' => $request->input('message'),
@@ -840,6 +916,7 @@ class AdminApiController extends Controller
         if ($result['success']) {
             return response()->json(['success' => true, 'message' => 'Notification sent.'], 201);
         }
+
         return response()->json(['success' => false, 'message' => $result['message']], 400);
     }
 
@@ -848,6 +925,7 @@ class AdminApiController extends Controller
     public function getApiConfig(Request $request)
     {
         $configs = ApiConfig::all();
+
         return response()->json(['success' => true, 'configs' => $configs]);
     }
 
@@ -874,7 +952,7 @@ class AdminApiController extends Controller
 
         $data = [
             'network_type' => $request->input('network_type'),
-            'api_name' => $request->input('api_name', $request->input('network_type') . ' API'),
+            'api_name' => $request->input('api_name', $request->input('network_type').' API'),
             'endpoint_url' => $request->input('api_endpoint'),
             'api_key' => $request->input('api_key'),
             'api_secret' => $request->input('api_secret'),
@@ -903,6 +981,7 @@ class AdminApiController extends Controller
     public function getDataIntegration(Request $request)
     {
         $config = $this->integrationService->getConfig();
+
         return response()->json(['success' => true, 'config' => $config]);
     }
 
@@ -916,7 +995,9 @@ class AdminApiController extends Controller
         ]);
 
         foreach ($request->only(['data_website_url', 'data_website_api_key', 'webhook_url', 'enabled']) as $key => $value) {
-            if ($value !== null) $this->integrationService->updateConfig($key, $value);
+            if ($value !== null) {
+                $this->integrationService->updateConfig($key, $value);
+            }
         }
 
         return response()->json(['success' => true, 'message' => 'Data integration config updated.']);
@@ -927,6 +1008,7 @@ class AdminApiController extends Controller
     public function getPaymentConfig(Request $request)
     {
         $configs = $this->configService->getAllConfig();
+
         return response()->json(['success' => true, 'configs' => $configs]);
     }
 
@@ -940,7 +1022,9 @@ class AdminApiController extends Controller
         ]);
 
         foreach ($request->only(['payment_phone_number', 'payment_name', 'whatsapp_contact', 'whatsapp_group_link']) as $key => $value) {
-            if ($value !== null) $this->configService->updateConfig($key, $value);
+            if ($value !== null) {
+                $this->configService->updateConfig($key, $value);
+            }
         }
 
         return response()->json(['success' => true, 'message' => 'Payment config updated.']);
@@ -951,6 +1035,7 @@ class AdminApiController extends Controller
     public function getPaystackCharge(Request $request)
     {
         $chargeConfig = $this->chargeManager->getChargeConfig();
+
         return response()->json(['success' => true, 'charge_config' => $chargeConfig]);
     }
 
@@ -970,6 +1055,7 @@ class AdminApiController extends Controller
         if ($result['success']) {
             return response()->json(['success' => true, 'message' => $result['message']]);
         }
+
         return response()->json(['success' => false, 'message' => $result['message']], 400);
     }
 
@@ -978,6 +1064,7 @@ class AdminApiController extends Controller
     public function getReferralConfig(Request $request)
     {
         $configs = ReferralConfig::all();
+
         return response()->json(['success' => true, 'configs' => $configs]);
     }
 
@@ -1013,6 +1100,7 @@ class AdminApiController extends Controller
     public function getLowBalanceAlert(Request $request)
     {
         $config = $this->alertService->getConfig();
+
         return response()->json(['success' => true, 'config' => $config]);
     }
 
@@ -1039,6 +1127,7 @@ class AdminApiController extends Controller
     {
         $config = $this->topupManager->getConfig();
         $history = $this->topupManager->getConfigurationHistory(10);
+
         return response()->json(['success' => true, 'config' => $config, 'history' => $history]);
     }
 
@@ -1054,6 +1143,7 @@ class AdminApiController extends Controller
         if ($result['success']) {
             return response()->json(['success' => true, 'message' => $result['message']]);
         }
+
         return response()->json(['success' => false, 'message' => $result['message']], 400);
     }
 }

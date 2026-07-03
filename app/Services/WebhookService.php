@@ -18,12 +18,12 @@ class WebhookService
             return ['success' => false, 'message' => 'Webhook URL is empty', 'skipped' => true];
         }
 
-        if (!filter_var($webhookUrl, FILTER_VALIDATE_URL)) {
+        if (! filter_var($webhookUrl, FILTER_VALIDATE_URL)) {
             return ['success' => false, 'message' => 'Invalid webhook URL format'];
         }
 
         $order = $this->getOrderDetails($orderId);
-        if (!$order) {
+        if (! $order) {
             return ['success' => false, 'message' => 'Order not found', 'order_id' => $orderId];
         }
 
@@ -79,7 +79,7 @@ class WebhookService
         foreach ($orderIds as $orderId) {
             $orderInfo = $this->getOrderWebhookInfo($orderId);
 
-            if ($orderInfo && !empty($orderInfo['webhook_url'])) {
+            if ($orderInfo && ! empty($orderInfo['webhook_url'])) {
                 $results[$orderId] = $this->sendOrderStatusWebhook(
                     $orderId,
                     $oldStatus,
@@ -116,16 +116,18 @@ class WebhookService
     private function getApiKeyDetails(int $apiKeyId): ?array
     {
         $key = ApiKey::select('id', 'api_key', 'name', 'user_id')->find($apiKeyId);
+
         return $key ? $key->toArray() : null;
     }
 
     private function generateSignature(array $payload, ?array $apiKeyData): ?string
     {
-        if (!$apiKeyData || empty($apiKeyData['api_key'])) {
+        if (! $apiKeyData || empty($apiKeyData['api_key'])) {
             return null;
         }
 
         $payloadString = json_encode($payload, JSON_UNESCAPED_SLASHES);
+
         return hash_hmac('sha256', $payloadString, $apiKeyData['api_key']);
     }
 
@@ -154,7 +156,7 @@ class WebhookService
         } catch (\Exception $e) {
             return [
                 'success' => false,
-                'message' => 'cURL error: ' . $e->getMessage(),
+                'message' => 'cURL error: '.$e->getMessage(),
                 'http_code' => 0,
                 'response_time_ms' => 0,
             ];

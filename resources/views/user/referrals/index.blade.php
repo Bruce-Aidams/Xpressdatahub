@@ -1,4 +1,4 @@
-�@extends('layouts.user')
+@extends('layouts.user')
 @section('title', 'Referrals')
 @section('page-title', 'Referrals')
 @section('page-description', 'Manage your referrals and earnings')

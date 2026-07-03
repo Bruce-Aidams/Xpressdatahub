@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Agent;
 use App\Models\CustomPricing;
 use App\Models\Order;
+use App\Services\BalanceHistoryService;
 use App\Services\ExternalApiService;
 use App\Services\OrderService;
 use App\Services\PaystackService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class UserDataController extends Controller
@@ -68,7 +70,7 @@ class UserDataController extends Controller
             }
         }
         // Remove empty networks so network tabs show N/A correctly
-        $pricing = $expanded->filter(fn($pkgs) => $pkgs->isNotEmpty());
+        $pricing = $expanded->filter(fn ($pkgs) => $pkgs->isNotEmpty());
 
         return view('user.buy-data.index', compact('agent', 'pricing', 'isGuest'));
     }
@@ -89,13 +91,13 @@ class UserDataController extends Controller
 
         // Match the exact network OR packages set for 'all' networks
         $pricingQuery = CustomPricing::where(function ($q) use ($networkType) {
-                $q->where('network_type', $networkType)
-                  ->orWhere('network_type', 'all');
-            })
+            $q->where('network_type', $networkType)
+                ->orWhere('network_type', 'all');
+        })
             ->where('package_size', $packageSize)
             ->where('is_active', true);
 
-        if (!$isGuest) {
+        if (! $isGuest) {
             $userId = session('user_id');
             $agent = Agent::find($userId);
 
@@ -107,7 +109,7 @@ class UserDataController extends Controller
 
         $pricing = $pricingQuery->first();
 
-        if (!$pricing) {
+        if (! $pricing) {
             return redirect()->back()
                 ->with('error', 'Selected package not found or unavailable.');
         }
@@ -115,22 +117,22 @@ class UserDataController extends Controller
         $amount = floatval($pricing->selling_price);
 
         $validatedPhone = $this->validateGhanaPhone($phoneNumber);
-        if (!$validatedPhone) {
+        if (! $validatedPhone) {
             return redirect()->back()
                 ->with('error', 'Invalid phone number. Please enter a valid Ghana phone number (e.g. 0241234567).');
         }
 
-        if (!$this->phoneMatchesNetwork($validatedPhone, $networkType)) {
+        if (! $this->phoneMatchesNetwork($validatedPhone, $networkType)) {
             return redirect()->back()
                 ->with('error', "Phone number does not belong to {$networkType} network.");
         }
 
-        $reference = ($isGuest ? 'GUEST-' : 'ORD-') . strtoupper(Str::random(8)) . '-' . time();
+        $reference = ($isGuest ? 'GUEST-' : 'ORD-').strtoupper(Str::random(8)).'-'.time();
 
         if ($isGuest) {
             $paystack = app(PaystackService::class);
             $callbackUrl = route('guest.callback');
-            $email = 'guest-' . Str::random(6) . '@guestorder.com';
+            $email = 'guest-'.Str::random(6).'@guestorder.com';
 
             $paystackResult = $paystack->initializeTransaction([
                 'email' => $email,
@@ -146,14 +148,14 @@ class UserDataController extends Controller
                 ],
             ]);
 
-            if (!$paystackResult['success']) {
+            if (! $paystackResult['success']) {
                 return redirect()->back()
                     ->with('error', 'Failed to initialize payment. Please try again.');
             }
 
             $guestId = session('guest_id');
-            if (!$guestId) {
-                $guestId = 'GST-' . strtoupper(Str::random(6));
+            if (! $guestId) {
+                $guestId = 'GST-'.strtoupper(Str::random(6));
                 session()->put('guest_id', $guestId);
             }
 
@@ -186,10 +188,10 @@ class UserDataController extends Controller
 
         if (floatval($agent->balance) < $amount) {
             return redirect()->back()
-                ->with('error', 'Insufficient balance. Please top up your wallet first. Required: GH₵' . number_format($amount, 2));
+                ->with('error', 'Insufficient balance. Please top up your wallet first. Required: GH₵'.number_format($amount, 2));
         }
 
-        \Illuminate\Support\Facades\DB::beginTransaction();
+        DB::beginTransaction();
 
         try {
             $orderService = app(OrderService::class);
@@ -206,8 +208,9 @@ class UserDataController extends Controller
                 'base_amount' => floatval($pricing->cost),
             ]);
 
-            if (!$result['success']) {
-                \Illuminate\Support\Facades\DB::rollBack();
+            if (! $result['success']) {
+                DB::rollBack();
+
                 return redirect()->back()
                     ->with('error', 'Failed to create order. Please try again.');
             }
@@ -215,15 +218,16 @@ class UserDataController extends Controller
             $newBalance = floatval($agent->balance) - $amount;
             $agent->update(['balance' => $newBalance]);
 
-            \App\Services\BalanceHistoryService::log(
+            BalanceHistoryService::log(
                 $userId,
                 -$amount,
                 'order',
                 $result['order']['id'] ?? null,
-                $validatedPhone
+                null,
+                "Data purchase for {$validatedPhone}"
             );
 
-            \Illuminate\Support\Facades\DB::commit();
+            DB::commit();
 
             $externalApi = new ExternalApiService($networkType);
             $capacityMb = $externalApi->convertPackageSize($packageSize);
@@ -249,11 +253,12 @@ class UserDataController extends Controller
             }
 
             return redirect()->route('user.orders.today')
-                ->with('success', 'Order placed successfully! Phone: ' . $validatedPhone . ', Amount: GH₵' . number_format($amount, 2));
+                ->with('success', 'Order placed successfully! Phone: '.$validatedPhone.', Amount: GH₵'.number_format($amount, 2));
 
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\DB::rollBack();
+            DB::rollBack();
             report($e);
+
             return redirect()->back()
                 ->with('error', 'An error occurred while processing your order. Please try again.');
         }
@@ -276,7 +281,7 @@ class UserDataController extends Controller
         }
 
         if (preg_match('/^[235]\d{8}$/', $cleaned)) {
-            return '0' . $cleaned;
+            return '0'.$cleaned;
         }
 
         return null;

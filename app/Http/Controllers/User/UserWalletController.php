@@ -5,9 +5,12 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Agent;
 use App\Models\MinimumTopupConfig;
+use App\Models\Payment;
 use App\Models\PaystackTopupCharge;
+use App\Services\BalanceHistoryService;
 use App\Services\PaystackService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class UserWalletController extends Controller
@@ -52,7 +55,7 @@ class UserWalletController extends Controller
         }
 
         $totalAmount = $amount + $chargeAmount;
-        $reference = 'TOPUP-' . strtoupper(Str::random(8)) . '-' . time();
+        $reference = 'TOPUP-'.strtoupper(Str::random(8)).'-'.time();
 
         $email = $agent->email ?? 'user@example.com';
 
@@ -60,6 +63,7 @@ class UserWalletController extends Controller
             'email' => $email,
             'amount' => (int) round($totalAmount * 100),
             'reference' => $reference,
+            'callback_url' => route('user.wallet.callback'),
             'metadata' => [
                 'agent_id' => $userId,
                 'type' => 'wallet_topup',
@@ -68,12 +72,12 @@ class UserWalletController extends Controller
             ],
         ]);
 
-        if (!$result['success']) {
+        if (! $result['success']) {
             return redirect()->back()
                 ->with('error', $result['message'] ?? 'Failed to initialize payment. Please try again.');
         }
 
-        \App\Models\Payment::create([
+        Payment::create([
             'agent_id' => $userId,
             'amount' => $totalAmount,
             'payment_method' => 'paystack',
@@ -89,14 +93,14 @@ class UserWalletController extends Controller
     {
         $reference = $request->query('reference');
 
-        if (!$reference) {
+        if (! $reference) {
             return redirect()->route('user.wallet.topup')
                 ->with('error', 'No payment reference found.');
         }
 
         $result = PaystackService::verifyTransaction($reference);
 
-        if (!$result['success']) {
+        if (! $result['success']) {
             return redirect()->route('user.wallet.topup')
                 ->with('error', 'Payment verification failed. Please contact support.');
         }
@@ -105,15 +109,15 @@ class UserWalletController extends Controller
         $status = $data['status'] ?? '';
         $metadata = $data['metadata'] ?? [];
 
-        $payment = \App\Models\Payment::where('paystack_reference', $reference)->first();
+        $payment = Payment::where('paystack_reference', $reference)->first();
 
-        if (!$payment) {
+        if (! $payment) {
             return redirect()->route('user.wallet.topup')
                 ->with('error', 'Payment record not found.');
         }
 
         if ($payment->status === 'verified') {
-            return redirect()->route('user.dashboard')
+            return redirect()->route('user.wallet.topup')
                 ->with('success', 'Payment already verified. Balance updated.');
         }
 
@@ -121,17 +125,17 @@ class UserWalletController extends Controller
             $agentId = $payment->agent_id;
             $amount = floatval($payment->amount);
 
-            \Illuminate\Support\Facades\DB::transaction(function () use ($payment, $agentId, $amount) {
+            DB::transaction(function () use ($payment, $agentId, $amount) {
                 $payment->update([
                     'status' => 'verified',
                     'verified_at' => now(),
                 ]);
 
-                \Illuminate\Support\Facades\DB::table('agents')
+                DB::table('agents')
                     ->where('id', $agentId)
                     ->increment('balance', $amount);
 
-                \App\Services\BalanceHistoryService::log(
+                BalanceHistoryService::log(
                     $agentId,
                     $amount,
                     'payment',
@@ -139,8 +143,8 @@ class UserWalletController extends Controller
                 );
             });
 
-            return redirect()->route('user.dashboard')
-                ->with('success', 'Wallet topped up successfully! GH₵' . number_format($amount, 2) . ' added.');
+            return redirect()->route('user.wallet.topup')
+                ->with('success', 'Wallet topped up successfully! GH₵'.number_format($amount, 2).' added.');
         }
 
         $payment->update(['status' => 'failed']);

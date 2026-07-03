@@ -27,7 +27,7 @@ class GuestShopController extends Controller
             ->where('is_active', true)
             ->first();
 
-        if (!$shop) {
+        if (! $shop) {
             abort(404, 'Shop not found or not available.');
         }
 
@@ -43,7 +43,7 @@ class GuestShopController extends Controller
             ->where('is_active', true)
             ->first();
 
-        if (!$shop) {
+        if (! $shop) {
             abort(404, 'Shop not found or not available.');
         }
 
@@ -56,16 +56,16 @@ class GuestShopController extends Controller
             ->where('id', $request->input('product_id'))
             ->first();
 
-        if (!$pricing) {
+        if (! $pricing) {
             return redirect()->back()
                 ->with('error', 'Selected package not found.');
         }
 
         $amount = floatval($pricing->selling_price);
-        $reference = 'SHOP-' . strtoupper(Str::random(8)) . '-' . time();
+        $reference = 'SHOP-'.strtoupper(Str::random(8)).'-'.time();
 
         $result = PaystackService::initializeTransaction([
-            'email' => 'guest-' . Str::random(6) . '@shoporder.com',
+            'email' => 'guest-'.Str::random(6).'@shoporder.com',
             'amount' => (int) round($amount * 100),
             'reference' => $reference,
             'metadata' => [
@@ -80,14 +80,14 @@ class GuestShopController extends Controller
             ],
         ]);
 
-        if (!$result['success']) {
+        if (! $result['success']) {
             return redirect()->back()
                 ->with('error', $result['message'] ?? 'Failed to initialize payment. Please try again.');
         }
 
         $orderResult = $this->orderService->createOrder([
             'agent_id' => null,
-            'guest_id' => 'GST-' . strtoupper(Str::random(6)),
+            'guest_id' => 'GST-'.strtoupper(Str::random(6)),
             'phone_number' => $request->input('phone'),
             'network_type' => $pricing->network_type,
             'package_size' => $pricing->package_size,
@@ -108,14 +108,14 @@ class GuestShopController extends Controller
     {
         $reference = $request->query('reference');
 
-        if (!$reference) {
+        if (! $reference) {
             return redirect()->route('shop.order.error')
                 ->with('error', 'No payment reference found.');
         }
 
         $result = PaystackService::verifyTransaction($reference);
 
-        if (!$result['success']) {
+        if (! $result['success']) {
             return redirect()->route('shop.order.error')
                 ->with('error', 'Payment verification failed. Please contact support.');
         }
@@ -126,7 +126,7 @@ class GuestShopController extends Controller
 
         $order = Order::where('transaction_id', $reference)->first();
 
-        if (!$order) {
+        if (! $order) {
             return redirect()->route('shop.order.error')
                 ->with('error', 'Order not found. Please contact support.');
         }
@@ -203,7 +203,7 @@ class GuestShopController extends Controller
     {
         $order = Order::find($orderId);
 
-        if (!$order) {
+        if (! $order) {
             return redirect()->route('shop.order.error')
                 ->with('error', 'Order not found.');
         }

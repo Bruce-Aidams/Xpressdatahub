@@ -3,7 +3,12 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\Agent;
+use App\Models\BalanceHistory;
 use App\Models\Order;
+use App\Services\BannerNotificationService;
+use App\Services\ShopService;
+use Illuminate\Support\Facades\DB;
 
 class UserDashboardController extends Controller
 {
@@ -28,7 +33,7 @@ class UserDashboardController extends Controller
         }
 
         $userId = session('user_id');
-        $agent = \App\Models\Agent::find($userId);
+        $agent = Agent::find($userId);
 
         $totalOrders = Order::where('agent_id', $userId)->count();
         $pendingOrders = Order::where('agent_id', $userId)->where('status', 'pending')->count();
@@ -45,20 +50,20 @@ class UserDashboardController extends Controller
             ->limit(10)
             ->get();
 
-        $recentActivity = \App\Models\BalanceHistory::where('agent_id', $userId)
+        $recentActivity = BalanceHistory::where('agent_id', $userId)
             ->orderByDesc('created_at')
             ->limit(5)
             ->get();
 
-        $shopService = app(\App\Services\ShopService::class);
+        $shopService = app(ShopService::class);
         $shop = $userId ? $shopService->getShopByUserId($userId) : null;
         $shopEarnings = null;
         if ($shop) {
             $shopEarnings = $shopService->getShopEarningsSummary($shop['id']);
         }
 
-        $referralCount = \App\Models\Agent::where('referred_by', $userId)->count();
-        $referralEarnings = \Illuminate\Support\Facades\DB::table('referral_commissions')
+        $referralCount = Agent::where('referred_by', $userId)->count();
+        $referralEarnings = DB::table('referral_commissions')
             ->where('referrer_id', $userId)
             ->sum('commission_amount');
 
@@ -92,7 +97,7 @@ class UserDashboardController extends Controller
         }
         $maxWeekly = max($weeklyOrders->pluck('count')->max(), 1);
 
-        $networkStats = Order::select('network_type', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
+        $networkStats = Order::select('network_type', DB::raw('count(*) as total'))
             ->where('agent_id', $userId)
             ->whereNotNull('network_type')
             ->groupBy('network_type')
@@ -100,7 +105,7 @@ class UserDashboardController extends Controller
             ->get();
         $totalNetworkOrders = max($networkStats->sum('total'), 1);
 
-        $topPackages = Order::select('network_type', 'package_size', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
+        $topPackages = Order::select('network_type', 'package_size', DB::raw('count(*) as total'))
             ->where('agent_id', $userId)
             ->whereNotNull('package_size')
             ->groupBy('network_type', 'package_size')
@@ -109,7 +114,7 @@ class UserDashboardController extends Controller
             ->get();
 
         $ordersByStatus = Order::where('agent_id', $userId)
-            ->select('status', \Illuminate\Support\Facades\DB::raw('count(*) as total'))
+            ->select('status', DB::raw('count(*) as total'))
             ->groupBy('status')
             ->get();
 
@@ -137,6 +142,8 @@ class UserDashboardController extends Controller
             'referral_earnings' => $referralEarnings,
         ];
 
+        $activeBanner = app(BannerNotificationService::class)->getActiveBanner();
+
         return view('user.dashboard', compact(
             'agent', 'totalOrders', 'pendingOrders', 'completedOrders',
             'totalSpent', 'todayOrders', 'todaySpent',
@@ -145,7 +152,8 @@ class UserDashboardController extends Controller
             'orderChange', 'spendChange',
             'weeklyOrders', 'maxWeekly',
             'networkStats', 'totalNetworkOrders', 'topPackages',
-            'ordersByStatus', 'hourlyOrders', 'maxHourly', 'stats'
+            'ordersByStatus', 'hourlyOrders', 'maxHourly', 'stats',
+            'activeBanner'
         ));
     }
 }

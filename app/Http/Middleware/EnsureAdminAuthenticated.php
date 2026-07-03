@@ -11,15 +11,16 @@ class EnsureAdminAuthenticated
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (!session('admin_logged_in') || !session('admin_id')) {
+        if (! session('admin_logged_in') || ! session('admin_id')) {
             return redirect()->route('admin.login')
                 ->with('error', 'Please log in to access the admin panel.');
         }
 
         $admin = AdminUser::find(session('admin_id'));
 
-        if (!$admin || !$admin->is_active) {
+        if (! $admin || ! $admin->is_active) {
             session()->forget(['admin_logged_in', 'admin_id', 'admin_username', 'admin_role', 'login_time']);
+
             return redirect()->route('admin.login')
                 ->with('error', 'Your account has been deactivated.');
         }
@@ -28,6 +29,7 @@ class EnsureAdminAuthenticated
         if ($loginTime && (now()->timestamp - $loginTime) > 7200) {
             session()->invalidate();
             session()->regenerateToken();
+
             return redirect()->route('admin.login')
                 ->with('error', 'Session expired. Please log in again.');
         }

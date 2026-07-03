@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('styles')
 
     <style>
         html, body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
@@ -57,6 +58,20 @@
 
             {{-- Right: Actions --}}
             <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                {{-- Notifications --}}
+                @if(($userRole ?? '') !== 'guest')
+                @php
+                    $notifService = app(\App\Services\AdminNotificationService::class);
+                    $userNotifCount = $notifService->getUnreadCount(session('user_id'), $currentUser->role ?? 'agent');
+                @endphp
+                <a href="{{ route('user.notifications.index') }}" class="relative w-9 h-9 rounded-xl bg-slate-50/80 border border-slate-200/50 flex items-center justify-center text-slate-400 hover:text-[#EA580C] hover:bg-[#EA580C]/5 hover:border-[#EA580C]/20 transition-all duration-200">
+                    <x-heroicon-o-bell class="w-5 h-5" />
+                    @if($userNotifCount > 0)
+                        <span class="absolute -top-1 -right-1 w-4.5 h-4.5 min-w-[18px] bg-[#EA580C] text-white text-[9px] font-bold rounded-full flex items-center justify-center shadow-sm">{{ $userNotifCount > 99 ? '99+' : $userNotifCount }}</span>
+                    @endif
+                </a>
+                @endif
+
                 {{-- Balance pill --}}
                 @if(($userRole ?? '') !== 'guest')
                 <div class="hidden sm:flex items-center gap-2 bg-[#EA580C]/5 border border-[#EA580C]/15 rounded-xl px-3 py-1.5">
@@ -130,7 +145,7 @@
         {{-- Flash Messages --}}
         <div class="px-4 sm:px-6 pt-3 sm:pt-4">
             @if(session('success'))
-                <div class="flash-message mb-4 p-3 sm:p-3.5 bg-emerald-50 border border-emerald-200/60 rounded-xl flex items-center gap-3 text-emerald-700 text-sm shadow-sm">
+                <div data-success-alert class="flash-message mb-4 p-3 sm:p-3.5 bg-emerald-50 border border-emerald-200/60 rounded-xl flex items-center gap-3 text-emerald-700 text-sm shadow-sm">
                     <div class="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
                         <x-heroicon-o-check class="text-emerald-600 w-4 h-4" />
                     </div>

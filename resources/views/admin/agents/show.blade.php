@@ -1,4 +1,4 @@
-�@extends('layouts.admin')
+@extends('layouts.admin')
 @section('page-title', $agent->username)
 @section('page-description', 'Agent profile and details')
 @section('content')
@@ -76,6 +76,19 @@
                 @method('DELETE')
                 <button type="submit" class="w-full py-2 text-xs font-bold rounded-xl border border-slate-200 text-slate-400 hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition">
                     Delete Agent
+                </button>
+            </form>
+        </div>
+
+        <div class="mt-3 flex gap-2">
+            <button onclick="document.getElementById('showResetPasswordModal').classList.remove('hidden')"
+                    class="flex-1 py-2 text-xs font-bold rounded-xl border border-amber-200 text-amber-600 hover:bg-amber-50 transition">
+                Reset Password
+            </button>
+            <form method="POST" action="{{ route('admin.agents.send-reset-link', $agent->id) }}" class="flex-1" onsubmit="return confirm('Send password reset link to {{ $agent->email }}?')">
+                @csrf
+                <button type="submit" class="w-full py-2 text-xs font-bold rounded-xl border border-blue-200 text-blue-600 hover:bg-blue-50 transition">
+                    Send Reset Link
                 </button>
             </form>
         </div>
@@ -178,6 +191,45 @@
                 </table>
             </div>
         </div>
+    </div>
+</div>
+
+{{-- Reset Password Modal --}}
+<div id="showResetPasswordModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-2xl w-full max-w-md mx-4 p-7">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h3 class="text-base font-black text-slate-800">Reset Password</h3>
+                <p class="text-xs text-slate-400 mt-0.5">Set a new password for {{ $agent->username }}</p>
+            </div>
+            <button onclick="document.getElementById('showResetPasswordModal').classList.add('hidden')"
+                    class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition">
+                <x-heroicon-o-x-mark class="w-5 h-5" />
+            </button>
+        </div>
+        <form method="POST" action="{{ route('admin.agents.reset-password', $agent->id) }}" class="space-y-4">
+            @csrf
+            @method('PUT')
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">New Password *</label>
+                <input type="password" name="password" required placeholder="Min 8 characters"
+                       class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-700 bg-slate-50 focus:outline-none focus:border-[#2563EB] focus:bg-white transition">
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Confirm Password *</label>
+                <input type="password" name="password_confirmation" required placeholder="Re-enter password"
+                       class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-700 bg-slate-50 focus:outline-none focus:border-[#2563EB] focus:bg-white transition">
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="button" onclick="document.getElementById('showResetPasswordModal').classList.add('hidden')"
+                        class="flex-1 py-2.5 border border-slate-200 text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-50 transition">
+                    Cancel
+                </button>
+                <button type="submit" class="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold rounded-xl transition">
+                    Update Password
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 @endsection

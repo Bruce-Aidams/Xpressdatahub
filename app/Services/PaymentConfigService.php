@@ -3,19 +3,20 @@
 namespace App\Services;
 
 use App\Models\PaymentConfig;
-use Illuminate\Support\Facades\DB;
 
 class PaymentConfigService
 {
     public function getConfig(string $key, string $default = ''): string
     {
         $config = PaymentConfig::where('config_key', $key)->first();
+
         return $config ? $config->config_value : $default;
     }
 
     public function getAllConfig(): array
     {
         $configs = PaymentConfig::pluck('config_value', 'config_key')->toArray();
+
         return $configs;
     }
 
@@ -46,6 +47,7 @@ class PaymentConfigService
     {
         $phone = $this->getPaymentPhone();
         $name = $this->getPaymentName();
+
         return "Pay to <span class=\"font-bold bg-accent-500 text-white px-2 py-1 rounded\">{$phone} ({$name})</span>";
     }
 
@@ -55,13 +57,14 @@ class PaymentConfigService
 
         if ($existing) {
             $existing->update(['config_value' => $value]);
+
             return true;
         }
 
         PaymentConfig::create([
             'config_key' => $key,
             'config_value' => $value,
-            'description' => ucwords(str_replace('_', ' ', $key)) . ' configuration',
+            'description' => ucwords(str_replace('_', ' ', $key)).' configuration',
         ]);
 
         return true;

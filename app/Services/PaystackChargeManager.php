@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\PaystackTopupCharge;
-use Illuminate\Support\Facades\DB;
 
 class PaystackChargeManager
 {
@@ -13,7 +12,7 @@ class PaystackChargeManager
             ->orderByDesc('id')
             ->first();
 
-        if (!$config) {
+        if (! $config) {
             return [
                 'id' => 0,
                 'charge_amount' => 0.00,
@@ -38,7 +37,7 @@ class PaystackChargeManager
             return ['success' => false, 'message' => 'Invalid charge amount'];
         }
 
-        if (!in_array($chargeType, ['fixed', 'percentage'])) {
+        if (! in_array($chargeType, ['fixed', 'percentage'])) {
             return ['success' => false, 'message' => 'Invalid charge type'];
         }
 
@@ -62,7 +61,7 @@ class PaystackChargeManager
     {
         $config = $this->getChargeConfig();
 
-        if (!$config['is_active']) {
+        if (! $config['is_active']) {
             return [
                 'base_amount' => $baseAmount,
                 'charge_amount' => 0.00,
@@ -94,6 +93,7 @@ class PaystackChargeManager
     public function isChargeEnabled(): bool
     {
         $config = $this->getChargeConfig();
+
         return (bool) $config['is_active'];
     }
 
@@ -101,7 +101,7 @@ class PaystackChargeManager
     {
         $config = $this->getChargeConfig();
 
-        if (!$config['is_active']) {
+        if (! $config['is_active']) {
             return 'No charges applied';
         }
 
@@ -109,15 +109,16 @@ class PaystackChargeManager
         $type = $config['charge_type'];
 
         if ($type === 'fixed') {
-            return 'GH₵ ' . number_format($amount, 2) . ' flat charge';
+            return 'GH₵ '.number_format($amount, 2).' flat charge';
         }
 
-        return number_format($amount, 2) . '% charge';
+        return number_format($amount, 2).'% charge';
     }
 
     public function disableCharge(): array
     {
         PaystackTopupCharge::where('is_active', true)->update(['is_active' => false]);
+
         return ['success' => true, 'message' => 'Paystack charge disabled successfully'];
     }
 }

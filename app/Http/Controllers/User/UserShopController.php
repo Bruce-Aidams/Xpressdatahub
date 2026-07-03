@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Models\CustomPricing;
+use App\Models\Agent;
+use App\Models\Shop;
 use App\Services\ShopService;
 use Illuminate\Http\Request;
 
@@ -18,13 +19,13 @@ class UserShopController extends Controller
         $userId = session('user_id');
         $shopArray = $this->shopService->getShopByUserId($userId);
 
-        if (!$shopArray) {
-            $agent = \App\Models\Agent::find($userId);
+        if (! $shopArray) {
+            $agent = Agent::find($userId);
             $shopArray = $this->shopService->createShopForUser($userId, $agent->username ?? 'user');
         }
 
         // Load the Eloquent model so the Blade template can use object notation
-        $shop = \App\Models\Shop::with('setting', 'pricing', 'earnings', 'withdrawals')
+        $shop = Shop::with('setting', 'pricing', 'earnings', 'withdrawals')
             ->where('id', $shopArray['id'] ?? 0)
             ->first();
 
@@ -40,7 +41,7 @@ class UserShopController extends Controller
         $userId = session('user_id');
         $shopArray = $this->shopService->getShopByUserId($userId);
 
-        if (!$shopArray) {
+        if (! $shopArray) {
             return redirect()->back()
                 ->with('error', 'Shop not found.');
         }
@@ -53,7 +54,7 @@ class UserShopController extends Controller
         ]);
 
         try {
-            $shop = \App\Models\Shop::find($shopArray['id']);
+            $shop = Shop::find($shopArray['id']);
 
             if ($request->input('name')) {
                 $shop->update(['name' => $request->input('name')]);
@@ -83,12 +84,12 @@ class UserShopController extends Controller
         $userId = session('user_id');
         $shopArray = $this->shopService->getShopByUserId($userId);
 
-        if (!$shopArray) {
+        if (! $shopArray) {
             return redirect()->route('user.shop')
                 ->with('error', 'Shop not found.');
         }
 
-        $shop = \App\Models\Shop::find($shopArray['id']);
+        $shop = Shop::find($shopArray['id']);
         $pricing = $this->shopService->listShopPricing($shop->id);
 
         return view('user.shop.pricing', compact('shop', 'pricing'));

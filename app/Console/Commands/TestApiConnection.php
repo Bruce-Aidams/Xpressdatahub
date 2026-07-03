@@ -17,8 +17,9 @@ class TestApiConnection extends Command
         $networkFilter = $this->argument('network');
 
         $globalEnabled = PaymentConfig::where('config_key', 'api_enabled')->value('config_value');
-        if (!$globalEnabled) {
+        if (! $globalEnabled) {
             $this->error('Global API integration is disabled. Enable it in Payment Config (api_enabled).');
+
             return static::FAILURE;
         }
 
@@ -29,7 +30,8 @@ class TestApiConnection extends Command
         $configs = $query->get();
 
         if ($configs->isEmpty()) {
-            $this->error('No active API configurations found' . ($networkFilter ? " for network: {$networkFilter}" : '') . '.');
+            $this->error('No active API configurations found'.($networkFilter ? " for network: {$networkFilter}" : '').'.');
+
             return static::FAILURE;
         }
 
@@ -44,11 +46,13 @@ class TestApiConnection extends Command
 
             if (empty($endpoint)) {
                 $rows[] = [$config->network_type, '(not set)', 'SKIP', '-', '-', 'No endpoint configured'];
+
                 continue;
             }
 
-            if (!filter_var($endpoint, FILTER_VALIDATE_URL)) {
+            if (! filter_var($endpoint, FILTER_VALIDATE_URL)) {
                 $rows[] = [$config->network_type, $this->truncate($endpoint, 40), 'FAIL', '-', '-', 'Invalid URL'];
+
                 continue;
             }
 
@@ -60,16 +64,16 @@ class TestApiConnection extends Command
                 $this->truncate($endpoint, 40),
                 $statusIcon,
                 $result['http_code'] ?? '-',
-                ($result['response_time_ms'] ?? 0) . 'ms',
+                ($result['response_time_ms'] ?? 0).'ms',
                 $this->truncate($result['message'] ?? '', 50),
             ];
         }
 
         $this->table($headers, $rows);
 
-        $okCount = count(array_filter($rows, fn($r) => $r[2] === 'OK'));
-        $failCount = count(array_filter($rows, fn($r) => $r[2] === 'FAIL'));
-        $skipCount = count(array_filter($rows, fn($r) => $r[2] === 'SKIP'));
+        $okCount = count(array_filter($rows, fn ($r) => $r[2] === 'OK'));
+        $failCount = count(array_filter($rows, fn ($r) => $r[2] === 'FAIL'));
+        $skipCount = count(array_filter($rows, fn ($r) => $r[2] === 'SKIP'));
 
         $this->newLine();
         $this->info("Results: {$okCount} connected, {$failCount} failed, {$skipCount} skipped");
@@ -89,7 +93,7 @@ class TestApiConnection extends Command
 
         $testPayload = [
             'test' => true,
-            'transaction_id' => 'TEST-' . time(),
+            'transaction_id' => 'TEST-'.time(),
             'api_key' => $config->api_key ?? '',
             'api_secret' => $config->api_secret ?? '',
         ];
@@ -148,11 +152,12 @@ class TestApiConnection extends Command
         foreach ($headers as $key => $value) {
             $formatted[] = "{$key}: {$value}";
         }
+
         return $formatted;
     }
 
     private function truncate(string $value, int $length): string
     {
-        return strlen($value) > $length ? substr($value, 0, $length - 3) . '...' : $value;
+        return strlen($value) > $length ? substr($value, 0, $length - 3).'...' : $value;
     }
 }

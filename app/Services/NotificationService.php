@@ -6,12 +6,13 @@ use App\Models\Agent;
 use App\Models\NotificationConfig;
 use App\Models\NotificationLog;
 use App\Models\NotificationTemplate;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use PHPMailer\PHPMailer\PHPMailer;
 
 class NotificationService
 {
     private array $smsConfig;
+
     private array $emailConfig;
 
     public function __construct()
@@ -33,8 +34,9 @@ class NotificationService
         $results = ['sms' => false, 'email' => false, 'errors' => []];
 
         $user = Agent::select('id', 'username', 'email', 'phone')->find($userId);
-        if (!$user) {
+        if (! $user) {
             $results['errors'][] = 'User not found';
+
             return $results;
         }
 
@@ -42,18 +44,19 @@ class NotificationService
             ->where('is_active', true)
             ->first();
 
-        if (!$template) {
+        if (! $template) {
             $results['errors'][] = 'Notification template not found';
+
             return $results;
         }
 
         $processedTemplate = $this->processTemplate($template, $data, $user);
 
-        if (!empty($this->smsConfig['enabled']) && !empty($user->phone)) {
+        if (! empty($this->smsConfig['enabled']) && ! empty($user->phone)) {
             $results['sms'] = $this->sendSMS($user->phone, $processedTemplate['sms']);
         }
 
-        if (!empty($this->emailConfig['enabled']) && !empty($user->email)) {
+        if (! empty($this->emailConfig['enabled']) && ! empty($user->email)) {
             $results['email'] = $this->sendEmail(
                 $user->email,
                 $processedTemplate['email']['subject'],
@@ -73,7 +76,7 @@ class NotificationService
         }
 
         try {
-            $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+            $mail = new PHPMailer(true);
             $mail->isSMTP();
             $mail->Host = $this->emailConfig['smtp_host'];
             $mail->SMTPAuth = true;
@@ -81,17 +84,19 @@ class NotificationService
             $mail->Password = $this->emailConfig['smtp_password'];
             $mail->Port = $this->emailConfig['smtp_port'] ?? 587;
             $mail->SMTPSecure = $mail->Port == 465
-                ? \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS
-                : \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+                ? PHPMailer::ENCRYPTION_SMTPS
+                : PHPMailer::ENCRYPTION_STARTTLS;
             $mail->setFrom($this->emailConfig['from_email'], $this->emailConfig['from_name'] ?? 'Xpressdatahub');
             $mail->addAddress($to);
             $mail->isHTML(true);
             $mail->Subject = $subject;
             $mail->Body = $body;
             $mail->send();
+
             return true;
         } catch (\Exception $e) {
             report($e);
+
             return false;
         }
     }
@@ -104,6 +109,7 @@ class NotificationService
         );
 
         $this->loadConfigurations();
+
         return true;
     }
 
@@ -111,11 +117,11 @@ class NotificationService
     {
         $query = NotificationLog::with('agent:id,username,email');
 
-        if (!empty($filters['limit'])) {
+        if (! empty($filters['limit'])) {
             $query->limit($filters['limit']);
         }
 
-        if (!empty($filters['offset'])) {
+        if (! empty($filters['offset'])) {
             $query->offset($filters['offset']);
         }
 
@@ -160,7 +166,7 @@ class NotificationService
         }
 
         $phoneNumber = $this->cleanPhoneNumber($phoneNumber);
-        if (!$phoneNumber) {
+        if (! $phoneNumber) {
             return false;
         }
 
@@ -197,6 +203,7 @@ class NotificationService
             return $response->successful();
         } catch (\Exception $e) {
             report($e);
+
             return false;
         }
     }
@@ -211,7 +218,7 @@ class NotificationService
         }
 
         if (strpos($phoneNumber, '233') !== 0) {
-            $phoneNumber = '233' . ltrim($phoneNumber, '0');
+            $phoneNumber = '233'.ltrim($phoneNumber, '0');
         }
 
         try {
@@ -219,7 +226,7 @@ class NotificationService
                 'Host' => 'api.smsonlinegh.com',
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-                'Authorization' => 'key ' . $apiKey,
+                'Authorization' => 'key '.$apiKey,
             ])->timeout(30)->post('https://api.smsonlinegh.com/v5/sms/send', [
                 'text' => $message,
                 'type' => 0,
@@ -230,6 +237,7 @@ class NotificationService
             return $response->successful();
         } catch (\Exception $e) {
             report($e);
+
             return false;
         }
     }
@@ -239,9 +247,9 @@ class NotificationService
         $phone = preg_replace('/\D/', '', $phone);
 
         if (strlen($phone) == 10 && $phone[0] === '0') {
-            $phone = '233' . substr($phone, 1);
+            $phone = '233'.substr($phone, 1);
         } elseif (strlen($phone) == 9) {
-            $phone = '233' . $phone;
+            $phone = '233'.$phone;
         }
 
         return $phone;

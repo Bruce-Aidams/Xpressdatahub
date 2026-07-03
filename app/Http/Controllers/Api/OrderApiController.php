@@ -36,7 +36,7 @@ class OrderApiController extends Controller
         ]);
 
         $agent = $this->getAgent($request);
-        if (!$agent || ($agent->status ?? 'active') !== 'active') {
+        if (! $agent || ($agent->status ?? 'active') !== 'active') {
             return response()->json([
                 'success' => false,
                 'message' => 'Account is not active.',
@@ -44,7 +44,7 @@ class OrderApiController extends Controller
         }
 
         $phone = $this->externalApiService->validatePhoneNumber($request->input('phone_number'));
-        if (!$phone) {
+        if (! $phone) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid Ghana phone number.',
@@ -59,7 +59,7 @@ class OrderApiController extends Controller
             ->where('is_active', true)
             ->first();
 
-        if (!$pricing) {
+        if (! $pricing) {
             return response()->json([
                 'success' => false,
                 'message' => 'Package not found for this network.',
@@ -76,7 +76,7 @@ class OrderApiController extends Controller
             ], 402);
         }
 
-        $orderReference = 'ORD-' . strtoupper(substr(uniqid(), -8)) . '-' . rand(1000, 9999);
+        $orderReference = 'ORD-'.strtoupper(substr(uniqid(), -8)).'-'.rand(1000, 9999);
 
         try {
             DB::beginTransaction();
@@ -97,8 +97,9 @@ class OrderApiController extends Controller
                 'order_reference' => $orderReference,
             ]);
 
-            if (!$result['success']) {
+            if (! $result['success']) {
                 DB::rollBack();
+
                 return response()->json([
                     'success' => false,
                     'message' => $result['message'] ?? 'Failed to create order.',
@@ -175,7 +176,7 @@ class OrderApiController extends Controller
                     'order_id' => $orderId,
                     'old_status' => 'pending',
                     'new_status' => 'failed',
-                    'notes' => 'API call failed: ' . ($apiResult['error'] ?? 'Unknown error'),
+                    'notes' => 'API call failed: '.($apiResult['error'] ?? 'Unknown error'),
                     'created_at' => now(),
                 ]);
 
@@ -195,9 +196,10 @@ class OrderApiController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred: ' . $e->getMessage(),
+                'message' => 'An error occurred: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -212,7 +214,7 @@ class OrderApiController extends Controller
         ]);
 
         $agent = $this->getAgent($request);
-        if (!$agent) {
+        if (! $agent) {
             return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
         }
 
@@ -233,7 +235,7 @@ class OrderApiController extends Controller
     public function showOrder(Request $request, int $orderId)
     {
         $agent = $this->getAgent($request);
-        if (!$agent) {
+        if (! $agent) {
             return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
         }
 
@@ -241,7 +243,7 @@ class OrderApiController extends Controller
             ->where('agent_id', $agent->id)
             ->first();
 
-        if (!$order) {
+        if (! $order) {
             return response()->json([
                 'success' => false,
                 'message' => 'Order not found.',
@@ -269,7 +271,7 @@ class OrderApiController extends Controller
     public function checkOrderStatus(Request $request, string $externalTransactionId)
     {
         $agent = $this->getAgent($request);
-        if (!$agent) {
+        if (! $agent) {
             return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
         }
 
@@ -277,13 +279,13 @@ class OrderApiController extends Controller
             ->where('agent_id', $agent->id)
             ->first();
 
-        if (!$order) {
+        if (! $order) {
             $order = Order::where('transaction_id', $externalTransactionId)
                 ->where('agent_id', $agent->id)
                 ->first();
         }
 
-        if (!$order) {
+        if (! $order) {
             return response()->json([
                 'success' => false,
                 'message' => 'Order not found.',

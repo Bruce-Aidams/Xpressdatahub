@@ -19,7 +19,7 @@ class UserShopProfitController extends Controller
         $userId = session('user_id');
         $shop = $this->shopService->getShopByUserId($userId);
 
-        if (!$shop) {
+        if (! $shop) {
             return redirect()->route('user.shop')
                 ->with('error', 'Shop not found.');
         }
@@ -35,7 +35,7 @@ class UserShopProfitController extends Controller
         }
 
         if ($dateTo = $request->input('date_to')) {
-            $query->where('created_at', '<=', $dateTo . ' 23:59:59');
+            $query->where('created_at', '<=', $dateTo.' 23:59:59');
         }
 
         $earnings = $query->orderByDesc('created_at')->paginate(25);

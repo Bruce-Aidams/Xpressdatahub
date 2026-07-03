@@ -32,7 +32,7 @@ class AdminApiKeyController extends Controller
             $apiKey = ApiKey::create([
                 'user_id' => $request->input('user_id'),
                 'name' => $request->input('name'),
-                'api_key' => 'mk_' . Str::random(32),
+                'api_key' => 'mk_'.Str::random(32),
                 'api_secret' => Str::random(64),
                 'is_active' => true,
                 'rate_limit' => $request->input('rate_limit', 100),

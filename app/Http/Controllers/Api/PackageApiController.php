@@ -23,7 +23,7 @@ class PackageApiController extends Controller
         $packages = $query->orderBy('network_type')
             ->orderBy('package_size_gb')
             ->get()
-            ->map(fn($p) => [
+            ->map(fn ($p) => [
                 'id' => $p->id,
                 'network_type' => $p->network_type,
                 'package_size' => $p->package_size,

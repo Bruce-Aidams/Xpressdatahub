@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\BannerNotification;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class BannerNotificationService
 {
@@ -26,18 +26,20 @@ class BannerNotificationService
     public function getBannerById(int $id): ?array
     {
         $banner = BannerNotification::find($id);
+
         return $banner ? $banner->toArray() : null;
     }
 
     public function saveBanner(array $data): array
     {
         $id = $data['id'] ?? null;
+        $title = $data['title'] ?? '';
         $message = $data['message'] ?? '';
         $isEnabled = $data['is_enabled'] ?? false;
         $speed = $data['speed'] ?? 50;
         $color = $data['color'] ?? 'blue';
-        $backgroundColor = $data['background_color'] ?? 'blue';
-        $textColor = $data['text_color'] ?? 'white';
+        $backgroundColor = $data['background_color'] ?? '#1e40af';
+        $textColor = $data['text_color'] ?? '#ffffff';
 
         if (empty($message)) {
             return ['success' => false, 'message' => 'Message is required'];
@@ -47,32 +49,32 @@ class BannerNotificationService
             BannerNotification::where('is_active', true)->update(['is_active' => false]);
         }
 
-        $extraData = json_encode([
-            'speed' => $speed,
+        $extraData = [
+            'speed' => (int) $speed,
             'color' => $color,
             'background_color' => $backgroundColor,
             'text_color' => $textColor,
-        ]);
+        ];
+
+        $bannerTitle = ! empty($title) ? $title : Str::limit(strip_tags($message), 50);
+
+        $attributes = [
+            'title' => $bannerTitle,
+            'message' => $message,
+            'is_active' => $isEnabled,
+            'type' => $color,
+            'data' => $extraData,
+        ];
 
         if ($id) {
             $banner = BannerNotification::find($id);
-            if (!$banner) {
+            if (! $banner) {
                 return ['success' => false, 'message' => 'Banner not found'];
             }
 
-            $banner->update([
-                'message' => $message,
-                'is_active' => $isEnabled,
-                'type' => $color,
-                'data' => $extraData,
-            ]);
+            $banner->update($attributes);
         } else {
-            BannerNotification::create([
-                'message' => $message,
-                'is_active' => $isEnabled,
-                'type' => $color,
-                'data' => $extraData,
-            ]);
+            BannerNotification::create($attributes);
         }
 
         return ['success' => true, 'message' => 'Banner saved successfully'];
@@ -85,7 +87,7 @@ class BannerNotificationService
         }
 
         $banner = BannerNotification::find($id);
-        if (!$banner) {
+        if (! $banner) {
             return ['success' => false, 'message' => 'Banner not found'];
         }
 

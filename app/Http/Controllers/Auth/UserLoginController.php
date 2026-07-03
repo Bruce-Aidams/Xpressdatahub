@@ -28,8 +28,8 @@ class UserLoginController extends Controller
     {
         session()->regenerate();
         session()->put('guest_mode', true);
-        session()->put('guest临时_id', 'guest-' . Str::random(12));
-        session()->put('guest_id', 'GST-' . strtoupper(Str::random(6)));
+        session()->put('guest临时_id', 'guest-'.Str::random(12));
+        session()->put('guest_id', 'GST-'.strtoupper(Str::random(6)));
         session()->put('user_login_time', now()->timestamp);
 
         return redirect()->route('user.dashboard')
@@ -47,7 +47,7 @@ class UserLoginController extends Controller
             ->orWhere('email', $request->input('username'))
             ->first();
 
-        if (!$agent || !Hash::check($request->input('password'), $agent->password_hash)) {
+        if (! $agent || ! Hash::check($request->input('password'), $agent->password_hash)) {
             return redirect()->back()
                 ->withInput($request->only('username'))
                 ->with('error', 'Invalid credentials.');
@@ -56,7 +56,7 @@ class UserLoginController extends Controller
         if (isset($agent->status) && $agent->status !== 'active') {
             return redirect()->back()
                 ->withInput($request->only('username'))
-                ->with('error', 'Your account has been ' . $agent->status . '.');
+                ->with('error', 'Your account has been '.$agent->status.'.');
         }
 
         session()->regenerate();
@@ -74,7 +74,7 @@ class UserLoginController extends Controller
         $agent->update(['last_login_ip' => $request->ip()]);
 
         return redirect()->route('user.dashboard')
-            ->with('success', 'Welcome back, ' . $agent->username . '!');
+            ->with('success', 'Welcome back, '.$agent->username.'!');
     }
 
     public function logout()

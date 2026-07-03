@@ -1,4 +1,4 @@
-�@extends('layouts.user')
+@extends('layouts.user')
 @section('title', 'My Profile')
 @section('page-title', 'My Profile')
 @section('page-description', 'Manage your account settings')

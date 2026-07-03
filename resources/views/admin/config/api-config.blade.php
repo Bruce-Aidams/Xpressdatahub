@@ -161,6 +161,492 @@
             <button onclick="openAddModal()" class="inline-flex items-center gap-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-bold rounded-xl px-6 py-2.5 transition shadow-md shadow-blue-500/10"><x-heroicon-o-plus class="w-5 h-5" /> Add Network API</button>
         </div>
     @endforelse
+
+    {{-- API Documentation --}}
+    <div class="bg-white border border-slate-100/80 rounded-2xl shadow-sm overflow-hidden mb-6" id="apiDocsSection">
+        <button onclick="toggleDocs()" class="w-full flex items-center justify-between px-6 py-4 hover:bg-slate-50/50 transition text-left" type="button">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center">
+                    <x-heroicon-o-book-open class="w-5 h-5 text-indigo-500" />
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-slate-800">API Documentation & Setup Guide</h3>
+                    <p class="text-[11px] text-slate-400 mt-0.5">Step-by-step guide to configure network APIs with examples</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <span id="docsBadge" class="hidden px-2 py-0.5 bg-indigo-50 text-indigo-600 text-[10px] font-bold rounded-full">Open</span>
+                <x-heroicon-o-chevron-down id="docsChevron" class="w-5 h-5 text-slate-400 transition-transform duration-200" />
+            </div>
+        </button>
+
+        <div id="apiDocsContent" class="hidden">
+            <div class="px-6 pb-6 space-y-6 border-t border-slate-100 pt-5">
+
+                {{-- Overview --}}
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-2">
+                        <span class="w-5 h-5 rounded bg-indigo-100 text-indigo-600 text-[10px] font-black flex items-center justify-center">1</span>
+                        Overview
+                    </h4>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        The API Configuration page lets you connect external data providers (APIs) that process data orders for each network (MTN, AirtelTigo, Telecel). When a customer places a data order, the system sends the order details to the configured API endpoint, which delivers the data to the customer's phone.
+                    </p>
+                    <div class="mt-3 p-3 bg-amber-50 border border-amber-100 rounded-xl text-xs text-amber-700 flex items-start gap-2">
+                        <x-heroicon-o-exclamation-triangle class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                        <span>Each network can only have <strong>one active API configuration</strong>. Adding a new config for an existing network will update the existing one.</span>
+                    </div>
+                </div>
+
+                {{-- Step-by-Step --}}
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2">
+                        <span class="w-5 h-5 rounded bg-indigo-100 text-indigo-600 text-[10px] font-black flex items-center justify-center">2</span>
+                        Adding a Network API — Step by Step
+                    </h4>
+                    <div class="space-y-3">
+                        <div class="border border-slate-100 rounded-xl overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-slate-50">
+                                <span class="w-6 h-6 rounded-full bg-[#2563EB] text-white text-[11px] font-bold flex items-center justify-center">1</span>
+                                <span class="text-sm font-semibold text-slate-700">Click "Add Network API"</span>
+                            </div>
+                            <div class="px-4 py-3 text-xs text-slate-500 leading-relaxed">
+                                Click the <strong class="text-[#2563EB]">Add Network API</strong> button at the top-right of the page. A modal form will open with all configuration fields.
+                            </div>
+                        </div>
+                        <div class="border border-slate-100 rounded-xl overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-slate-50">
+                                <span class="w-6 h-6 rounded-full bg-[#2563EB] text-white text-[11px] font-bold flex items-center justify-center">2</span>
+                                <span class="text-sm font-semibold text-slate-700">Select the Network</span>
+                            </div>
+                            <div class="px-4 py-3 text-xs text-slate-500 leading-relaxed">
+                                Choose which network this API is for: <strong>MTN</strong>, <strong>AirtelTigo</strong>, or <strong>Telecel</strong>. This determines which orders are routed to this API. You can only have one active API per network.
+                            </div>
+                        </div>
+                        <div class="border border-slate-100 rounded-xl overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-slate-50">
+                                <span class="w-6 h-6 rounded-full bg-[#2563EB] text-white text-[11px] font-bold flex items-center justify-center">3</span>
+                                <span class="text-sm font-semibold text-slate-700">Enter API Name</span>
+                            </div>
+                            <div class="px-4 py-3 text-xs text-slate-500 leading-relaxed">
+                                Give the configuration a recognizable name. This is for your reference only.
+                                <div class="mt-2 p-2 bg-white border border-slate-100 rounded-lg font-mono text-[11px] text-slate-600">
+                                    Examples: <code class="text-indigo-600">Hubnet API</code>, <code class="text-indigo-600">GigBundles</code>, <code class="text-indigo-600">MooreTel Data API</code>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border border-slate-100 rounded-xl overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-slate-50">
+                                <span class="w-6 h-6 rounded-full bg-[#2563EB] text-white text-[11px] font-bold flex items-center justify-center">4</span>
+                                <span class="text-sm font-semibold text-slate-700">Enter the API Endpoint URL</span>
+                            </div>
+                            <div class="px-4 py-3 text-xs text-slate-500 leading-relaxed">
+                                This is the full URL where data orders will be sent. Must be a valid HTTPS URL.
+                                <div class="mt-2 p-2 bg-white border border-slate-100 rounded-lg font-mono text-[11px] text-slate-600">
+                                    Example: <code class="text-indigo-600">https://api.hubnet.com/v1/data/purchase</code>
+                                </div>
+                                <div class="mt-2 text-[11px] text-slate-400">The system will POST order data (phone, network, package, amount) to this URL.</div>
+                            </div>
+                        </div>
+                        <div class="border border-slate-100 rounded-xl overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-slate-50">
+                                <span class="w-6 h-6 rounded-full bg-[#2563EB] text-white text-[11px] font-bold flex items-center justify-center">5</span>
+                                <span class="text-sm font-semibold text-slate-700">Status Check Endpoint <span class="text-slate-400 font-normal">(optional)</span></span>
+                            </div>
+                            <div class="px-4 py-3 text-xs text-slate-500 leading-relaxed">
+                                If the API provider has a separate endpoint to check order status, enter it here. If left empty, the system will use the main endpoint for status checks.
+                                <div class="mt-2 p-2 bg-white border border-slate-100 rounded-lg font-mono text-[11px] text-slate-600">
+                                    Example: <code class="text-indigo-600">https://api.hubnet.com/v1/data/status</code>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border border-slate-100 rounded-xl overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-slate-50">
+                                <span class="w-6 h-6 rounded-full bg-[#2563EB] text-white text-[11px] font-bold flex items-center justify-center">6</span>
+                                <span class="text-sm font-semibold text-slate-700">Enter API Credentials</span>
+                            </div>
+                            <div class="px-4 py-3 text-xs text-slate-500 leading-relaxed">
+                                <strong>API Key</strong> (required): Your authentication key from the provider.<br>
+                                <strong>API Secret</strong> (optional): If the provider requires a second secret for authentication.
+                                <div class="mt-2 p-2 bg-white border border-slate-100 rounded-lg font-mono text-[11px] text-slate-600">
+                                    Example: <code class="text-indigo-600">sk_live_abc123def456ghi789</code>
+                                </div>
+                                <div class="mt-2 text-[11px] text-slate-400">These are stored encrypted and never exposed in the admin panel (masked as <code>••••••••xxxxxx</code>).</div>
+                            </div>
+                        </div>
+                        <div class="border border-slate-100 rounded-xl overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-slate-50">
+                                <span class="w-6 h-6 rounded-full bg-[#2563EB] text-white text-[11px] font-bold flex items-center justify-center">7</span>
+                                <span class="text-sm font-semibold text-slate-700">Configure Request Settings</span>
+                            </div>
+                            <div class="px-4 py-3 text-xs text-slate-500 leading-relaxed space-y-2">
+                                <div><strong>Request Method:</strong> Typically <code class="bg-slate-100 px-1 rounded">POST</code> for data purchases. Use <code class="bg-slate-100 px-1 rounded">GET</code> if the API requires query parameters.</div>
+                                <div><strong>Timeout:</strong> How long (in seconds) to wait for a response before retrying. Default: <code class="bg-slate-100 px-1 rounded">30s</code>. Range: 5–300 seconds.</div>
+                                <div><strong>Retry Attempts:</strong> How many times to retry on failure. Default: <code class="bg-slate-100 px-1 rounded">3</code>. Range: 0–10.</div>
+                            </div>
+                        </div>
+                        <div class="border border-slate-100 rounded-xl overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-slate-50">
+                                <span class="w-6 h-6 rounded-full bg-[#2563EB] text-white text-[11px] font-bold flex items-center justify-center">8</span>
+                                <span class="text-sm font-semibold text-slate-700">Configure Request Headers</span>
+                            </div>
+                            <div class="px-4 py-3 text-xs text-slate-500 leading-relaxed">
+                                Enter the HTTP headers as JSON. Use <code class="bg-slate-100 px-1 rounded">{api_key}</code> to dynamically inject the API key.
+                                <div class="mt-2 p-3 bg-slate-900 rounded-lg font-mono text-[11px] text-emerald-400 leading-relaxed">
+<pre class="whitespace-pre-wrap m-0">{\n    "Content-Type": "application/json",\n    "Authorization": "Bearer {api_key}"\n}</pre>
+                                </div>
+                                <div class="mt-2 text-[11px] text-slate-400">Some APIs use <code>api_key</code> in headers instead of the body. The <code>{api_key}</code> placeholder is replaced at runtime.</div>
+                            </div>
+                        </div>
+                        <div class="border border-slate-100 rounded-xl overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-slate-50">
+                                <span class="w-6 h-6 rounded-full bg-[#2563EB] text-white text-[11px] font-bold flex items-center justify-center">9</span>
+                                <span class="text-sm font-semibold text-slate-700">Configure Request Body Template</span>
+                            </div>
+                            <div class="px-4 py-3 text-xs text-slate-500 leading-relaxed">
+                                Define the JSON body sent to the API. Use placeholders for dynamic values. Click <strong>"View Placeholders"</strong> in the modal to see all available placeholders.
+                                <div class="mt-2 p-3 bg-slate-900 rounded-lg font-mono text-[11px] text-emerald-400 leading-relaxed">
+<pre class="whitespace-pre-wrap m-0">{\n    "phone": "{phone}",\n    "network": "{network}",\n    "package": "{package}",\n    "amount": "{amount}",\n    "payment_method": "{payment_method}",\n    "order_id": "{order_id}",\n    "reference": "{reference}"\n}</pre>
+                                </div>
+                                <div class="mt-3">
+                                    <strong class="text-slate-700">Common variations by provider:</strong>
+                                    <div class="mt-2 space-y-2">
+                                        <div class="p-2 bg-white border border-slate-100 rounded-lg">
+                                            <span class="font-semibold text-indigo-600">Provider A (field: "msisdn")</span>
+                                            <div class="font-mono text-[10px] text-slate-500 mt-1">"msisdn": "{phone}", "networkId": "{network}", "bundleSize": "{mb}"</div>
+                                        </div>
+                                        <div class="p-2 bg-white border border-slate-100 rounded-lg">
+                                            <span class="font-semibold text-indigo-600">Provider B (nested body)</span>
+                                            <div class="font-mono text-[10px] text-slate-500 mt-1">"subscriber": {"msisdn": "{phone}"}, "product": {"id": "{package}"}, "metadata": {"orderRef": "{order_id}"}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border border-slate-100 rounded-xl overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-slate-50">
+                                <span class="w-6 h-6 rounded-full bg-[#2563EB] text-white text-[11px] font-bold flex items-center justify-center">10</span>
+                                <span class="text-sm font-semibold text-slate-700">Map Response Fields</span>
+                            </div>
+                            <div class="px-4 py-3 text-xs text-slate-500 leading-relaxed">
+                                Tell the system how to read the API's response JSON. This determines whether an order was successful or failed.
+                                <div class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                    <div class="p-2 bg-white border border-slate-100 rounded-lg">
+                                        <span class="font-bold text-[10px] uppercase tracking-wider text-slate-400">Success Field</span>
+                                        <div class="font-mono text-[11px] text-slate-600 mt-1">Default: <code class="text-indigo-600">success</code></div>
+                                        <div class="text-[10px] text-slate-400 mt-0.5">The JSON key that indicates success (e.g. <code>"success": true</code>)</div>
+                                    </div>
+                                    <div class="p-2 bg-white border border-slate-100 rounded-lg">
+                                        <span class="font-bold text-[10px] uppercase tracking-wider text-slate-400">Data Field</span>
+                                        <div class="font-mono text-[11px] text-slate-600 mt-1">Default: <code class="text-indigo-600">data</code></div>
+                                        <div class="text-[10px] text-slate-400 mt-0.5">The JSON key containing response data (transaction ID, balance, etc.)</div>
+                                    </div>
+                                    <div class="p-2 bg-white border border-slate-100 rounded-lg">
+                                        <span class="font-bold text-[10px] uppercase tracking-wider text-slate-400">Error Field</span>
+                                        <div class="font-mono text-[11px] text-slate-600 mt-1">Default: <code class="text-indigo-600">error</code></div>
+                                        <div class="text-[10px] text-slate-400 mt-0.5">The JSON key containing error message when the request fails</div>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <strong class="text-slate-700">Example responses and matching field names:</strong>
+                                    <div class="mt-2 space-y-2">
+                                        <div class="p-2 bg-white border border-slate-100 rounded-lg">
+                                            <span class="font-semibold text-emerald-600">Success response</span>
+                                            <div class="font-mono text-[10px] text-slate-500 mt-1">{"<span class="text-emerald-600">success</span>": true, "<span class="text-blue-600">data</span>": {"transactionId": "TXN-123"}, ...}</div>
+                                        </div>
+                                        <div class="p-2 bg-white border border-slate-100 rounded-lg">
+                                            <span class="font-semibold text-red-600">Error response</span>
+                                            <div class="font-mono text-[10px] text-slate-500 mt-1">{"<span class="text-emerald-600">success</span>": false, "<span class="text-red-600">error</span>": "Insufficient balance", ...}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-3 p-2 bg-amber-50 border border-amber-100 rounded-lg text-[11px] text-amber-700">
+                                    <strong>Note:</strong> If your API uses different field names (e.g. <code>status</code> instead of <code>success</code>, or <code>message</code> instead of <code>error</code>), update these fields to match your provider's response format.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border border-slate-100 rounded-xl overflow-hidden">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-slate-50">
+                                <span class="w-6 h-6 rounded-full bg-[#2563EB] text-white text-[11px] font-bold flex items-center justify-center">11</span>
+                                <span class="text-sm font-semibold text-slate-700">Activate & Test</span>
+                            </div>
+                            <div class="px-4 py-3 text-xs text-slate-500 leading-relaxed">
+                                Check <strong>"Active"</strong> to enable the API immediately. After saving, hover over the config card and click the <strong class="text-blue-500">signal icon</strong> to run a test connection. This sends a sample request to verify the endpoint, credentials, and response mapping are correct.
+                                <div class="mt-2 p-2 bg-emerald-50 border border-emerald-100 rounded-lg text-[11px] text-emerald-700 flex items-start gap-2">
+                                    <x-heroicon-o-check-circle class="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                                    <span>A successful test means the API is ready to process real data orders.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Placeholder Reference --}}
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2">
+                        <span class="w-5 h-5 rounded bg-indigo-100 text-indigo-600 text-[10px] font-black flex items-center justify-center">3</span>
+                        Template Placeholders Reference
+                    </h4>
+                    <div class="border border-slate-100 rounded-xl overflow-hidden">
+                        <table class="w-full text-xs">
+                            <thead>
+                                <tr class="bg-slate-50 text-left">
+                                    <th class="px-4 py-2 font-bold text-slate-500">Placeholder</th>
+                                    <th class="px-4 py-2 font-bold text-slate-500">Description</th>
+                                    <th class="px-4 py-2 font-bold text-slate-500">Example Value</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50">
+                                @foreach([
+                                    ['{phone}', 'Beneficiary phone number', '233501234567'],
+                                    ['{network}', 'Network type', 'MTN'],
+                                    ['{package}', 'Package size in MB', '1024'],
+                                    ['{capacity}', 'Package size in GB', '1'],
+                                    ['{mb}', 'Package size in MB (alias)', '1024'],
+                                    ['{volume}', 'Package size in MB (alias)', '1024'],
+                                    ['{amount}', 'Order amount', '15.00'],
+                                    ['{payment_method}', 'Payment method', 'wallet'],
+                                    ['{order_id}', 'Local order ID', 'ORD-2026-001'],
+                                    ['{reference}', 'Order reference', 'REF-ABC123'],
+                                    ['{api_key}', 'API key (injected in headers)', 'sk_live_xxx'],
+                                    ['{webhook}', 'Webhook callback URL', 'https://...'],
+                                ] as [$ph, $desc, $example])
+                                    <tr class="hover:bg-slate-50/50">
+                                        <td class="px-4 py-2 font-mono text-indigo-600 font-bold">{{ $ph }}</td>
+                                        <td class="px-4 py-2 text-slate-500">{{ $desc }}</td>
+                                        <td class="px-4 py-2 font-mono text-slate-400">{{ $example }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {{-- Full Example --}}
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2">
+                        <span class="w-5 h-5 rounded bg-indigo-100 text-indigo-600 text-[10px] font-black flex items-center justify-center">4</span>
+                        Complete Example — MTN API Configuration
+                    </h4>
+                    <div class="border border-slate-100 rounded-xl overflow-hidden">
+                        <div class="px-4 py-2 bg-slate-50 border-b border-slate-100">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Form Fields</span>
+                        </div>
+                        <div class="px-4 py-3 space-y-2 text-xs">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div><span class="text-slate-400">Network:</span> <span class="font-bold text-amber-600">MTN</span></div>
+                                <div><span class="text-slate-400">API Name:</span> <span class="text-slate-700">Hubnet MTN API</span></div>
+                                <div><span class="text-slate-400">Endpoint:</span> <span class="font-mono text-slate-600">https://api.hubnet.com/v1/data/purchase</span></div>
+                                <div><span class="text-slate-400">Status Endpoint:</span> <span class="font-mono text-slate-600">https://api.hubnet.com/v1/data/status</span></div>
+                                <div><span class="text-slate-400">API Key:</span> <span class="font-mono text-slate-600">sk_live_abc123...</span></div>
+                                <div><span class="text-slate-400">Method:</span> <span class="font-bold text-slate-700">POST</span></div>
+                                <div><span class="text-slate-400">Timeout:</span> <span class="text-slate-700">30s</span></div>
+                                <div><span class="text-slate-400">Retries:</span> <span class="text-slate-700">3</span></div>
+                            </div>
+                        </div>
+                        <div class="px-4 py-2 bg-slate-50 border-t border-b border-slate-100">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Request Headers</span>
+                        </div>
+                        <div class="px-4 py-3 bg-slate-900">
+<pre class="font-mono text-[11px] text-emerald-400 whitespace-pre-wrap m-0">{\n    "Content-Type": "application/json",\n    "Authorization": "Bearer {api_key}"\n}</pre>
+                        </div>
+                        <div class="px-4 py-2 bg-slate-50 border-t border-b border-slate-100">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Request Body Template</span>
+                        </div>
+                        <div class="px-4 py-3 bg-slate-900">
+<pre class="font-mono text-[11px] text-emerald-400 whitespace-pre-wrap m-0">{\n    "phone": "{phone}",\n    "network": "{network}",\n    "package": "{package}",\n    "amount": "{amount}",\n    "payment_method": "{payment_method}",\n    "order_id": "{order_id}",\n    "reference": "{reference}"\n}</pre>
+                        </div>
+                        <div class="px-4 py-2 bg-slate-50 border-t border-b border-slate-100">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Response Field Mapping</span>
+                        </div>
+                        <div class="px-4 py-3 space-y-1 text-xs">
+                            <div><span class="text-slate-400">Success Field:</span> <code class="text-indigo-600">success</code></div>
+                            <div><span class="text-slate-400">Data Field:</span> <code class="text-indigo-600">data</code></div>
+                            <div><span class="text-slate-400">Error Field:</span> <code class="text-indigo-600">error</code></div>
+                        </div>
+                        <div class="px-4 py-2 bg-slate-50 border-t border-b border-slate-100">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">What Gets Sent at Runtime</span>
+                        </div>
+                        <div class="px-4 py-3 bg-slate-900">
+                            <p class="text-[10px] text-slate-400 mb-2">POST https://api.hubnet.com/v1/data/purchase</p>
+<pre class="font-mono text-[11px] text-emerald-400 whitespace-pre-wrap m-0">Headers:\n  Content-Type: application/json\n  Authorization: Bearer sk_live_abc123...\n\nBody:\n{\n    "phone": "233501234567",\n    "network": "MTN",\n    "package": "1024",\n    "amount": 15,\n    "payment_method": "wallet",\n    "order_id": "ORD-2026-0456",\n    "reference": "REF-ABC123XYZ"\n}</pre>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Common Error Codes --}}
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2">
+                        <span class="w-5 h-5 rounded bg-indigo-100 text-indigo-600 text-[10px] font-black flex items-center justify-center">5</span>
+                        Common Error Codes & Solutions
+                    </h4>
+                    <div class="border border-slate-100 rounded-xl overflow-hidden divide-y divide-slate-50">
+
+                        {{-- Critical --}}
+                        <div class="flex items-start gap-4 px-4 py-3">
+                            <span class="shrink-0 mt-0.5 px-2 py-0.5 bg-red-100 text-red-700 text-[10px] font-bold rounded-md uppercase">Critical</span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-bold text-slate-700">cURL Error 6 — Could not resolve host</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">The endpoint URL domain cannot be resolved by DNS.</p>
+                                <p class="text-[11px] text-emerald-600 mt-1 font-medium">Fix: Verify the endpoint URL is correct and uses a valid domain. Check for typos.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 px-4 py-3">
+                            <span class="shrink-0 mt-0.5 px-2 py-0.5 bg-red-100 text-red-700 text-[10px] font-bold rounded-md uppercase">Critical</span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-bold text-slate-700">cURL Error 7 — Failed to connect to host</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">The server refused the connection or is unreachable.</p>
+                                <p class="text-[11px] text-emerald-600 mt-1 font-medium">Fix: Ensure the API server is online. Check if the port number is correct. Whitelist your server IP if the provider uses IP restrictions.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 px-4 py-3">
+                            <span class="shrink-0 mt-0.5 px-2 py-0.5 bg-red-100 text-red-700 text-[10px] font-bold rounded-md uppercase">Critical</span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-bold text-slate-700">cURL Error 28 — Operation timed out</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">The API did not respond within the configured timeout period.</p>
+                                <p class="text-[11px] text-emerald-600 mt-1 font-medium">Fix: Increase the <strong>Timeout</strong> setting (e.g. 30s → 60s). Contact the API provider if their server is slow.</p>
+                            </div>
+                        </div>
+
+                        {{-- Error --}}
+                        <div class="flex items-start gap-4 px-4 py-3">
+                            <span class="shrink-0 mt-0.5 px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] font-bold rounded-md uppercase">Error</span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-bold text-slate-700">HTTP 401 — Unauthorized</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">The API key or secret is invalid, expired, or missing.</p>
+                                <p class="text-[11px] text-emerald-600 mt-1 font-medium">Fix: Regenerate your API key from the provider dashboard. Update the key in this configuration. Ensure the <code>{api_key}</code> placeholder is used in headers if required.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 px-4 py-3">
+                            <span class="shrink-0 mt-0.5 px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] font-bold rounded-md uppercase">Error</span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-bold text-slate-700">HTTP 403 — Forbidden</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Your server IP is not whitelisted or the API key lacks required permissions.</p>
+                                <p class="text-[11px] text-emerald-600 mt-1 font-medium">Fix: Request IP whitelisting from the API provider. Verify the API key has data purchase permissions.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 px-4 py-3">
+                            <span class="shrink-0 mt-0.5 px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] font-bold rounded-md uppercase">Error</span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-bold text-slate-700">HTTP 404 — Not Found</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">The endpoint URL path is incorrect.</p>
+                                <p class="text-[11px] text-emerald-600 mt-1 font-medium">Fix: Verify the full endpoint URL with the API provider's documentation. Ensure no trailing slashes or missing path segments.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 px-4 py-3">
+                            <span class="shrink-0 mt-0.5 px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] font-bold rounded-md uppercase">Error</span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-bold text-slate-700">HTTP 422 — Unprocessable Entity</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">The request body is missing required fields or has invalid data format.</p>
+                                <p class="text-[11px] text-emerald-600 mt-1 font-medium">Fix: Check the API provider's required fields. Verify your <strong>Request Body Template</strong> includes all mandatory placeholders. Ensure phone numbers include country code.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 px-4 py-3">
+                            <span class="shrink-0 mt-0.5 px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] font-bold rounded-md uppercase">Error</span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-bold text-slate-700">HTTP 429 — Too Many Requests</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">You've exceeded the API rate limit.</p>
+                                <p class="text-[11px] text-emerald-600 mt-1 font-medium">Fix: Increase the <strong>Retry Attempts</strong> delay. Contact the provider to raise your rate limit if needed.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 px-4 py-3">
+                            <span class="shrink-0 mt-0.5 px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] font-bold rounded-md uppercase">Error</span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-bold text-slate-700">HTTP 500 — Internal Server Error</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">The API provider's server encountered an internal error.</p>
+                                <p class="text-[11px] text-emerald-600 mt-1 font-medium">Fix: Retry the request. If persistent, contact the API provider's support team.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 px-4 py-3">
+                            <span class="shrink-0 mt-0.5 px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] font-bold rounded-md uppercase">Error</span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-bold text-slate-700">HTTP 502 / 503 — Bad Gateway / Service Unavailable</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">The API provider's server is down or undergoing maintenance.</p>
+                                <p class="text-[11px] text-emerald-600 mt-1 font-medium">Fix: Wait and retry. Check the provider's status page. The system will automatically retry based on your retry settings.</p>
+                            </div>
+                        </div>
+
+                        {{-- Warning --}}
+                        <div class="flex items-start gap-4 px-4 py-3">
+                            <span class="shrink-0 mt-0.5 px-2 py-0.5 bg-yellow-100 text-yellow-700 text-[10px] font-bold rounded-md uppercase">Warning</span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-bold text-slate-700">Response: "success: false" with error message</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">The API returned a valid response but the order was rejected.</p>
+                                <p class="text-[11px] text-emerald-600 mt-1 font-medium">Fix: Read the error message in the <code>error</code> field. Common reasons: insufficient provider balance, invalid phone number, invalid package ID, or duplicate order reference.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 px-4 py-3">
+                            <span class="shrink-0 mt-0.5 px-2 py-0.5 bg-yellow-100 text-yellow-700 text-[10px] font-bold rounded-md uppercase">Warning</span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-bold text-slate-700">Response success field not recognized</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">The system can't determine if the order succeeded because the <strong>Success Field</strong> name doesn't match the API response.</p>
+                                <p class="text-[11px] text-emerald-600 mt-1 font-medium">Fix: Check the raw API response and update the <strong>Response Field Mapping</strong>. Common alternatives: <code>status</code>, <code>result</code>, <code>ok</code>, <code>successful</code>.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 px-4 py-3">
+                            <span class="shrink-0 mt-0.5 px-2 py-0.5 bg-yellow-100 text-yellow-700 text-[10px] font-bold rounded-md uppercase">Warning</span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-bold text-slate-700">Request headers/body template validation failed</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">The JSON in <strong>Request Headers</strong> or <strong>Request Body Template</strong> is malformed.</p>
+                                <p class="text-[11px] text-emerald-600 mt-1 font-medium">Fix: Use a JSON validator (jsonlint.com) to check syntax. Ensure all braces, quotes, and commas are correct. No trailing commas allowed in JSON.</p>
+                            </div>
+                        </div>
+
+                        {{-- Info --}}
+                        <div class="flex items-start gap-4 px-4 py-3">
+                            <span class="shrink-0 mt-0.5 px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded-md uppercase">Info</span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-bold text-slate-700">Test connection succeeds but real orders fail</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">The test uses dummy data. Real orders may fail due to actual account constraints.</p>
+                                <p class="text-[11px] text-emerald-600 mt-1 font-medium">Ensure the provider account has sufficient balance. Verify package IDs match the provider's catalog. Check phone number format (must include country code).</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4 px-4 py-3">
+                            <span class="shrink-0 mt-0.5 px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded-md uppercase">Info</span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-bold text-slate-700">Order stuck in "processing" status</p>
+                                <p class="text-[11px] text-slate-500 mt-0.5">The API was called but the response hasn't confirmed success or failure yet.</p>
+                                <p class="text-[11px] text-emerald-600 mt-1 font-medium">Check the <strong>Status Check Endpoint</strong> configuration. The system will poll this endpoint to determine the final order status. Ensure it's correctly configured.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                {{-- Troubleshooting --}}
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2">
+                        <span class="w-5 h-5 rounded bg-indigo-100 text-indigo-600 text-[10px] font-black flex items-center justify-center">6</span>
+                        General Troubleshooting
+                    </h4>
+                    <div class="space-y-2">
+                        <div class="p-3 bg-white border border-slate-100 rounded-xl">
+                            <p class="text-xs font-bold text-slate-700 mb-1">Test connection fails with "cURL Error"</p>
+                            <p class="text-[11px] text-slate-500">The endpoint URL may be incorrect, the server may be down, or there's a firewall blocking the request. Verify the URL is accessible and uses HTTPS.</p>
+                        </div>
+                        <div class="p-3 bg-white border border-slate-100 rounded-xl">
+                            <p class="text-xs font-bold text-slate-700 mb-1">Test passes but orders fail</p>
+                            <p class="text-[11px] text-slate-500">The test uses dummy data. Real orders may fail due to invalid phone numbers, insufficient provider balance, or package ID mismatches. Check the API provider's docs for required field formats.</p>
+                        </div>
+                        <div class="p-3 bg-white border border-slate-100 rounded-xl">
+                            <p class="text-xs font-bold text-slate-700 mb-1">Response shows "success: false"</p>
+                            <p class="text-[11px] text-slate-500">The <strong>Success Field</strong> name may not match your provider's response. Check the raw response body and update the field mapping. Some providers use <code>status</code>, <code>result</code>, or <code>ok</code> instead of <code>success</code>.</p>
+                        </div>
+                        <div class="p-3 bg-white border border-slate-100 rounded-xl">
+                            <p class="text-xs font-bold text-slate-700 mb-1">Orders timeout frequently</p>
+                            <p class="text-[11px] text-slate-500">Increase the <strong>Timeout</strong> value (e.g. from 30s to 60s) and check if the provider's API is experiencing high latency.</p>
+                        </div>
+                        <div class="p-3 bg-white border border-slate-100 rounded-xl">
+                            <p class="text-xs font-bold text-slate-700 mb-1">"Validation failed" when saving</p>
+                            <p class="text-[11px] text-slate-500">The JSON in Headers or Body Template is malformed. Use a JSON validator (like jsonlint.com) to check your JSON syntax. Ensure all braces, quotes, and commas are correct.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 </div>
 
 {{-- Add/Edit Modal --}}
@@ -168,9 +654,9 @@
     <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeModal()"></div>
     <div class="absolute inset-0 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-fade-in">
-            <form id="apiForm" method="POST" action="{{ route('admin.api-config.store') }}">
+            <form id="apiForm" method="POST" action="{{ route('admin.api-config.store') }}" onsubmit="return validateNetwork()">
                 @csrf
-                <input type="hidden" name="network_type" id="m_network">
+                <input type="hidden" name="network_type" id="m_network" required>
 
                 {{-- Modal Header --}}
                 <div class="sticky top-0 bg-white z-10 flex items-center justify-between px-6 py-4 border-b border-slate-100 rounded-t-2xl">
@@ -403,6 +889,35 @@
 
 @push('scripts')
 <script>
+    function openDocs() {
+        var content = document.getElementById('apiDocsContent');
+        var chevron = document.getElementById('docsChevron');
+        var badge = document.getElementById('docsBadge');
+        if (content && content.classList.contains('hidden')) {
+            content.classList.remove('hidden');
+            chevron.style.transform = 'rotate(180deg)';
+            badge.classList.remove('hidden');
+            document.getElementById('apiDocsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+    if (window.location.hash === '#docs') { openDocs(); }
+    window.addEventListener('hashchange', function() { if (window.location.hash === '#docs') openDocs(); });
+
+    function toggleDocs() {
+        const content = document.getElementById('apiDocsContent');
+        const chevron = document.getElementById('docsChevron');
+        const badge = document.getElementById('docsBadge');
+        if (content.classList.contains('hidden')) {
+            content.classList.remove('hidden');
+            chevron.style.transform = 'rotate(180deg)';
+            badge.classList.remove('hidden');
+        } else {
+            content.classList.add('hidden');
+            chevron.style.transform = '';
+            badge.classList.add('hidden');
+        }
+    }
+
     function openAddModal() {
         document.getElementById('m_title').textContent = 'Add Network API';
         document.getElementById('m_submit').textContent = 'Save Configuration';
@@ -412,6 +927,13 @@
         document.getElementById('m_active').checked = true;
         document.getElementById('networkSelector').style.display = 'block';
         document.querySelectorAll('.network-option').forEach(b => { b.classList.remove('border-[#2563EB]','bg-blue-50'); b.classList.add('border-slate-200'); });
+        document.getElementById('m_headers').value = '{\n    "Content-Type": "application/json",\n    "Authorization": "Bearer {api_key}"\n}';
+        document.getElementById('m_template').value = '{\n    "phone": "{phone}",\n    "network": "{network}",\n    "package": "{package}",\n    "amount": "{amount}",\n    "payment_method": "{payment_method}",\n    "order_id": "{order_id}",\n    "reference": "{reference}"\n}';
+        document.getElementById('m_success').value = 'success';
+        document.getElementById('m_data_field').value = 'data';
+        document.getElementById('m_error').value = 'error';
+        document.getElementById('m_timeout').value = '30';
+        document.getElementById('m_retries').value = '3';
         document.getElementById('apiModal').classList.remove('hidden');
     }
 
@@ -440,6 +962,15 @@
 
     function closeModal() { document.getElementById('apiModal').classList.add('hidden'); }
 
+    function validateNetwork() {
+        const net = document.getElementById('m_network').value;
+        if (!net) {
+            alert('Please select a network type.');
+            return false;
+        }
+        return true;
+    }
+
     function selectNetwork(net, btn) {
         document.getElementById('m_network').value = net;
         document.querySelectorAll('.network-option').forEach(b => { b.classList.remove('border-[#2563EB]','bg-blue-50'); b.classList.add('border-slate-200'); });
@@ -450,7 +981,7 @@
     function deleteConfig(id, network) {
         if (!confirm('Delete the ' + network + ' API configuration? This cannot be undone.')) return;
         const f = document.getElementById('deleteForm');
-        f.action = '{{ url("admin/api-config") }}/' + id;
+        f.action = '{{ url(config("app.admin_path") . "/api-config") }}/' + id;
         f.submit();
     }
 
@@ -486,7 +1017,7 @@
 
         document.getElementById('testModal').classList.remove('hidden');
 
-        fetch('{{ url("admin/api-config") }}/' + id + '/test', {
+        fetch('{{ url(config("app.admin_path") . "/api-config") }}/' + id + '/test', {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,

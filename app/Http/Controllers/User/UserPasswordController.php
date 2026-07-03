@@ -24,12 +24,12 @@ class UserPasswordController extends Controller
         try {
             $user = Agent::find(session('user_id'));
 
-            if (!$user) {
+            if (! $user) {
                 return redirect()->back()
                     ->with('error', 'User not found.');
             }
 
-            if (!Hash::check($request->input('current_password'), $user->password_hash)) {
+            if (! Hash::check($request->input('current_password'), $user->password_hash)) {
                 return redirect()->back()
                     ->with('error', 'Current password is incorrect.');
             }

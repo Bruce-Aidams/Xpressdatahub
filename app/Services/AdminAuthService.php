@@ -4,9 +4,9 @@ namespace App\Services;
 
 use App\Models\AdminUser;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Session;
 
 class AdminAuthService
 {
@@ -16,13 +16,15 @@ class AdminAuthService
             ->where('is_active', true)
             ->first();
 
-        if (!$admin) {
+        if (! $admin) {
             $this->logLogin(null, $username, 'failed', 'User not found');
+
             return ['success' => false, 'error' => 'Invalid credentials'];
         }
 
-        if (!Hash::check($password, $admin->password_hash)) {
+        if (! Hash::check($password, $admin->password_hash)) {
             $this->logLogin($admin->id, $username, 'failed', 'Invalid password');
+
             return ['success' => false, 'error' => 'Invalid credentials'];
         }
 
@@ -55,7 +57,7 @@ class AdminAuthService
 
     public function requireAuth(string $redirectTo = '/admin/login'): void
     {
-        if (!$this->isAuthenticated()) {
+        if (! $this->isAuthenticated()) {
             redirect($redirectTo)->send();
             exit();
         }
@@ -63,7 +65,7 @@ class AdminAuthService
         $loginTime = Session::get('login_time');
         if ($loginTime && (now()->timestamp - $loginTime) > 7200) {
             $this->logout();
-            redirect($redirectTo . '?timeout=1')->send();
+            redirect($redirectTo.'?timeout=1')->send();
             exit();
         }
     }
@@ -103,11 +105,11 @@ class AdminAuthService
     public function changePassword(int $adminId, string $currentPassword, string $newPassword): array
     {
         $admin = AdminUser::find($adminId);
-        if (!$admin) {
+        if (! $admin) {
             return ['success' => false, 'error' => 'Admin not found'];
         }
 
-        if (!Hash::check($currentPassword, $admin->password_hash)) {
+        if (! Hash::check($currentPassword, $admin->password_hash)) {
             return ['success' => false, 'error' => 'Current password is incorrect'];
         }
 

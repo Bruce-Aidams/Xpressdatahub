@@ -12,11 +12,11 @@ class EnsureUserRole
     {
         $userRole = session('role');
 
-        if (!$userRole) {
+        if (! $userRole) {
             abort(403, 'Unauthorized. No role assigned.');
         }
 
-        if (!empty($roles) && !in_array($userRole, $roles)) {
+        if (! empty($roles) && ! in_array($userRole, $roles)) {
             abort(403, 'Unauthorized. You do not have the required role to access this resource.');
         }
 

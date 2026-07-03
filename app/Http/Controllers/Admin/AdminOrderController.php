@@ -8,7 +8,6 @@ use App\Models\Order;
 use App\Models\Shop;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class AdminOrderController extends Controller
 {
@@ -44,7 +43,7 @@ class AdminOrderController extends Controller
         }
 
         if ($dateTo = $request->input('date_to')) {
-            $query->where('created_at', '<=', $dateTo . ' 23:59:59');
+            $query->where('created_at', '<=', $dateTo.' 23:59:59');
         }
 
         $orders = $query->orderByDesc('created_at')->paginate(25);
@@ -127,5 +126,41 @@ class AdminOrderController extends Controller
             return redirect()->back()
                 ->with('error', 'An error occurred while updating order status.');
         }
+    }
+
+    public function bulkStatusUpdate(Request $request)
+    {
+        $request->validate([
+            'order_ids' => 'required|array|min:1',
+            'order_ids.*' => 'integer|exists:orders,id',
+            'status' => 'required|string|in:pending,processing,delivered,failed,cancelled',
+        ]);
+
+        $orderIds = $request->input('order_ids');
+        $status = $request->input('status');
+        $successCount = 0;
+        $failCount = 0;
+
+        foreach ($orderIds as $orderId) {
+            $result = $this->orderService->updateOrderStatus(
+                $orderId,
+                $status,
+                'Bulk update by admin',
+                'admin'
+            );
+
+            if ($result['success']) {
+                $successCount++;
+            } else {
+                $failCount++;
+            }
+        }
+
+        $message = ucfirst($status)." status applied to {$successCount} order(s) successfully.";
+        if ($failCount > 0) {
+            $message .= " {$failCount} order(s) could not be updated.";
+        }
+
+        return redirect()->back()->with('success', $message);
     }
 }

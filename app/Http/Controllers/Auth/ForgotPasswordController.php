@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Agent;
+use App\Models\PasswordResetToken;
 use App\Services\PasswordResetService;
 use Illuminate\Http\Request;
 
@@ -28,12 +29,12 @@ class ForgotPasswordController extends Controller
 
         $agent = Agent::where('email', $email)->first();
 
-        if (!$agent) {
+        if (! $agent) {
             return redirect()->back()
                 ->with('error', 'No account found with that email address.');
         }
 
-        if (!$this->resetService->checkRateLimit($email)) {
+        if (! $this->resetService->checkRateLimit($email)) {
             return redirect()->back()
                 ->with('error', 'Too many reset attempts. Please try again later.');
         }
@@ -45,7 +46,7 @@ class ForgotPasswordController extends Controller
         $expiresAt = now()->addMinutes(60);
 
         try {
-            \App\Models\PasswordResetToken::create([
+            PasswordResetToken::create([
                 'email' => $email,
                 'token_hash' => password_hash($token, PASSWORD_DEFAULT),
                 'otp_code' => $otp,

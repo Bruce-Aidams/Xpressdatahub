@@ -31,8 +31,9 @@ class BulkOrderController extends Controller
 
         foreach ($request->orders as $order) {
             $prefix = substr($order['phone_number'], 0, 3);
-            if (!in_array($prefix, $networkPrefixes[$order['network_type']] ?? [])) {
+            if (! in_array($prefix, $networkPrefixes[$order['network_type']] ?? [])) {
                 $skipped++;
+
                 continue;
             }
 
@@ -41,8 +42,9 @@ class BulkOrderController extends Controller
                 ->where('is_active', true)
                 ->first();
 
-            if (!$pricing) {
+            if (! $pricing) {
                 $skipped++;
+
                 continue;
             }
 
@@ -68,9 +70,9 @@ class BulkOrderController extends Controller
             $added++;
         }
 
-        $message = $added . ' item(s) added to cart.';
+        $message = $added.' item(s) added to cart.';
         if ($skipped > 0) {
-            $message .= ' ' . $skipped . ' skipped (unavailable package).';
+            $message .= ' '.$skipped.' skipped (unavailable package).';
         }
 
         return redirect()->route('user.buy-data')

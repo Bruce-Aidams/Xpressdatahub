@@ -34,7 +34,7 @@ class PaystackWebhookController extends Controller
 
             $payment = Payment::where('paystack_reference', $reference)->first();
 
-            if (!$payment) {
+            if (! $payment) {
                 return response()->json(['status' => 'error', 'message' => 'Payment not found'], 404);
             }
 
@@ -42,7 +42,7 @@ class PaystackWebhookController extends Controller
                 return response()->json(['status' => 'already_verified']);
             }
 
-            DB::transaction(function () use ($payment, $data, $status, $gatewayResponse, $paidAt) {
+            DB::transaction(function () use ($payment, $status, $paidAt) {
                 $payment->update([
                     'status' => $status === 'success' ? 'verified' : 'failed',
                     'verified_at' => $paidAt ? now() : now(),
@@ -69,6 +69,7 @@ class PaystackWebhookController extends Controller
 
         } catch (\Exception $e) {
             report($e);
+
             return response()->json(['status' => 'error', 'message' => 'Webhook processing failed'], 500);
         }
     }

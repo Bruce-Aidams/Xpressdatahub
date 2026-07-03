@@ -1,4 +1,4 @@
-�@extends('layouts.admin')
+@extends('layouts.admin')
 @section('page-title', 'Shop Orders')
 @section('page-description', 'Verify shop orders')
 @section('content')

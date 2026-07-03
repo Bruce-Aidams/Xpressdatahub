@@ -31,7 +31,7 @@ class AdminBalanceHistoryController extends Controller
         }
 
         if ($dateTo = $request->input('date_to')) {
-            $query->where('created_at', '<=', $dateTo . ' 23:59:59');
+            $query->where('created_at', '<=', $dateTo.' 23:59:59');
         }
 
         $history = $query->orderByDesc('created_at')->paginate(25);

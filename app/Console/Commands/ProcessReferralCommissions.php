@@ -21,9 +21,10 @@ class ProcessReferralCommissions extends Command
 
             $result = $referralService->processDailyCommissions($date);
 
-            if (!$result['success']) {
+            if (! $result['success']) {
                 $this->error("Failed: {$result['message']}");
                 Log::error('Referral commission processing failed', ['message' => $result['message'], 'date' => $date]);
+
                 return static::FAILURE;
             }
 
@@ -34,6 +35,7 @@ class ProcessReferralCommissions extends Command
         } catch (\Exception $e) {
             $this->error("Error: {$e->getMessage()}");
             Log::error('Referral commission processing exception', ['date' => $date, 'error' => $e->getMessage()]);
+
             return static::FAILURE;
         }
     }

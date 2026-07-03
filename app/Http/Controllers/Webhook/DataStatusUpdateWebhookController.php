@@ -32,7 +32,7 @@ class DataStatusUpdateWebhookController extends Controller
 
             $status = $payload['status'] ?? null;
 
-            if (!$externalTransactionId || !$status) {
+            if (! $externalTransactionId || ! $status) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Missing required fields: transaction_id and status',
@@ -40,18 +40,18 @@ class DataStatusUpdateWebhookController extends Controller
             }
 
             $mappedStatus = $this->mapExternalStatus($status);
-            if (!$mappedStatus) {
+            if (! $mappedStatus) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Could not map external status: ' . $status,
+                    'message' => 'Could not map external status: '.$status,
                 ], 422);
             }
 
             $order = $this->findOrder($externalTransactionId, $payload);
 
-            if (!$order) {
+            if (! $order) {
                 $order = $this->createOrderFromWebhook($payload, $externalTransactionId, $mappedStatus);
-                if (!$order) {
+                if (! $order) {
                     return response()->json([
                         'success' => false,
                         'message' => 'Order not found and could not create from webhook data',
@@ -89,6 +89,7 @@ class DataStatusUpdateWebhookController extends Controller
         } catch (\Exception $e) {
             Log::error("Data webhook processing error: {$e->getMessage()}");
             report($e);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Webhook processing failed',
@@ -146,7 +147,7 @@ class DataStatusUpdateWebhookController extends Controller
         $amount = $payload['amount'] ?? 0;
         $username = $payload['username'] ?? null;
 
-        if (!$phoneNumber || !$packageSize || !$username) {
+        if (! $phoneNumber || ! $packageSize || ! $username) {
             return null;
         }
 
@@ -155,7 +156,7 @@ class DataStatusUpdateWebhookController extends Controller
             $agent = DB::table('agents')->where('username', $username)->first();
         }
 
-        if (!$agent) {
+        if (! $agent) {
             return null;
         }
 
@@ -216,7 +217,7 @@ class DataStatusUpdateWebhookController extends Controller
 
     private function mapExternalStatus(?string $externalStatus): ?string
     {
-        if (!$externalStatus) {
+        if (! $externalStatus) {
             return null;
         }
 

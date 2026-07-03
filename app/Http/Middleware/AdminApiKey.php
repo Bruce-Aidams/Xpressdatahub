@@ -23,26 +23,27 @@ class AdminApiKey
 
         $admin = AdminUser::where('api_token', $token)->first();
 
-        if (!$admin) {
+        if (! $admin) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid admin token.',
             ], 401);
         }
 
-        if (!$admin->is_active) {
+        if (! $admin->is_active) {
             return response()->json([
                 'success' => false,
                 'message' => 'Admin account is deactivated.',
             ], 403);
         }
 
-        $limiterKey = 'admin_api_' . $admin->id;
+        $limiterKey = 'admin_api_'.$admin->id;
         if (RateLimiter::tooManyAttempts($limiterKey, 120)) {
             $retryAfter = RateLimiter::availableIn($limiterKey);
+
             return response()->json([
                 'success' => false,
-                'message' => 'Rate limit exceeded. Try again in ' . $retryAfter . ' seconds.',
+                'message' => 'Rate limit exceeded. Try again in '.$retryAfter.' seconds.',
             ], 429)->header('Retry-After', $retryAfter);
         }
 

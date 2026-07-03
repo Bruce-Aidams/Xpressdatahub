@@ -1,4 +1,4 @@
-�@extends('layouts.admin')
+@extends('layouts.admin')
 @section('page-title', 'Dashboard')
 @section('page-description', 'Real-time overview of your platform performance')
 @section('content')

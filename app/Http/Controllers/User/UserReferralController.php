@@ -23,7 +23,7 @@ class UserReferralController extends Controller
             ->orderByDesc('created_at')
             ->paginate(25);
 
-        $referralLink = url('/register?ref=' . $referralCode);
+        $referralLink = url('/register?ref='.$referralCode);
 
         $totalReferrals = $stats['total_referrals'] ?? 0;
         $totalEarnings = $stats['total_earned'] ?? 0;

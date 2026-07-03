@@ -11,6 +11,7 @@ use App\Models\ShopEarning;
 use App\Models\ShopPricing;
 use App\Models\ShopSetting;
 use App\Models\ShopWithdrawal;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class ShopService
@@ -54,6 +55,7 @@ class ShopService
     public function getShopByUserId(int $userId): ?array
     {
         $shop = Shop::where('user_id', $userId)->first();
+
         return $shop ? $shop->toArray() : null;
     }
 
@@ -62,6 +64,7 @@ class ShopService
         $shop = Shop::with('agent:id,username,role')
             ->where('shop_slug', $slug)
             ->first();
+
         return $shop ? $shop->toArray() : null;
     }
 
@@ -84,7 +87,7 @@ class ShopService
         return true;
     }
 
-    public function listShopPricing(int $shopId): \Illuminate\Support\Collection
+    public function listShopPricing(int $shopId): Collection
     {
         return ShopPricing::where('shop_id', $shopId)
             ->orderBy('network_type')
@@ -98,7 +101,7 @@ class ShopService
             ->where('id', $pricingId)
             ->first();
 
-        if (!$pricing) {
+        if (! $pricing) {
             return ['success' => false, 'message' => 'Package not found'];
         }
 
@@ -106,7 +109,7 @@ class ShopService
         $sell = floatval($data['selling_price'] ?? 0);
 
         if ($sell < $base) {
-            return ['success' => false, 'message' => 'Selling price cannot be below base price (' . $base . ' GHS)'];
+            return ['success' => false, 'message' => 'Selling price cannot be below base price ('.$base.' GHS)'];
         }
 
         $profit = round($sell - $base, 2);
@@ -201,11 +204,11 @@ class ShopService
         $max = floatval(DB::table('payment_config')->where('config_key', 'shop_max_withdrawal')->value('config_value') ?? 100000);
 
         if ($amount < $min) {
-            return ['success' => false, 'message' => 'Minimum withdrawal is GH₵ ' . number_format($min, 2)];
+            return ['success' => false, 'message' => 'Minimum withdrawal is GH₵ '.number_format($min, 2)];
         }
 
         if ($max > 0 && $amount > $max) {
-            return ['success' => false, 'message' => 'Maximum withdrawal is GH₵ ' . number_format($max, 2)];
+            return ['success' => false, 'message' => 'Maximum withdrawal is GH₵ '.number_format($max, 2)];
         }
 
         $summary = $this->getShopEarningsSummary($shopId);
@@ -255,7 +258,7 @@ class ShopService
         return DB::transaction(function () use ($orderId, $adminId, $adminUsername, $paystackTxnId) {
             $order = Order::lockForUpdate()->find($orderId);
 
-            if (!$order) {
+            if (! $order) {
                 return ['success' => false, 'message' => 'Order not found'];
             }
 
@@ -264,7 +267,7 @@ class ShopService
             }
 
             $shopId = $order->shop_id;
-            if (!$shopId) {
+            if (! $shopId) {
                 return ['success' => false, 'message' => 'Order has no shop'];
             }
 
@@ -275,12 +278,12 @@ class ShopService
 
             $noManualVerify = ['verified', 'processing', 'delivered', 'paid', 'cancelled'];
             if (in_array(strtolower($order->status), $noManualVerify)) {
-                return ['success' => false, 'message' => 'Order cannot be manually verified in status: ' . $order->status];
+                return ['success' => false, 'message' => 'Order cannot be manually verified in status: '.$order->status];
             }
 
             $adminLabel = trim($adminUsername);
             if ($adminId && $adminId > 0) {
-                $adminLabel = $adminLabel !== '' ? $adminLabel . ' (id ' . $adminId . ')' : 'admin id ' . $adminId;
+                $adminLabel = $adminLabel !== '' ? $adminLabel.' (id '.$adminId.')' : 'admin id '.$adminId;
             }
             if ($adminLabel === '') {
                 $adminLabel = 'admin';
@@ -303,13 +306,13 @@ class ShopService
         if (empty($base)) {
             $base = 'shop';
         }
-        $slug = $base . 'store';
+        $slug = $base.'store';
         $candidate = $slug;
         $n = 0;
 
         while (Shop::where('shop_slug', $candidate)->exists()) {
             $n++;
-            $candidate = $slug . $n;
+            $candidate = $slug.$n;
         }
 
         return $candidate;
@@ -322,6 +325,7 @@ class ShopService
         foreach ($days as $d) {
             $hours[$d] = ['enabled' => true, 'open' => '08:00', 'close' => '18:00'];
         }
+
         return json_encode($hours);
     }
 

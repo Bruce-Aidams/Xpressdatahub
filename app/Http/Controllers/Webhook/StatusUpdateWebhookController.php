@@ -7,7 +7,6 @@ use App\Models\Order;
 use App\Models\WebhookLog;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class StatusUpdateWebhookController extends Controller
@@ -30,14 +29,14 @@ class StatusUpdateWebhookController extends Controller
                 ?? $payload['reference']
                 ?? null;
 
-            if (!$orderId && !$externalTransactionId) {
+            if (! $orderId && ! $externalTransactionId) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Missing required fields: order_id or external_transaction_id',
                 ], 400);
             }
 
-            if (!$status) {
+            if (! $status) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Missing required field: status',
@@ -45,10 +44,10 @@ class StatusUpdateWebhookController extends Controller
             }
 
             $validStatuses = ['pending', 'processing', 'completed', 'delivered', 'failed', 'cancelled'];
-            if (!in_array(strtolower($status), $validStatuses)) {
+            if (! in_array(strtolower($status), $validStatuses)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Invalid status value: ' . $status,
+                    'message' => 'Invalid status value: '.$status,
                 ], 422);
             }
 
@@ -57,13 +56,13 @@ class StatusUpdateWebhookController extends Controller
                 $order = Order::find($orderId);
             }
 
-            if (!$order && $externalTransactionId) {
+            if (! $order && $externalTransactionId) {
                 $order = Order::where('external_transaction_id', $externalTransactionId)->first()
                     ?? Order::where('transaction_id', $externalTransactionId)->first()
                     ?? Order::where('order_reference', $externalTransactionId)->first();
             }
 
-            if (!$order) {
+            if (! $order) {
                 $phoneNumber = $payload['phoneNumber'] ?? $payload['phone_number'] ?? null;
                 $packageSize = $payload['packageSize'] ?? $payload['package_size'] ?? null;
                 $amount = $payload['amount'] ?? null;
@@ -86,7 +85,7 @@ class StatusUpdateWebhookController extends Controller
                 }
             }
 
-            if (!$order) {
+            if (! $order) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Order not found',
@@ -96,15 +95,16 @@ class StatusUpdateWebhookController extends Controller
             $oldStatus = $order->status;
             $mappedStatus = $this->mapExternalStatus($status);
 
-            if (!$mappedStatus) {
+            if (! $mappedStatus) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Could not map status: ' . $status,
+                    'message' => 'Could not map status: '.$status,
                 ], 422);
             }
 
             if (strtolower($oldStatus) === strtolower($mappedStatus)) {
                 $this->logWebhook($order->id, $externalTransactionId, $rawInput, $mappedStatus);
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Status unchanged',
@@ -140,6 +140,7 @@ class StatusUpdateWebhookController extends Controller
         } catch (\Exception $e) {
             Log::error("Status webhook processing error: {$e->getMessage()}");
             report($e);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Webhook processing failed',
@@ -149,7 +150,7 @@ class StatusUpdateWebhookController extends Controller
 
     private function mapExternalStatus(?string $externalStatus): ?string
     {
-        if (!$externalStatus) {
+        if (! $externalStatus) {
             return null;
         }
 

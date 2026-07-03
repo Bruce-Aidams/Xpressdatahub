@@ -18,7 +18,7 @@ return new class extends Migration
         foreach ($orders as $order) {
             DB::table('orders')
                 ->where('id', $order->id)
-                ->update(['guest_id' => 'GST-' . strtoupper(Str::random(6))]);
+                ->update(['guest_id' => 'GST-'.strtoupper(Str::random(6))]);
         }
     }
 

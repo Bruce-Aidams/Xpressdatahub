@@ -10,12 +10,12 @@ class AccountStatusManager
     public function updateAccountStatus(int $userId, string $newStatus, string $reason = ''): array
     {
         $validStatuses = ['active', 'inactive', 'suspended'];
-        if (!in_array($newStatus, $validStatuses, true)) {
+        if (! in_array($newStatus, $validStatuses, true)) {
             return ['success' => false, 'message' => 'Invalid account status'];
         }
 
         $agent = Agent::find($userId);
-        if (!$agent) {
+        if (! $agent) {
             return ['success' => false, 'message' => 'User not found'];
         }
 
@@ -23,7 +23,7 @@ class AccountStatusManager
         if ($currentStatus === $newStatus) {
             return [
                 'success' => true,
-                'message' => 'Status is already ' . $newStatus,
+                'message' => 'Status is already '.$newStatus,
                 'action' => 'no_change',
             ];
         }
@@ -55,12 +55,14 @@ class AccountStatusManager
     public function getAccountStatus(int $userId): ?array
     {
         $agent = Agent::find($userId);
+
         return $agent ? $agent->toArray() : null;
     }
 
     public function canUserLogin(int $userId): bool
     {
         $agent = Agent::select('status')->find($userId);
+
         return $agent && ($agent->status === 'active');
     }
 

@@ -21,6 +21,7 @@ class BalanceHistory extends Model
         'reason',
         'reference_id',
         'beneficiary_number',
+        'description',
         'created_at',
     ];
 

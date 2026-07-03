@@ -3,8 +3,6 @@
 namespace App\Services;
 
 use App\Models\PasswordResetToken;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class PasswordResetService
 {
@@ -26,7 +24,7 @@ class PasswordResetService
             ->orderByDesc('created_at')
             ->first();
 
-        if (!$record) {
+        if (! $record) {
             return null;
         }
 
@@ -36,10 +34,12 @@ class PasswordResetService
 
         if (password_verify($token, $record->token_hash)) {
             $record->update(['used_at' => now()]);
+
             return ['valid' => true, 'token_id' => $record->id];
         }
 
         $record->increment('attempts');
+
         return null;
     }
 
@@ -58,31 +58,31 @@ class PasswordResetService
         $strength = 0;
 
         if (strlen($password) < 8) {
-            $errors[] = "Password must be at least 8 characters long";
+            $errors[] = 'Password must be at least 8 characters long';
         } else {
             $strength++;
         }
 
-        if (!preg_match('/[a-z]/', $password)) {
-            $errors[] = "Password must contain at least one lowercase letter";
+        if (! preg_match('/[a-z]/', $password)) {
+            $errors[] = 'Password must contain at least one lowercase letter';
         } else {
             $strength++;
         }
 
-        if (!preg_match('/[A-Z]/', $password)) {
-            $errors[] = "Password must contain at least one uppercase letter";
+        if (! preg_match('/[A-Z]/', $password)) {
+            $errors[] = 'Password must contain at least one uppercase letter';
         } else {
             $strength++;
         }
 
-        if (!preg_match('/\d/', $password)) {
-            $errors[] = "Password must contain at least one number";
+        if (! preg_match('/\d/', $password)) {
+            $errors[] = 'Password must contain at least one number';
         } else {
             $strength++;
         }
 
-        if (!preg_match('/[^A-Za-z0-9]/', $password)) {
-            $errors[] = "Password must contain at least one special character";
+        if (! preg_match('/[^A-Za-z0-9]/', $password)) {
+            $errors[] = 'Password must contain at least one special character';
         } else {
             $strength++;
         }
@@ -99,8 +99,8 @@ class PasswordResetService
     {
         $errors = [];
 
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors[] = "Invalid email format";
+        if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = 'Invalid email format';
         }
 
         $disposableDomains = [
@@ -108,9 +108,9 @@ class PasswordResetService
             'mailinator.com', 'throwaway.email', 'temp-mail.org',
         ];
 
-        $domain = substr(strrchr($email, "@"), 1);
+        $domain = substr(strrchr($email, '@'), 1);
         if (in_array(strtolower($domain), $disposableDomains)) {
-            $errors[] = "Disposable email addresses are not allowed";
+            $errors[] = 'Disposable email addresses are not allowed';
         }
 
         return [
@@ -137,10 +137,19 @@ class PasswordResetService
 
     private function getStrengthLevel(int $strength): string
     {
-        if ($strength < 2) return 'Very Weak';
-        if ($strength < 3) return 'Weak';
-        if ($strength < 4) return 'Fair';
-        if ($strength < 5) return 'Good';
+        if ($strength < 2) {
+            return 'Very Weak';
+        }
+        if ($strength < 3) {
+            return 'Weak';
+        }
+        if ($strength < 4) {
+            return 'Fair';
+        }
+        if ($strength < 5) {
+            return 'Good';
+        }
+
         return 'Strong';
     }
 }

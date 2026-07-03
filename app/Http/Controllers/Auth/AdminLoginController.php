@@ -35,7 +35,7 @@ class AdminLoginController extends Controller
 
         if ($result['success']) {
             return redirect()->route('admin.dashboard')
-                ->with('success', 'Welcome back, ' . $result['admin']['username'] . '!');
+                ->with('success', 'Welcome back, '.$result['admin']['username'].'!');
         }
 
         return redirect()->back()

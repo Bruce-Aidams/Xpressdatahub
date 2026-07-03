@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Shop;
+use App\Models\ShopPricing;
 use Illuminate\Http\Request;
 
 class AdminShopController extends Controller
@@ -53,6 +54,7 @@ class AdminShopController extends Controller
     {
         try {
             $shop->delete();
+
             return redirect()->route('admin.shops.index')
                 ->with('success', 'Shop deleted successfully.');
         } catch (\Exception $e) {
@@ -61,7 +63,44 @@ class AdminShopController extends Controller
         }
     }
 
-    public function updatePricing(Request $request, \App\Models\ShopPricing $shopPricing)
+    public function bulkStatus(Request $request)
+    {
+        $request->validate([
+            'shop_ids' => 'required|array|min:1',
+            'shop_ids.*' => 'integer|exists:shops,id',
+            'is_active' => 'required|boolean',
+        ]);
+
+        $shopIds = $request->input('shop_ids');
+        $isActive = $request->boolean('is_active');
+
+        Shop::whereIn('id', $shopIds)->update([
+            'is_active' => $isActive,
+            'updated_at' => now(),
+        ]);
+
+        $status = $isActive ? 'activated' : 'deactivated';
+        $count = count($shopIds);
+
+        return redirect()->back()
+            ->with('success', "{$count} shop(s) {$status} successfully.");
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'shop_ids' => 'required|array|min:1',
+            'shop_ids.*' => 'integer|exists:shops,id',
+        ]);
+
+        $shopIds = $request->input('shop_ids');
+        $deleted = Shop::whereIn('id', $shopIds)->delete();
+
+        return redirect()->back()
+            ->with('success', "{$deleted} shop(s) deleted successfully.");
+    }
+
+    public function updatePricing(Request $request, ShopPricing $shopPricing)
     {
         $request->validate([
             'selling_price' => 'required|numeric|min:0',
@@ -73,7 +112,7 @@ class AdminShopController extends Controller
 
             if ($sellingPrice < $basePrice) {
                 return redirect()->back()
-                    ->with('error', 'Selling price cannot be less than base price (GH₵' . number_format($basePrice, 2) . ').');
+                    ->with('error', 'Selling price cannot be less than base price (GH₵'.number_format($basePrice, 2).').');
             }
 
             $profit = round($sellingPrice - $basePrice, 2);

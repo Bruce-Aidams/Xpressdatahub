@@ -1,4 +1,4 @@
-�@extends('layouts.admin')
+@extends('layouts.admin')
 @section('page-title', 'Sales Analytics')
 @section('page-description', 'View sales analytics and charts')
 @section('content')

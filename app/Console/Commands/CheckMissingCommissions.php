@@ -32,6 +32,7 @@ class CheckMissingCommissions extends Command
         } catch (\Exception $e) {
             $this->error("Error: {$e->getMessage()}");
             Log::error('Missing commissions check exception', ['error' => $e->getMessage()]);
+
             return static::FAILURE;
         }
     }

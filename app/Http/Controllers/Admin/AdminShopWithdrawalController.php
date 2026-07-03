@@ -97,6 +97,7 @@ class AdminShopWithdrawalController extends Controller
                 if ($request->input('admin_note')) {
                     $shopWithdrawal->update(['admin_note' => $request->input('admin_note')]);
                 }
+
                 return redirect()->back()
                     ->with('success', 'Withdrawal marked as completed.');
             }

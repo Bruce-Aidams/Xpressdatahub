@@ -30,6 +30,7 @@ class ProcessLowBalanceAlerts extends Command
         } catch (\Exception $e) {
             $this->error("Error: {$e->getMessage()}");
             Log::error('Low balance alert processing exception', ['error' => $e->getMessage()]);
+
             return static::FAILURE;
         }
     }

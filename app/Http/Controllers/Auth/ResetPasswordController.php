@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Agent;
-use App\Models\PasswordResetToken;
 use App\Services\PasswordResetService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -20,7 +19,7 @@ class ResetPasswordController extends Controller
         $token = $request->route('token');
         $email = $request->query('email', $request->input('email'));
 
-        if (!$token || !$email) {
+        if (! $token || ! $email) {
             return redirect()->route('password.request')
                 ->with('error', 'Invalid password reset link.');
         }
@@ -41,7 +40,7 @@ class ResetPasswordController extends Controller
         $password = $request->input('password');
 
         $passwordValidation = $this->resetService->validatePasswordStrength($password);
-        if (!$passwordValidation['valid']) {
+        if (! $passwordValidation['valid']) {
             return redirect()->back()
                 ->withInput($request->except('password', 'password_confirmation'))
                 ->with('error', implode(' ', $passwordValidation['errors']));
@@ -49,7 +48,7 @@ class ResetPasswordController extends Controller
 
         $verified = $this->resetService->verifyToken($token, $email);
 
-        if (!$verified) {
+        if (! $verified) {
             return redirect()->back()
                 ->withInput($request->except('password', 'password_confirmation'))
                 ->with('error', 'Invalid or expired reset token.');
@@ -57,7 +56,7 @@ class ResetPasswordController extends Controller
 
         $agent = Agent::where('email', $email)->first();
 
-        if (!$agent) {
+        if (! $agent) {
             return redirect()->back()
                 ->with('error', 'No account found with that email address.');
         }

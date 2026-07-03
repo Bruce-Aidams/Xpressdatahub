@@ -31,6 +31,7 @@ class CleanOldPasswordResetTokens extends Command
         } catch (\Exception $e) {
             $this->error("Error: {$e->getMessage()}");
             Log::error('Password reset tokens cleanup exception', ['error' => $e->getMessage()]);
+
             return static::FAILURE;
         }
     }

@@ -28,6 +28,7 @@ class CleanOldLoginLogs extends Command
         } catch (\Exception $e) {
             $this->error("Error: {$e->getMessage()}");
             Log::error('Login logs cleanup exception', ['days' => $days, 'error' => $e->getMessage()]);
+
             return static::FAILURE;
         }
     }
