@@ -270,7 +270,7 @@ class AdminApiController extends Controller
             'email' => 'required|email|max:255|unique:agents,email',
             'phone' => 'required|string|max:20',
             'password' => 'required|string|min:8',
-            'role' => 'required|string|in:agent,super_agent,dealers',
+            'role' => 'required|string|in:agent,super_agent,dealers,administrator',
             'balance' => 'nullable|numeric|min:0',
         ]);
 
@@ -308,7 +308,7 @@ class AdminApiController extends Controller
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:agents,email,'.$agent->id,
             'phone' => 'required|string|max:20',
-            'role' => 'required|string|in:agent,super_agent,dealers',
+            'role' => 'required|string|in:agent,super_agent,dealers,administrator',
             'balance' => 'nullable|numeric|min:0',
         ]);
 
@@ -573,7 +573,7 @@ class AdminApiController extends Controller
             'network_type' => 'required|string|max:50',
             'cost' => 'required|numeric|min:0',
             'selling_price' => 'required|numeric|min:0',
-            'user_role' => 'required|string|in:agent,super_agent,dealers,all',
+            'user_role' => 'required|string|in:agent,super_agent,dealers,administrator,all',
         ]);
 
         $result = $this->pricingService->setCustomPricing([
@@ -910,7 +910,7 @@ class AdminApiController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'message' => 'required|string',
-            'recipient_type' => 'required|string|in:all,agents,super_agents,specific,admin',
+            'recipient_type' => 'required|string|in:all,agents,super_agents,dealers,administrators,specific,admin',
             'recipient_ids' => 'nullable|array',
             'priority' => 'nullable|string|in:low,normal,high,urgent',
         ]);

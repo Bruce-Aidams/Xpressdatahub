@@ -26,7 +26,7 @@ class AdminNotificationController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'message' => 'required|string',
-            'recipient_type' => 'required|string|in:all,agents,super_agents,dealers,specific,admin',
+            'recipient_type' => 'required|string|in:all,agents,super_agents,dealers,administrators,specific,admin',
             'recipient_ids' => 'nullable|array',
             'priority' => 'nullable|string|in:low,normal,high,urgent',
         ]);

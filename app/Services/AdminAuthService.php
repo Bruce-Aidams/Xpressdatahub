@@ -113,10 +113,21 @@ class AdminAuthService
             return ['success' => false, 'error' => 'Current password is incorrect'];
         }
 
+        $newHash = Hash::make($newPassword);
+
         $admin->update([
-            'password_hash' => Hash::make($newPassword),
+            'password_hash' => $newHash,
             'updated_at' => now(),
         ]);
+
+        // Sync password back to agent account if one exists
+        $agent = \App\Models\Agent::where('username', $admin->username)
+            ->orWhere('email', $admin->email)
+            ->first();
+
+        if ($agent && $agent->role === 'administrator') {
+            $agent->update(['password_hash' => $newHash]);
+        }
 
         $this->logPasswordChange($adminId);
 

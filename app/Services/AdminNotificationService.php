@@ -22,7 +22,7 @@ class AdminNotificationService
             return ['success' => false, 'message' => 'Title, message, and sender ID are required'];
         }
 
-        $validTypes = ['all', 'agents', 'super_agents', 'dealers', 'specific', 'admin'];
+        $validTypes = ['all', 'agents', 'super_agents', 'dealers', 'administrators', 'specific', 'admin'];
         if (! in_array($recipientType, $validTypes)) {
             return ['success' => false, 'message' => 'Invalid recipient type'];
         }
@@ -74,6 +74,8 @@ class AdminNotificationService
                             $q2->where('notifications.recipient_type', 'super_agents');
                         } elseif ($userType === 'dealer') {
                             $q2->where('notifications.recipient_type', 'dealers');
+                        } elseif ($userType === 'administrator') {
+                            $q2->where('notifications.recipient_type', 'administrators');
                         }
                     })
                     ->orWhere(function ($q2) use ($userId) {
@@ -152,6 +154,8 @@ class AdminNotificationService
                             $q2->where('notifications.recipient_type', 'super_agents');
                         } elseif ($type === 'dealers') {
                             $q2->where('notifications.recipient_type', 'dealers');
+                        } elseif ($type === 'administrator') {
+                            $q2->where('notifications.recipient_type', 'administrators');
                         }
                     })
                     ->orWhere(function ($q2) use ($userId) {

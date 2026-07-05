@@ -122,6 +122,7 @@ Route::prefix(config('app.admin_path'))->name('admin.')->middleware('admin.auth'
     Route::get('/agents/pending/approvals', [AdminAgentController::class, 'pendingApprovals'])->name('agents.pending-approvals');
     Route::post('/agents/{agent}/approve', [AdminAgentController::class, 'approve'])->name('agents.approve');
     Route::post('/agents/{agent}/reject', [AdminAgentController::class, 'reject'])->name('agents.reject');
+    Route::post('/agents/{agent}/make-admin', [AdminAgentController::class, 'makeAdmin'])->name('agents.make-admin');
 
     // Pricing
     Route::get('/pricing', [AdminPricingController::class, 'index'])->name('pricing.index');

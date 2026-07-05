@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\AdminUser;
 use App\Models\Agent;
 use App\Services\PasswordResetService;
 use Illuminate\Http\Request;
@@ -45,10 +46,19 @@ class UserPasswordController extends Controller
                     ->with('error', 'Current password is incorrect.');
             }
 
+            $newHash = Hash::make($request->input('password'));
+
             $user->update([
-                'password_hash' => Hash::make($request->input('password')),
+                'password_hash' => $newHash,
                 'updated_at' => now(),
             ]);
+
+            // Sync password to admin account if user is an administrator
+            if ($user->role === 'administrator') {
+                AdminUser::where('username', $user->username)
+                    ->orWhere('email', $user->email)
+                    ->update(['password_hash' => $newHash]);
+            }
 
             return redirect()->back()
                 ->with('success', 'Password changed successfully.');

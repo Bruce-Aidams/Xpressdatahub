@@ -118,14 +118,25 @@ class UserDashboardController extends Controller
             ->groupBy('status')
             ->get();
 
+        // Build a single cross-DB query for hourly order counts
+        // SQLite uses strftime('%H', ...), MySQL/MariaDB uses HOUR(...)
+        $dbDriver = DB::connection()->getDriverName();
+        $hourExpr = $dbDriver === 'sqlite'
+            ? "CAST(strftime('%H', created_at) AS INTEGER)"
+            : 'HOUR(created_at)';
+
+        $hourlyData = Order::where('agent_id', $userId)
+            ->whereDate('created_at', today()->toDateString())
+            ->selectRaw("{$hourExpr} as hour, COUNT(*) as count")
+            ->groupByRaw("{$hourExpr}")
+            ->pluck('count', 'hour')
+            ->toArray();
+
         $hourlyOrders = collect();
         for ($h = 0; $h < 24; $h++) {
             $hourlyOrders->push([
                 'label' => str_pad($h, 2, '0', STR_PAD_LEFT),
-                'count' => Order::where('agent_id', $userId)
-                    ->whereDate('created_at', today())
-                    ->whereHour('created_at', $h)
-                    ->count(),
+                'count' => (int) ($hourlyData[$h] ?? 0),
             ]);
         }
         $maxHourly = max($hourlyOrders->pluck('count')->max(), 1);

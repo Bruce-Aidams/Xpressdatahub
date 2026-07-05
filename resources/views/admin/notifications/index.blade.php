@@ -62,6 +62,7 @@
                             <option value="agents">Agents Only</option>
                             <option value="super_agents">Super Agents</option>
                             <option value="dealers">Dealers</option>
+                            <option value="administrators">Administrators</option>
                         </select>
                     </div>
                     <div>
@@ -176,7 +177,8 @@
         all: 'All Users',
         agents: 'Agents Only',
         super_agents: 'Super Agents',
-        dealers: 'Dealers'
+        dealers: 'Dealers',
+        administrators: 'Administrators'
     };
 
     inputTitle.addEventListener('input', function() {

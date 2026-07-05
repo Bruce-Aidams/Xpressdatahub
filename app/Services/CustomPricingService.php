@@ -15,11 +15,11 @@ class CustomPricingService
         $networkType = $data['network_type'] ?? 'all';
         $createdBy = $data['created_by'] ?? null;
 
-        $validRoles = ['agent', 'super_agent', 'dealers', 'all'];
+        $validRoles = ['agent', 'super_agent', 'dealers', 'administrator', 'all'];
         if (! in_array($userRole, $validRoles)) {
             return [
                 'success' => false,
-                'message' => 'Invalid user role. Only "agent", "super_agent", "dealers", or "all" are allowed.',
+                'message' => 'Invalid user role. Only "agent", "super_agent", "dealers", "administrator", or "all" are allowed.',
             ];
         }
 

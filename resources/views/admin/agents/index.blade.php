@@ -64,9 +64,10 @@
                    class="px-3 py-2 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-700 bg-slate-50 focus:outline-none focus:border-[#2563EB] w-full sm:w-44">
             <select name="role" class="px-3 py-2 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-700 bg-slate-50 focus:outline-none focus:border-[#2563EB]">
                 <option value="">All Roles</option>
-                <option value="agent"       {{ request('role') === 'agent'       ? 'selected' : '' }}>Agent</option>
-                <option value="super_agent" {{ request('role') === 'super_agent' ? 'selected' : '' }}>Super Agent</option>
-                <option value="dealers"     {{ request('role') === 'dealers'     ? 'selected' : '' }}>Dealer</option>
+                <option value="agent"         {{ request('role') === 'agent'         ? 'selected' : '' }}>Agent</option>
+                <option value="super_agent"   {{ request('role') === 'super_agent'   ? 'selected' : '' }}>Super Agent</option>
+                <option value="dealers"       {{ request('role') === 'dealers'       ? 'selected' : '' }}>Dealer</option>
+                <option value="administrator" {{ request('role') === 'administrator' ? 'selected' : '' }}>Administrator</option>
             </select>
             <select name="status" class="px-3 py-2 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-700 bg-slate-50 focus:outline-none focus:border-[#2563EB]">
                 <option value="">All Status</option>
@@ -164,6 +165,7 @@
                                         <x-heroicon-o-envelope class="w-5 h-5" />
                                     </button>
                                 </form>
+                                @if($agent->role !== 'administrator' || session('admin_role') === 'super_admin')
                                 <form method="POST" action="{{ route('admin.agents.toggle-status', $agent->id) }}" class="inline">
                                     @csrf
                                     @method('PUT')
@@ -174,6 +176,14 @@
                                         <x-dynamic-component :component="$isActive ? 'heroicon-o-no-symbol' : 'heroicon-o-check-circle'" class="w-5 h-5" />
                                     </button>
                                 </form>
+                                @endif
+                                @if(session('admin_role') === 'super_admin')
+                                <form method="POST" action="{{ route('admin.agents.make-admin', $agent->id) }}" class="inline" onsubmit="return confirm('Promote {{ $agent->username }} to Administrator? They will be able to log in to the admin panel with their current password.')">
+                                    @csrf
+                                    <button type="submit" class="text-slate-400 hover:text-indigo-500 transition" title="Make Administrator">
+                                        <x-heroicon-o-shield-check class="w-5 h-5" />
+                                    </button>
+                                </form>
                                 <form method="POST" action="{{ route('admin.agents.destroy', $agent->id) }}" class="inline" onsubmit="return confirm('Delete agent {{ $agent->username }}? This cannot be undone.')">
                                     @csrf
                                     @method('DELETE')
@@ -181,6 +191,7 @@
                                         <x-heroicon-o-trash class="w-5 h-5" />
                                     </button>
                                 </form>
+                                @endif
                             </div>
                         </td>
                     </tr>
@@ -247,6 +258,9 @@
                         <option value="agent">Agent</option>
                         <option value="super_agent">Super Agent</option>
                         <option value="dealers">Dealer</option>
+                        @if(session('admin_role') === 'super_admin')
+                        <option value="administrator">Administrator</option>
+                        @endif
                     </select>
                 </div>
                 <div>
@@ -313,6 +327,7 @@
                         <option value="agent">Agent</option>
                         <option value="super_agent">Super Agent</option>
                         <option value="dealers">Dealer</option>
+                        <option value="administrator">Administrator</option>
                     </select>
                 </div>
                 <div>
@@ -459,8 +474,38 @@ function openEditModal(id, firstName, lastName, email, phone, role, balance) {
     document.getElementById('edit_last_name').value = lastName;
     document.getElementById('edit_email').value = email;
     document.getElementById('edit_phone').value = phone;
-    document.getElementById('edit_role').value = role;
     document.getElementById('edit_balance').value = balance;
+
+    const roleSelect = document.getElementById('edit_role');
+    roleSelect.value = role;
+    const isSuperAdmin = '{{ session('admin_role') }}' === 'super_admin';
+
+    // Disable role selection if editing an administrator and user is not super_admin
+    if (role === 'administrator' && !isSuperAdmin) {
+        roleSelect.disabled = true;
+        let hiddenRole = document.getElementById('edit_role_hidden');
+        if (!hiddenRole) {
+            hiddenRole = document.createElement('input');
+            hiddenRole.type = 'hidden';
+            hiddenRole.name = 'role';
+            hiddenRole.id = 'edit_role_hidden';
+            roleSelect.parentNode.appendChild(hiddenRole);
+        }
+        hiddenRole.value = 'administrator';
+    } else {
+        roleSelect.disabled = false;
+        const hiddenRole = document.getElementById('edit_role_hidden');
+        if (hiddenRole) {
+            hiddenRole.remove();
+        }
+
+        // Hide/Show administrator option based on super_admin status
+        const adminOption = roleSelect.querySelector('option[value="administrator"]');
+        if (adminOption) {
+            adminOption.style.display = isSuperAdmin ? '' : 'none';
+        }
+    }
+
     document.getElementById('editAgentModal').classList.remove('hidden');
 }
 

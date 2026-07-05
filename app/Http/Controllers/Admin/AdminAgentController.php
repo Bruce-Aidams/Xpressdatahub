@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Mail\AgentPasswordResetMail;
+use App\Models\AdminUser;
 use App\Models\Agent;
 use App\Models\PasswordResetToken;
 use App\Services\AccountStatusManager;
@@ -67,7 +68,7 @@ class AdminAgentController extends Controller
             'email' => 'required|email|max:255|unique:agents,email',
             'phone' => 'required|string|max:20',
             'password' => 'required|string|min:8',
-            'role' => 'required|string|in:agent,super_agent,dealers',
+            'role' => 'required|string|in:agent,super_agent,dealers,administrator',
             'balance' => 'nullable|numeric|min:0',
         ]);
 
@@ -93,6 +94,7 @@ class AdminAgentController extends Controller
             ]);
 
             $this->referralService->generateReferralCode($agent->id);
+            $this->syncAdminRole($agent);
 
             return redirect()->back()
                 ->with('success', 'Agent created successfully.');
@@ -111,14 +113,26 @@ class AdminAgentController extends Controller
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:agents,email,'.$agent->id,
             'phone' => 'required|string|max:20',
-            'role' => 'required|string|in:agent,super_agent,dealers',
+            'role' => 'required|string|in:agent,super_agent,dealers,administrator',
             'balance' => 'nullable|numeric|min:0',
         ]);
+
+        $currentRole = $agent->role;
+        $newRole = $request->input('role');
+
+        if (($currentRole === 'administrator' || $newRole === 'administrator') && $currentRole !== $newRole) {
+            if (session('admin_role') !== 'super_admin') {
+                return redirect()->back()
+                    ->with('error', 'Only super admins can promote users to or demote users from administrator.');
+            }
+        }
 
         try {
             $agent->update($request->only([
                 'first_name', 'last_name', 'email', 'phone', 'role', 'balance',
             ]));
+
+            $this->syncAdminRole($agent);
 
             return redirect()->back()
                 ->with('success', 'Agent updated successfully.');
@@ -131,7 +145,17 @@ class AdminAgentController extends Controller
 
     public function destroy(Agent $agent)
     {
+        if (session('admin_role') !== 'super_admin') {
+            return redirect()->back()
+                ->with('error', 'Only super admins can delete agents.');
+        }
+
         try {
+            // Also remove admin account if exists
+            AdminUser::where('username', $agent->username)
+                ->orWhere('email', $agent->email)
+                ->delete();
+
             $agent->delete();
 
             return redirect()->back()
@@ -145,6 +169,11 @@ class AdminAgentController extends Controller
 
     public function updateStatus(Request $request, Agent $agent)
     {
+        if ($agent->role === 'administrator' && session('admin_role') !== 'super_admin') {
+            return redirect()->back()
+                ->with('error', 'Only super admins can modify the status of administrators.');
+        }
+
         $request->validate([
             'status' => 'required|string|in:active,inactive,suspended',
         ]);
@@ -157,6 +186,8 @@ class AdminAgentController extends Controller
             );
 
             if ($result['success']) {
+                $agent->refresh();
+                $this->syncAdminRole($agent);
                 return redirect()->back()
                     ->with('success', 'Agent status updated successfully.');
             }
@@ -187,6 +218,8 @@ class AdminAgentController extends Controller
             $agent->update([
                 'password_hash' => Hash::make($request->input('password')),
             ]);
+
+            $this->syncAdminRole($agent);
 
             return redirect()->back()
                 ->with('success', "Password updated successfully for {$agent->username}.");
@@ -263,6 +296,63 @@ class AdminAgentController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Failed to reject agent.');
+        }
+    }
+
+    public function makeAdmin(Agent $agent)
+    {
+        if (session('admin_role') !== 'super_admin') {
+            return redirect()->back()
+                ->with('error', 'Only super admins can promote agents to administrator.');
+        }
+
+        try {
+            $agent->update(['role' => 'administrator']);
+            $this->syncAdminRole($agent);
+
+            return redirect()->back()
+                ->with('success', "{$agent->username} has been promoted to administrator successfully.");
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to promote agent to admin: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', 'Failed to promote agent to administrator.');
+        }
+    }
+
+    protected function syncAdminRole(Agent $agent)
+    {
+        $existingAdmin = AdminUser::where('username', $agent->username)
+            ->orWhere('email', $agent->email)
+            ->first();
+
+        $isActive = ($agent->role === 'administrator' && $agent->status === 'active');
+
+        if ($agent->role === 'administrator') {
+            if (! $existingAdmin) {
+                AdminUser::create([
+                    'username' => $agent->username,
+                    'email' => $agent->email,
+                    'password_hash' => $agent->password_hash,
+                    'full_name' => trim($agent->first_name . ' ' . $agent->last_name),
+                    'role' => 'admin',
+                    'is_active' => $isActive,
+                ]);
+            } else {
+                $existingAdmin->update([
+                    'username' => $agent->username,
+                    'email' => $agent->email,
+                    'password_hash' => $agent->password_hash,
+                    'full_name' => trim($agent->first_name . ' ' . $agent->last_name),
+                    'is_active' => $isActive,
+                ]);
+            }
+        } else {
+            if ($existingAdmin) {
+                $existingAdmin->update([
+                    'is_active' => false,
+                ]);
+            }
         }
     }
 }

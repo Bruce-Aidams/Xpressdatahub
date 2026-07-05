@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\AdminUser;
 use App\Models\Agent;
 use App\Services\PasswordResetService;
 use Illuminate\Http\Request;
@@ -62,10 +63,19 @@ class ResetPasswordController extends Controller
         }
 
         try {
+            $newHash = Hash::make($password);
+
             $agent->update([
-                'password_hash' => Hash::make($password),
+                'password_hash' => $newHash,
                 'updated_at' => now(),
             ]);
+
+            // Sync password to admin account if user is an administrator
+            if ($agent->role === 'administrator') {
+                AdminUser::where('username', $agent->username)
+                    ->orWhere('email', $agent->email)
+                    ->update(['password_hash' => $newHash]);
+            }
 
             return redirect()->route('login')
                 ->with('success', 'Password has been reset successfully. You can now log in.');

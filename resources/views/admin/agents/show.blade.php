@@ -62,6 +62,7 @@
         </div>
 
         <div class="mt-6 flex gap-2">
+            @if($agent->role !== 'administrator' || session('admin_role') === 'super_admin')
             <form method="POST" action="{{ route('admin.agents.toggle-status', $agent->id) }}" class="flex-1">
                 @csrf
                 @method('PUT')
@@ -71,6 +72,8 @@
                     {{ $isActive ? 'Suspend Agent' : 'Activate Agent' }}
                 </button>
             </form>
+            @endif
+            @if(session('admin_role') === 'super_admin')
             <form method="POST" action="{{ route('admin.agents.destroy', $agent->id) }}" class="flex-1" onsubmit="return confirm('Permanently delete this agent? This cannot be undone.')">
                 @csrf
                 @method('DELETE')
@@ -78,7 +81,19 @@
                     Delete Agent
                 </button>
             </form>
+            @endif
         </div>
+
+        @if(session('admin_role') === 'super_admin')
+        <div class="mt-3">
+            <form method="POST" action="{{ route('admin.agents.make-admin', $agent->id) }}" onsubmit="return confirm('Promote {{ $agent->username }} to Administrator? They will be able to log in to the admin panel with their current password.')">
+                @csrf
+                <button type="submit" class="w-full py-2 text-xs font-bold rounded-xl border border-indigo-200 text-indigo-600 hover:bg-indigo-50 transition">
+                    Make Administrator
+                </button>
+            </form>
+        </div>
+        @endif
 
         <div class="mt-3 flex gap-2">
             <button onclick="document.getElementById('showResetPasswordModal').classList.remove('hidden')"
