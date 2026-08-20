@@ -35,6 +35,7 @@ class Order extends Model
         'customer_email',
         'base_amount',
         'paystack_total',
+        'is_refunded',
     ];
 
     protected function casts(): array
@@ -43,6 +44,7 @@ class Order extends Model
             'amount' => 'decimal:2',
             'base_amount' => 'decimal:2',
             'paystack_total' => 'decimal:2',
+            'is_refunded' => 'boolean',
         ];
     }
 

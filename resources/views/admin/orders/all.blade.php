@@ -33,6 +33,10 @@
                 <x-heroicon-o-arrow-path class="w-3.5 h-3.5" />
                 Update Status
             </button>
+            <button onclick="openBulkDeleteModal()" class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5">
+                <x-heroicon-o-trash class="w-3.5 h-3.5" />
+                Delete Selected
+            </button>
             <button onclick="clearSelection()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition">
                 Deselect
             </button>
@@ -212,6 +216,38 @@
         </form>
     </div>
 </div>
+
+{{-- Bulk Delete Confirmation Modal --}}
+<div id="bulkDeleteModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-2xl w-full max-w-md mx-4 p-7">
+        <div class="flex items-center gap-4 mb-5">
+            <div class="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+                <x-heroicon-o-exclamation-triangle class="w-6 h-6 text-red-500" />
+            </div>
+            <div>
+                <h3 class="text-base font-black text-slate-800">Delete <span id="bulkDeleteCount">0</span> Order(s)?</h3>
+                <p class="text-xs text-slate-400 mt-0.5">This action is permanent and cannot be undone.</p>
+            </div>
+        </div>
+        <div class="bg-red-50 border border-red-100 rounded-xl p-3 mb-5 text-xs text-red-600 font-medium space-y-1">
+            <p>• All status history for the selected orders will also be deleted.</p>
+            <p>• Agent wallet balances will <strong>not</strong> be refunded automatically.</p>
+        </div>
+        <form id="bulkDeleteForm" method="POST" action="{{ route('admin.orders.bulk.delete') }}" class="space-y-4">
+            @csrf
+            <div id="bulkDeleteIdsContainer"></div>
+            <div class="flex gap-3">
+                <button type="button" onclick="closeBulkDeleteModal()"
+                        class="flex-1 py-2.5 border border-slate-200 text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-50 transition">
+                    Cancel
+                </button>
+                <button type="submit" class="flex-1 py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-bold rounded-xl transition">
+                    Yes, Delete All
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -280,9 +316,22 @@
         bulkStatusModal.classList.add('hidden');
     };
 
+    window.openBulkDeleteModal = function() {
+        const ids = getSelectedIds();
+        if (ids.length === 0) return;
+        document.getElementById('bulkDeleteCount').textContent = ids.length;
+        setHiddenInputs('bulkDeleteIdsContainer', ids);
+        document.getElementById('bulkDeleteModal').classList.remove('hidden');
+    };
+
+    window.closeBulkDeleteModal = function() {
+        document.getElementById('bulkDeleteModal').classList.add('hidden');
+    };
+
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closeBulkStatusModal();
+            closeBulkDeleteModal();
         }
     });
 })();

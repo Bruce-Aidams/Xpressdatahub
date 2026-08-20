@@ -157,21 +157,12 @@ class GuestShopController extends Controller
 
                 if ($deliveryResult['success']) {
                     $order->update([
-                        'status' => 'delivered',
+                        'status' => 'processing',
                         'external_transaction_id' => $deliveryResult['data']['transaction_id'] ?? null,
                         'external_reference' => $deliveryResult['data']['reference'] ?? null,
                         'api_response_data' => json_encode($deliveryResult['data'] ?? []),
                         'status_updated_at' => now(),
                     ]);
-
-                    // Credit shop profit
-                    if ($order->shop_id) {
-                        try {
-                            $this->shopService->creditShopProfit((int) $order->shop_id, (int) $order->id);
-                        } catch (\Exception $e) {
-                            Log::error("Shop profit credit error for order #{$order->id}: {$e->getMessage()}");
-                        }
-                    }
                 } else {
                     $order->update([
                         'status' => 'pending',

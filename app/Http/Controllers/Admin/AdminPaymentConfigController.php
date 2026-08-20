@@ -26,12 +26,15 @@ class AdminPaymentConfigController extends Controller
             'payment_name' => 'nullable|string|max:255',
             'whatsapp_contact' => 'nullable|string|max:50',
             'whatsapp_group_link' => 'nullable|string|max:500',
+            'admin_momo_number' => 'nullable|string|max:50',
+            'admin_momo_name' => 'nullable|string|max:255',
         ]);
 
         try {
             $fields = $request->only([
                 'payment_phone_number', 'payment_name',
                 'whatsapp_contact', 'whatsapp_group_link',
+                'admin_momo_number', 'admin_momo_name',
             ]);
 
             foreach ($fields as $key => $value) {

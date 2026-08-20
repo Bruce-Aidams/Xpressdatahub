@@ -122,6 +122,19 @@ class UserDataController extends Controller
                 ->with('error', 'Invalid phone number. Please enter a valid Ghana phone number (e.g. 0241234567).');
         }
 
+        if (! $isGuest) {
+            $userId = session('user_id');
+            $agent = Agent::find($userId);
+            if ($agent) {
+                $cleanedPhone = preg_replace('/\D+/', '', $validatedPhone);
+                if ($cleanedPhone === '0500000000' || $cleanedPhone === '233500000000' || $cleanedPhone === '500000000') {
+                    if (! empty($agent->phone)) {
+                        $validatedPhone = $this->validateGhanaPhone($agent->phone) ?: $agent->phone;
+                    }
+                }
+            }
+        }
+
         if (! $this->phoneMatchesNetwork($validatedPhone, $networkType)) {
             return redirect()->back()
                 ->with('error', "Phone number does not belong to {$networkType} network.");
@@ -241,12 +254,30 @@ class UserDataController extends Controller
                     (string) ($result['order']['id'] ?? '')
                 );
 
-                if ($apiResult['success']) {
-                    $orderId = $result['order']['id'] ?? null;
-                    if ($orderId) {
+                $orderId = $result['order']['id'] ?? null;
+                if ($orderId) {
+                    if ($apiResult['success']) {
+                        $externalTransactionId = $apiResult['data']['data']['transaction_id']
+                            ?? $apiResult['data']['transaction_id']
+                            ?? $apiResult['data']['data']['purchaseId']
+                            ?? $apiResult['data']['purchaseId']
+                            ?? null;
+                        $externalReference = $apiResult['data']['data']['transactionReference']
+                            ?? $apiResult['data']['transactionReference']
+                            ?? null;
+
                         Order::where('id', $orderId)->update([
                             'status' => 'processing',
-                            'transaction_id' => $apiResult['data']['data']['transaction_id'] ?? $reference,
+                            'external_transaction_id' => $externalTransactionId ? (string) $externalTransactionId : null,
+                            'external_reference' => $externalReference,
+                            'api_response_data' => json_encode($apiResult['data'] ?? []),
+                            'status_updated_at' => now(),
+                        ]);
+                    } else {
+                        Order::where('id', $orderId)->update([
+                            'status' => 'failed',
+                            'api_response_data' => json_encode(['error' => $apiResult['error'] ?? 'API call failed']),
+                            'status_updated_at' => now(),
                         ]);
                     }
                 }

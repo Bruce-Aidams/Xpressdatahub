@@ -51,6 +51,13 @@ class OrderApiController extends Controller
             ], 422);
         }
 
+        $cleanedPhone = preg_replace('/\D+/', '', $phone);
+        if ($cleanedPhone === '0500000000' || $cleanedPhone === '233500000000' || $cleanedPhone === '500000000') {
+            if ($agent && ! empty($agent->phone)) {
+                $phone = $this->externalApiService->validatePhoneNumber($agent->phone) ?: $agent->phone;
+            }
+        }
+
         $networkType = $request->input('network_type');
         $packageSize = $request->input('package_size');
 
@@ -129,7 +136,7 @@ class OrderApiController extends Controller
                 $apiResponseData = json_encode($apiResult['data']);
 
                 $order->update([
-                    'status' => 'delivered',
+                    'status' => 'processing',
                     'external_transaction_id' => $externalTransactionId ? (string) $externalTransactionId : null,
                     'external_reference' => $externalReference,
                     'api_response_data' => $apiResponseData,
@@ -139,7 +146,7 @@ class OrderApiController extends Controller
                 DB::table('order_status_history')->insert([
                     'order_id' => $orderId,
                     'old_status' => 'pending',
-                    'new_status' => 'delivered',
+                    'new_status' => 'processing',
                     'notes' => 'Order submitted to external API successfully',
                     'changed_by' => 'system',
                     'created_at' => now(),
@@ -159,9 +166,9 @@ class OrderApiController extends Controller
                     'phone_number' => $phone,
                     'amount' => $amount,
                     'new_balance' => $newBalance,
-                    'status' => 'delivered',
+                    'status' => 'processing',
                     'external_transaction_id' => $externalTransactionId,
-                    'message' => 'Order submitted and delivered successfully',
+                    'message' => 'Order submitted successfully and is now being processed',
                 ]);
             } else {
                 $apiResponseData = json_encode(['error' => $apiResult['error']]);

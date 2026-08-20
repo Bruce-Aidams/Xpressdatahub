@@ -35,7 +35,7 @@
         @media (min-width: 1024px) { #sidebarBackdrop { display: none !important; } }
     </style>
 </head>
-<body class="bg-[#F8F9FC] min-h-screen">
+<body class="bg-[#F8F9FC] min-h-screen" autocomplete="off">
     {{-- Sidebar Toggle Mobile --}}
     <button onclick="openSidebar()" class="lg:hidden fixed top-3 left-3 z-[60] bg-white text-slate-600 p-2.5 rounded-xl shadow-lg border border-slate-200/60 hover:bg-slate-50 transition-colors" id="sidebarToggle">
         <x-heroicon-o-bars-3 class="w-5 h-5" />
@@ -226,6 +226,14 @@
                 }
                 closeSidebar();
             }
+        });
+        // Reset all forms on every page load (including back/forward cache) so no stale data is shown
+        window.addEventListener('pageshow', function(e) {
+            document.querySelectorAll('form:not([data-keep-values])').forEach(function(form) {
+                // Skip filter/search forms (GET method) – they reflect URL params intentionally
+                if (form.method && form.method.toUpperCase() === 'GET') return;
+                form.reset();
+            });
         });
     </script>
     @stack('scripts')

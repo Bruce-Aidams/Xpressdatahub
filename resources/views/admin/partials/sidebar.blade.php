@@ -217,6 +217,13 @@
                 <div class="pt-4">
                     <p class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-slate-300">Finance</p>
                     <div class="mt-1 space-y-0.5">
+                        <a href="{{ route('admin.manual-topups.index') }}"
+                           class="nav-item flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200 {{ request()->routeIs('admin.manual-topups.*') ? 'bg-gradient-to-r from-[#2563EB]/10 to-[#2563EB]/5 text-[#2563EB] shadow-sm shadow-[#2563EB]/10' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700' }}">
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 {{ request()->routeIs('admin.manual-topups.*') ? 'bg-[#2563EB]/15' : 'bg-slate-100/80' }}">
+                                <x-heroicon-o-banknotes class="w-4 h-4 {{ request()->routeIs('admin.manual-topups.*') ? 'text-[#2563EB]' : 'text-slate-400' }}" />
+                            </div>
+                            <span>Manual Top-ups</span>
+                        </a>
                         <a href="{{ route('admin.balance-history.index') }}"
                            class="nav-item flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200 {{ request()->routeIs('admin.balance-history.*') ? 'bg-gradient-to-r from-[#2563EB]/10 to-[#2563EB]/5 text-[#2563EB] shadow-sm shadow-[#2563EB]/10' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700' }}">
                             <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 {{ request()->routeIs('admin.balance-history.*') ? 'bg-[#2563EB]/15' : 'bg-slate-100/80' }}">

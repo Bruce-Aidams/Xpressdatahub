@@ -1,7 +1,6 @@
 @php
     $currentRoute = request()->route()->getName();
     $isGuest = ($userRole ?? '') === 'guest';
-    $cartCount = !$isGuest ? \App\Models\CartItem::where('agent_id', session('user_id'))->sum('quantity') : 0;
 @endphp
 
 <aside
@@ -50,22 +49,7 @@
                     <span>Buy Data</span>
                 </a>
 
-                @if(!$isGuest)
-                {{-- Cart --}}
-                <a href="{{ route('user.cart.index') }}"
-                   class="nav-item flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200 {{ request()->routeIs('user.cart.*') ? 'bg-gradient-to-r from-[#EA580C]/10 to-[#EA580C]/5 text-[#EA580C] shadow-sm shadow-[#EA580C]/10' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700' }}">
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 {{ request()->routeIs('user.cart.*') ? 'bg-[#EA580C]/15' : 'bg-slate-100/80' }} relative">
-                        <x-heroicon-o-shopping-bag class="w-4 h-4 {{ request()->routeIs('user.cart.*') ? 'text-[#EA580C]' : 'text-slate-400' }}" />
-                        @if($cartCount > 0)
-                            <span class="absolute -top-1 -right-1 w-4 h-4 bg-[#EA580C] text-white text-[8px] font-bold rounded-full flex items-center justify-center shadow-sm">{{ $cartCount > 9 ? '9+' : $cartCount }}</span>
-                        @endif
-                    </div>
-                    <span>Cart</span>
-                    @if($cartCount > 0)
-                        <span class="ml-auto px-2 py-0.5 bg-[#EA580C]/10 text-[#EA580C] text-[10px] font-bold rounded-full">{{ $cartCount }}</span>
-                    @endif
-                </a>
-                @endif
+
 
                 @if(!$isGuest)
                 {{-- Wallet --}}

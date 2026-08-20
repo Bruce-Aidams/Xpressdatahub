@@ -8,6 +8,8 @@ use App\Models\Order;
 use App\Models\Shop;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 class AdminOrderController extends Controller
 {
@@ -162,5 +164,40 @@ class AdminOrderController extends Controller
         }
 
         return redirect()->back()->with('success', $message);
+    }
+
+    public function destroy(Order $order)
+    {
+        try {
+            DB::table('order_status_history')->where('order_id', $order->id)->delete();
+            $order->delete();
+
+            return redirect()->route('admin.orders.index')
+                ->with('success', "Order #{$order->id} has been permanently deleted.");
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Failed to delete order. Please try again.');
+        }
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'order_ids'   => 'required|array|min:1',
+            'order_ids.*' => 'integer|exists:orders,id',
+        ]);
+
+        $orderIds = $request->input('order_ids');
+
+        try {
+            DB::table('order_status_history')->whereIn('order_id', $orderIds)->delete();
+            $deleted = Order::whereIn('id', $orderIds)->delete();
+
+            return redirect()->back()
+                ->with('success', "{$deleted} order(s) permanently deleted.");
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Failed to delete orders. Please try again.');
+        }
     }
 }

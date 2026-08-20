@@ -36,6 +36,19 @@
                         <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">WhatsApp Group Link</label>
                         <input type="url" name="whatsapp_group_link" value="{{ $configs['whatsapp_group_link'] ?? '' }}" class="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 outline-none transition w-full">
                     </div>
+                    <div class="pt-4 mt-4 border-t border-slate-100">
+                        <h3 class="text-sm font-bold text-slate-800 mb-4">Manual MTN MoMo Top-up Settings</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Admin MTN MoMo Number</label>
+                                <input type="text" name="admin_momo_number" value="{{ $configs['admin_momo_number'] ?? '' }}" placeholder="e.g. 0551234567" class="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 outline-none transition w-full">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Admin MTN MoMo Name</label>
+                                <input type="text" name="admin_momo_name" value="{{ $configs['admin_momo_name'] ?? '' }}" placeholder="e.g. John Doe" class="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 outline-none transition w-full">
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="mt-6">
                     <button type="submit" class="bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-bold rounded-xl px-6 py-2.5 transition shadow-md shadow-blue-500/10">Save Configuration</button>

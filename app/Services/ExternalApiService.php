@@ -40,6 +40,11 @@ class ExternalApiService
 
     public function purchaseData(string $msisdn, string $network, int $capacityMb, string $paymentMethod = 'wallet', ?string $localOrderId = null): array
     {
+        if (! $this->apiConfig || $this->network !== $network) {
+            $this->network = $network;
+            $this->loadApiConfig();
+        }
+
         if (! $this->isGlobalApiEnabled()) {
             return ['success' => false, 'error' => 'Global API integration is disabled', 'data' => null];
         }
@@ -140,6 +145,11 @@ class ExternalApiService
     {
         $value = PaymentConfig::where('config_key', 'api_enabled')->value('config_value');
 
+        // If no row exists yet, default to enabled
+        if ($value === null) {
+            return true;
+        }
+
         return (bool) $value;
     }
 
@@ -147,14 +157,26 @@ class ExternalApiService
     {
         $template = $this->apiConfig['request_body_template'] ?? '{}';
         $capacityGb = round($capacityMb / 1024, 2);
-        $reference = $localOrderId;
-        if (empty($reference) || strlen($reference) < 6) {
-            $reference = 'ORDER-'.time().'-'.rand(100, 999);
+        
+        $amount = $capacityMb; // fallback
+        $reference = $localOrderId ?: ('ORDER-'.time().'-'.rand(100, 999));
+        $orderId = $localOrderId;
+        $packageVal = $capacityMb.'MB';
+
+        if ($localOrderId) {
+            $order = \App\Models\Order::find($localOrderId);
+            if ($order) {
+                $amount = $order->amount;
+                $reference = $order->order_reference ?: $order->transaction_id ?: $localOrderId;
+                $orderId = $order->id;
+                $packageVal = $order->package_size ?: ($capacityMb.'MB');
+                $msisdn = $order->phone_number ?: $msisdn;
+            }
         }
 
         $data = str_replace(
             ['{phone}', '{package}', '{amount}', '{network}', '{payment_method}', '{order_id}', '{capacity}', '{mb}', '{volume}', '{reference}', '{referrer}', '{webhook}'],
-            [$msisdn, $capacityMb.'MB', $capacityMb, $network, $paymentMethod, $localOrderId, $capacityGb, $capacityMb, $capacityMb, $reference, $msisdn, ''],
+            [$msisdn, $packageVal, $amount, $network, $paymentMethod, $orderId, $capacityGb, $capacityMb, $capacityMb, $reference, $msisdn, url('/api/v1/webhook/status-update')],
             $template
         );
 

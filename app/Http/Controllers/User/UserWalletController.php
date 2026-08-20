@@ -27,7 +27,13 @@ class UserWalletController extends Controller
         $chargeAmount = $chargeConfig ? floatval($chargeConfig->charge_amount) : 0;
         $chargeType = $chargeConfig ? $chargeConfig->charge_type : 'fixed';
 
-        return view('user.wallet.topup', compact('agent', 'minimumAmount', 'chargeAmount', 'chargeType'));
+        $momoNumberConfig = \App\Models\PaymentConfig::where('config_key', 'admin_momo_number')->first();
+        $momoNameConfig = \App\Models\PaymentConfig::where('config_key', 'admin_momo_name')->first();
+        
+        $momoNumber = $momoNumberConfig ? $momoNumberConfig->config_value : 'Not Configured';
+        $momoName = $momoNameConfig ? $momoNameConfig->config_value : '';
+
+        return view('user.wallet.topup', compact('agent', 'minimumAmount', 'chargeAmount', 'chargeType', 'momoNumber', 'momoName'));
     }
 
     public function initializeTopup(Request $request)
@@ -151,5 +157,33 @@ class UserWalletController extends Controller
 
         return redirect()->route('user.wallet.topup')
             ->with('error', 'Payment was not successful. Please try again.');
+    }
+
+    public function manualTopup(Request $request)
+    {
+        $userId = session('user_id');
+
+        $minConfig = MinimumTopupConfig::where('is_enabled', true)->first();
+        $minimumAmount = $minConfig ? floatval($minConfig->minimum_amount) : 10;
+
+        $request->validate([
+            'amount' => "required|numeric|min:{$minimumAmount}|max:100000",
+            'sender_name' => 'required|string|max:255',
+        ]);
+
+        $amount = floatval($request->input('amount'));
+        $senderName = $request->input('sender_name');
+
+        Payment::create([
+            'agent_id' => $userId,
+            'amount' => $amount,
+            'payment_method' => 'manual_momo',
+            'transaction_id' => 'MANUAL-' . strtoupper(Str::random(8)) . '-' . time(),
+            'status' => 'pending',
+            'sender_name' => $senderName,
+        ]);
+
+        return redirect()->route('user.wallet.topup')
+            ->with('success', 'Your top-up request has been submitted. It will be verified and approved shortly.');
     }
 }

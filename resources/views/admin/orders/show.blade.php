@@ -21,8 +21,15 @@
                 <h2 class="text-xl font-black text-slate-800">#{{ $order->id }}</h2>
             </div>
         </div>
-        @php $s = $order->status; @endphp
-        <x-status-badge :status="$s" />
+        <div class="flex items-center gap-3">
+            @php $s = $order->status; @endphp
+            <x-status-badge :status="$s" />
+            <button onclick="document.getElementById('deleteOrderModal').classList.remove('hidden')"
+                    class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold rounded-xl border border-red-100 transition">
+                <x-heroicon-o-trash class="w-4 h-4" />
+                Delete
+            </button>
+        </div>
     </div>
 
     {{-- Two column detail --}}
@@ -170,5 +177,38 @@
     </div>
     @endif
 
+</div>
+
+{{-- Delete Confirmation Modal --}}
+<div id="deleteOrderModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-2xl w-full max-w-md mx-4 p-7">
+        <div class="flex items-center gap-4 mb-5">
+            <div class="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+                <x-heroicon-o-exclamation-triangle class="w-6 h-6 text-red-500" />
+            </div>
+            <div>
+                <h3 class="text-base font-black text-slate-800">Delete Order #{{ $order->id }}?</h3>
+                <p class="text-xs text-slate-400 mt-0.5">This action is permanent and cannot be undone.</p>
+            </div>
+        </div>
+        <div class="bg-red-50 border border-red-100 rounded-xl p-3 mb-5 text-xs text-red-600 font-medium space-y-1">
+            <p>• All status history for this order will also be deleted.</p>
+            <p>• The agent's wallet balance will <strong>not</strong> be refunded automatically.</p>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="document.getElementById('deleteOrderModal').classList.add('hidden')"
+                    class="flex-1 py-2.5 border border-slate-200 text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-50 transition">
+                Cancel
+            </button>
+            <form method="POST" action="{{ route('admin.orders.destroy', $order->id) }}" class="flex-1">
+                @csrf
+                @method('DELETE')
+                <button type="submit"
+                        class="w-full py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-bold rounded-xl transition">
+                    Yes, Delete Order
+                </button>
+            </form>
+        </div>
+    </div>
 </div>
 @endsection

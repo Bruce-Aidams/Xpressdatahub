@@ -10,9 +10,28 @@
         <p class="text-sm text-slate-400 mt-1">Connect and manage external data provider APIs for each network</p>
     </div>
 
+    {{-- Banners --}}
+    @if($isLocked)
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 shadow-sm">
+        <x-heroicon-o-lock-closed class="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+        <div>
+            <h4 class="text-sm font-bold text-red-800">Configurations Locked</h4>
+            <p class="text-xs text-red-600 mt-1">API configurations are currently locked. You cannot add, modify, or delete any configurations.</p>
+        </div>
+    </div>
+    @elseif(!$canAddMore)
+    <div class="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3 shadow-sm">
+        <x-heroicon-o-exclamation-triangle class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+        <div>
+            <h4 class="text-sm font-bold text-amber-800">Maximum Connections Reached</h4>
+            <p class="text-xs text-amber-600 mt-1">You have reached the maximum number of allowed API connections. You cannot add any new ones.</p>
+        </div>
+    </div>
+    @endif
+
     {{-- Action Button --}}
     <div class="flex justify-end mb-6">
-        <button onclick="openAddModal()" class="inline-flex items-center gap-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-bold rounded-xl px-6 py-2.5 transition shadow-md shadow-blue-500/10">
+        <button onclick="openAddModal()" class="inline-flex items-center gap-2 {{ $isLocked || !$canAddMore ? 'bg-slate-300 cursor-not-allowed' : 'bg-[#2563EB] hover:bg-[#1D4ED8]' }} text-white text-sm font-bold rounded-xl px-6 py-2.5 transition shadow-md shadow-blue-500/10">
             <x-heroicon-o-plus class="w-5 h-5" /> Add Network API
         </button>
     </div>
@@ -89,7 +108,7 @@
                     <button onclick="testConnection({{ $config->id }}, '{{ $config->network_type }}')" id="test-btn-{{ $config->id }}" class="w-9 h-9 rounded-xl flex items-center justify-center text-slate-300 hover:text-blue-500 hover:bg-blue-50 transition opacity-0 group-hover:opacity-100" title="Test Connection">
                         <x-heroicon-o-signal class="w-5 h-5" />
                     </button>
-                    <form method="POST" action="{{ route('admin.api-config.toggle', $config->id) }}" class="inline" onsubmit="return confirm('{{ $isActive ? 'Deactivate' : 'Activate' }} the {{ $config->network_type }} API?')">
+                    <form method="POST" action="{{ route('admin.api-config.toggle', $config->id) }}" class="inline" onsubmit="return handleToggle(this, {{ $isActive ? 'true' : 'false' }}, '{{ $config->network_type }}')">
                         @csrf
                         <button type="submit" class="w-9 h-9 rounded-xl flex items-center justify-center {{ $isActive ? 'text-emerald-500 hover:bg-emerald-50' : 'text-slate-300 hover:bg-slate-50' }} transition" title="{{ $isActive ? 'Deactivate' : 'Activate' }}">
                             <x-dynamic-component :component="$isActive ? 'heroicon-o-check-badge' : 'heroicon-o-x-circle'" class="w-5 h-5" />
@@ -104,8 +123,8 @@
                         data-api-key="{{ $config->api_key }}"
                         data-api-secret="{{ $config->api_secret }}"
                         data-method="{{ $config->request_method }}"
-                        data-headers="{{ addslashes($config->request_headers) }}"
-                        data-template="{{ addslashes($config->request_body_template) }}"
+                        data-headers="{{ $config->request_headers }}"
+                        data-template="{{ $config->request_body_template }}"
                         data-success="{{ $config->response_success_field }}"
                         data-data-field="{{ $config->response_data_field }}"
                         data-error="{{ $config->response_error_field }}"
@@ -158,7 +177,7 @@
             <div class="w-16 h-16 mx-auto rounded-2xl bg-slate-50 flex items-center justify-center mb-4"><x-heroicon-o-puzzle-piece class="w-5 h-5 text-slate-300" /></div>
             <h3 class="text-base font-bold text-slate-700 mb-1">No API Configurations</h3>
             <p class="text-sm text-slate-400 mb-5 max-w-sm mx-auto">Add a network API to start processing data orders automatically.</p>
-            <button onclick="openAddModal()" class="inline-flex items-center gap-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-bold rounded-xl px-6 py-2.5 transition shadow-md shadow-blue-500/10"><x-heroicon-o-plus class="w-5 h-5" /> Add Network API</button>
+            <button onclick="openAddModal()" class="inline-flex items-center gap-2 {{ $isLocked || !$canAddMore ? 'bg-slate-300 cursor-not-allowed' : 'bg-[#2563EB] hover:bg-[#1D4ED8]' }} text-white text-sm font-bold rounded-xl px-6 py-2.5 transition shadow-md shadow-blue-500/10"><x-heroicon-o-plus class="w-5 h-5" /> Add Network API</button>
         </div>
     @endforelse
 
@@ -181,9 +200,175 @@
         </button>
 
         <div id="apiDocsContent" class="hidden">
-            <div class="px-6 pb-6 space-y-6 border-t border-slate-100 pt-5">
+            <!-- Tabs Navigation -->
+            <div class="flex border-b border-slate-100 bg-slate-50/50 px-6 py-2 gap-2">
+                <button type="button" onclick="switchDocTab('dev-api', this)" class="doc-tab-btn px-4 py-2 text-xs font-bold rounded-xl bg-[#2563EB] text-white">
+                    Developer API Reference
+                </button>
+                <button type="button" onclick="switchDocTab('outbound-api', this)" class="doc-tab-btn px-4 py-2 text-xs font-semibold rounded-xl text-slate-600 hover:bg-slate-100">
+                    Outbound API Setup Guide
+                </button>
+            </div>
 
-                {{-- Overview --}}
+            <!-- Tab 1: Developer API Content -->
+            <div id="dev-api-content" class="doc-tab-content px-6 pb-6 space-y-6 pt-5">
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-2">
+                        <span class="w-5 h-5 rounded bg-indigo-100 text-indigo-600 text-[10px] font-black flex items-center justify-center">1</span>
+                        Authentication
+                    </h4>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Incoming requests to Xpressdatahub must authenticate by passing your API Key in the <code class="bg-slate-100 px-1 rounded font-mono">X-API-Key</code> header, as a query parameter <code class="bg-slate-100 px-1 rounded font-mono">?api_key=</code>, or in the request body.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-2">
+                        <span class="w-5 h-5 rounded bg-indigo-100 text-indigo-600 text-[10px] font-black flex items-center justify-center">2</span>
+                        Endpoints
+                    </h4>
+                    <div class="space-y-4">
+                        <!-- Balance -->
+                        <div class="border border-slate-100 rounded-xl overflow-hidden">
+                            <div class="flex items-center justify-between px-4 py-2.5 bg-slate-50 border-b border-slate-100">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded">GET</span>
+                                    <span class="font-mono text-xs text-slate-700">/api/v1/wallet/balance</span>
+                                </div>
+                                <span class="text-[10px] text-slate-400 font-medium">Check Wallet Balance</span>
+                            </div>
+                            <div class="p-3 bg-slate-900 font-mono text-[10px] text-emerald-400 overflow-x-auto">
+<pre class="m-0">// Response (200 OK)
+{
+    "success": true,
+    "balance": 150.75,
+    "currency": "GH₵"
+}</pre>
+                            </div>
+                        </div>
+
+                        <!-- Packages -->
+                        <div class="border border-slate-100 rounded-xl overflow-hidden">
+                            <div class="flex items-center justify-between px-4 py-2.5 bg-slate-50 border-b border-slate-100">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded">GET</span>
+                                    <span class="font-mono text-xs text-slate-700">/api/v1/packages</span>
+                                </div>
+                                <span class="text-[10px] text-slate-400 font-medium">List Available Packages</span>
+                            </div>
+                            <div class="p-3 bg-slate-900 font-mono text-[10px] text-emerald-400 overflow-x-auto">
+<pre class="m-0">// Response (200 OK)
+{
+    "success": true,
+    "packages": [
+        {
+            "id": 1,
+            "network_type": "MTN",
+            "package_size": "1.5GB",
+            "selling_price": 10.00,
+            "cost": 8.50
+        }
+    ]
+}</pre>
+                            </div>
+                        </div>
+
+                        <!-- Create Order -->
+                        <div class="border border-slate-100 rounded-xl overflow-hidden">
+                            <div class="flex items-center justify-between px-4 py-2.5 bg-slate-50 border-b border-slate-100">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2 py-0.5 bg-blue-100 text-blue-800 text-[10px] font-bold rounded">POST</span>
+                                    <span class="font-mono text-xs text-slate-700">/api/v1/orders</span>
+                                </div>
+                                <span class="text-[10px] text-slate-400 font-medium">Create Order</span>
+                            </div>
+                            <div class="p-3 border-b border-slate-100 text-xs text-slate-600 space-y-1 bg-white">
+                                <p><strong>Request Body:</strong></p>
+                                <pre class="bg-slate-50 p-2 rounded font-mono text-[10px]">{ "phone_number": "0241234567", "network_type": "MTN", "package_size": "1.5GB" }</pre>
+                            </div>
+                            <div class="p-3 bg-slate-900 font-mono text-[10px] text-emerald-400 overflow-x-auto">
+<pre class="m-0">// Response (200 OK - Processing)
+{
+    "success": true,
+    "order_id": 482,
+    "order_reference": "ORD-5F2A8D9B-1715892",
+    "status": "processing",
+    "message": "Order submitted successfully and is now being processed"
+}</pre>
+                            </div>
+                        </div>
+
+                        <!-- Status Check -->
+                        <div class="border border-slate-100 rounded-xl overflow-hidden">
+                            <div class="flex items-center justify-between px-4 py-2.5 bg-slate-50 border-b border-slate-100">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded">GET</span>
+                                    <span class="font-mono text-xs text-slate-700">/api/v1/orders/status/{reference}</span>
+                                </div>
+                                <span class="text-[10px] text-slate-400 font-medium">Check Order Status</span>
+                            </div>
+                            <div class="p-3 bg-slate-900 font-mono text-[10px] text-emerald-400 overflow-x-auto">
+<pre class="m-0">// Response (200 OK)
+{
+    "success": true,
+    "order": {
+        "id": 482,
+        "status": "processing",
+        "order_reference": "ORD-5F2A8D9B-1715892"
+    }
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-2">
+                        <span class="w-5 h-5 rounded bg-indigo-100 text-indigo-600 text-[10px] font-black flex items-center justify-center">3</span>
+                        HTTP Status & Error Codes
+                    </h4>
+                    <div class="border border-slate-100 rounded-xl overflow-hidden divide-y divide-slate-100 text-xs">
+                        <div class="p-3 flex items-start gap-4">
+                            <span class="px-2 py-0.5 bg-red-100 text-red-700 text-[10px] font-bold rounded">401</span>
+                            <div>
+                                <p class="font-bold text-slate-700">Unauthorized</p>
+                                <p class="text-slate-500 mt-0.5">Missing or invalid API key (<code class="bg-slate-50 px-1 rounded font-mono">"API key is required"</code> or <code class="bg-slate-50 px-1 rounded font-mono">"Invalid API key"</code>)</p>
+                            </div>
+                        </div>
+                        <div class="p-3 flex items-start gap-4">
+                            <span class="px-2 py-0.5 bg-red-100 text-red-700 text-[10px] font-bold rounded">403</span>
+                            <div>
+                                <p class="font-bold text-slate-700">Forbidden</p>
+                                <p class="text-slate-500 mt-0.5">API key is inactive/expired, or agent account is inactive.</p>
+                            </div>
+                        </div>
+                        <div class="p-3 flex items-start gap-4">
+                            <span class="px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] font-bold rounded">402</span>
+                            <div>
+                                <p class="font-bold text-slate-700">Payment Required</p>
+                                <p class="text-slate-500 mt-0.5">Insufficient wallet balance to place this order.</p>
+                            </div>
+                        </div>
+                        <div class="p-3 flex items-start gap-4">
+                            <span class="px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] font-bold rounded">422</span>
+                            <div>
+                                <p class="font-bold text-slate-700">Unprocessable Entity</p>
+                                <p class="text-slate-500 mt-0.5">Validation failed: Invalid Ghana phone number or network/package mismatches.</p>
+                            </div>
+                        </div>
+                        <div class="p-3 flex items-start gap-4">
+                            <span class="px-2 py-0.5 bg-red-100 text-red-700 text-[10px] font-bold rounded">429</span>
+                            <div>
+                                <p class="font-bold text-slate-700">Too Many Requests</p>
+                                <p class="text-slate-500 mt-0.5">Rate limit exceeded. Check the <code class="bg-slate-50 px-1 rounded font-mono">Retry-After</code> header response.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Outbound API Content -->
+            <div id="outbound-api-content" class="doc-tab-content px-6 pb-6 space-y-6 pt-5 hidden">
                 <div>
                     <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-2">
                         <span class="w-5 h-5 rounded bg-indigo-100 text-indigo-600 text-[10px] font-black flex items-center justify-center">1</span>
@@ -231,7 +416,7 @@
                             <div class="px-4 py-3 text-xs text-slate-500 leading-relaxed">
                                 Give the configuration a recognizable name. This is for your reference only.
                                 <div class="mt-2 p-2 bg-white border border-slate-100 rounded-lg font-mono text-[11px] text-slate-600">
-                                    Examples: <code class="text-indigo-600">Hubnet API</code>, <code class="text-indigo-600">GigBundles</code>, <code class="text-indigo-600">MooreTel Data API</code>
+                                    Examples: <code class="text-indigo-600">Flutterwave API</code>, <code class="text-indigo-600">Paystack</code>, <code class="text-indigo-600">GooglePay Data API</code>
                                 </div>
                             </div>
                         </div>
@@ -243,7 +428,7 @@
                             <div class="px-4 py-3 text-xs text-slate-500 leading-relaxed">
                                 This is the full URL where data orders will be sent. Must be a valid HTTPS URL.
                                 <div class="mt-2 p-2 bg-white border border-slate-100 rounded-lg font-mono text-[11px] text-slate-600">
-                                    Example: <code class="text-indigo-600">https://api.hubnet.com/v1/data/purchase</code>
+                                    Example: <code class="text-indigo-600">https://api.Flutterwave.com/v1/data/purchase</code>
                                 </div>
                                 <div class="mt-2 text-[11px] text-slate-400">The system will POST order data (phone, network, package, amount) to this URL.</div>
                             </div>
@@ -256,7 +441,7 @@
                             <div class="px-4 py-3 text-xs text-slate-500 leading-relaxed">
                                 If the API provider has a separate endpoint to check order status, enter it here. If left empty, the system will use the main endpoint for status checks.
                                 <div class="mt-2 p-2 bg-white border border-slate-100 rounded-lg font-mono text-[11px] text-slate-600">
-                                    Example: <code class="text-indigo-600">https://api.hubnet.com/v1/data/status</code>
+                                    Example: <code class="text-indigo-600">https://api.Flutterwave.com/v1/data/status</code>
                                 </div>
                             </div>
                         </div>
@@ -293,7 +478,7 @@
                             <div class="px-4 py-3 text-xs text-slate-500 leading-relaxed">
                                 Enter the HTTP headers as JSON. Use <code class="bg-slate-100 px-1 rounded">{api_key}</code> to dynamically inject the API key.
                                 <div class="mt-2 p-3 bg-slate-900 rounded-lg font-mono text-[11px] text-emerald-400 leading-relaxed">
-<pre class="whitespace-pre-wrap m-0">{\n    "Content-Type": "application/json",\n    "Authorization": "Bearer {api_key}"\n}</pre>
+<pre class="whitespace-pre-wrap m-0">{"Content-Type": "application/json", "X-API-Key": "{api_key}"}</pre>
                                 </div>
                                 <div class="mt-2 text-[11px] text-slate-400">Some APIs use <code>api_key</code> in headers instead of the body. The <code>{api_key}</code> placeholder is replaced at runtime.</div>
                             </div>
@@ -306,7 +491,7 @@
                             <div class="px-4 py-3 text-xs text-slate-500 leading-relaxed">
                                 Define the JSON body sent to the API. Use placeholders for dynamic values. Click <strong>"View Placeholders"</strong> in the modal to see all available placeholders.
                                 <div class="mt-2 p-3 bg-slate-900 rounded-lg font-mono text-[11px] text-emerald-400 leading-relaxed">
-<pre class="whitespace-pre-wrap m-0">{\n    "phone": "{phone}",\n    "network": "{network}",\n    "package": "{package}",\n    "amount": "{amount}",\n    "payment_method": "{payment_method}",\n    "order_id": "{order_id}",\n    "reference": "{reference}"\n}</pre>
+<pre class="whitespace-pre-wrap m-0">{"recipient_phone": "{phone}","network": "{network}", "size_gb":  "{capacity}"}</pre>
                                 </div>
                                 <div class="mt-3">
                                     <strong class="text-slate-700">Common variations by provider:</strong>
@@ -435,9 +620,9 @@
                         <div class="px-4 py-3 space-y-2 text-xs">
                             <div class="grid grid-cols-2 gap-2">
                                 <div><span class="text-slate-400">Network:</span> <span class="font-bold text-amber-600">MTN</span></div>
-                                <div><span class="text-slate-400">API Name:</span> <span class="text-slate-700">Hubnet MTN API</span></div>
-                                <div><span class="text-slate-400">Endpoint:</span> <span class="font-mono text-slate-600">https://api.hubnet.com/v1/data/purchase</span></div>
-                                <div><span class="text-slate-400">Status Endpoint:</span> <span class="font-mono text-slate-600">https://api.hubnet.com/v1/data/status</span></div>
+                                <div><span class="text-slate-400">API Name:</span> <span class="text-slate-700">Flutterwave MTN API</span></div>
+                                <div><span class="text-slate-400">Endpoint:</span> <span class="font-mono text-slate-600">https://api.Flutterwave.com/v1/data/purchase</span></div>
+                                <div><span class="text-slate-400">Status Endpoint:</span> <span class="font-mono text-slate-600">https://api.Flutterwave.com/v1/data/status</span></div>
                                 <div><span class="text-slate-400">API Key:</span> <span class="font-mono text-slate-600">sk_live_abc123...</span></div>
                                 <div><span class="text-slate-400">Method:</span> <span class="font-bold text-slate-700">POST</span></div>
                                 <div><span class="text-slate-400">Timeout:</span> <span class="text-slate-700">30s</span></div>
@@ -448,13 +633,13 @@
                             <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Request Headers</span>
                         </div>
                         <div class="px-4 py-3 bg-slate-900">
-<pre class="font-mono text-[11px] text-emerald-400 whitespace-pre-wrap m-0">{\n    "Content-Type": "application/json",\n    "Authorization": "Bearer {api_key}"\n}</pre>
+<pre class="font-mono text-[11px] text-emerald-400 whitespace-pre-wrap m-0">{"Content-Type": "application/json", "X-API-Key": "{api_key}"}</pre>
                         </div>
                         <div class="px-4 py-2 bg-slate-50 border-t border-b border-slate-100">
                             <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Request Body Template</span>
                         </div>
                         <div class="px-4 py-3 bg-slate-900">
-<pre class="font-mono text-[11px] text-emerald-400 whitespace-pre-wrap m-0">{\n    "phone": "{phone}",\n    "network": "{network}",\n    "package": "{package}",\n    "amount": "{amount}",\n    "payment_method": "{payment_method}",\n    "order_id": "{order_id}",\n    "reference": "{reference}"\n}</pre>
+<pre class="font-mono text-[11px] text-emerald-400 whitespace-pre-wrap m-0">{"recipient_phone": "{phone}","network": "{network}", "size_gb":  "{capacity}"}</pre>
                         </div>
                         <div class="px-4 py-2 bg-slate-50 border-t border-b border-slate-100">
                             <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Response Field Mapping</span>
@@ -468,8 +653,8 @@
                             <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">What Gets Sent at Runtime</span>
                         </div>
                         <div class="px-4 py-3 bg-slate-900">
-                            <p class="text-[10px] text-slate-400 mb-2">POST https://api.hubnet.com/v1/data/purchase</p>
-<pre class="font-mono text-[11px] text-emerald-400 whitespace-pre-wrap m-0">Headers:\n  Content-Type: application/json\n  Authorization: Bearer sk_live_abc123...\n\nBody:\n{\n    "phone": "233501234567",\n    "network": "MTN",\n    "package": "1024",\n    "amount": 15,\n    "payment_method": "wallet",\n    "order_id": "ORD-2026-0456",\n    "reference": "REF-ABC123XYZ"\n}</pre>
+                            <p class="text-[10px] text-slate-400 mb-2">POST https://api.Flutterwave.com/v1/data/purchase</p>
+<pre class="font-mono text-[11px] text-emerald-400 whitespace-pre-wrap m-0"> Headers:  Content-Type: application/json  Authorization: Bearer sk_live_abc123...Body:{ "recipient_phone": "0501234567",    "network": "MTN",    "package": "1024",    "amount": 15,    "payment_method": "wallet",    "order_id": "ORD-2026-0456",    "reference": "REF-ABC123XYZ"}</pre>
                         </div>
                     </div>
                 </div>
@@ -654,7 +839,7 @@
     <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeModal()"></div>
     <div class="absolute inset-0 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-fade-in">
-            <form id="apiForm" method="POST" action="{{ route('admin.api-config.store') }}" onsubmit="return validateNetwork()">
+            <form id="apiForm" method="POST" action="{{ route('admin.api-config.store') }}" onsubmit="return validateNetwork()" autocomplete="off">
                 @csrf
                 <input type="hidden" name="network_type" id="m_network" required>
 
@@ -691,30 +876,30 @@
                     {{-- API Name --}}
                     <div>
                         <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">API Name <span class="text-red-400">*</span></label>
-                        <input type="text" name="api_name" id="m_name" required placeholder="e.g. Hubnet API, GigBundles" class="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 outline-none transition w-full">
+                        <input type="text" name="api_name" id="m_name" required placeholder="e.g vendor-pulse API" autocomplete="off" class="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 outline-none transition w-full">
                     </div>
 
                     {{-- Endpoint --}}
                     <div>
                         <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">API Endpoint <span class="text-red-400">*</span></label>
-                        <input type="url" name="api_endpoint" id="m_endpoint" required placeholder="https://api.provider.com/v1/data" class="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 font-mono focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 outline-none transition w-full">
+                        <input type="url" name="api_endpoint" id="m_endpoint" required placeholder="https://api.provider.com/v1/data" autocomplete="off" class="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 font-mono focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 outline-none transition w-full">
                     </div>
 
                     {{-- Status Endpoint --}}
                     <div>
                         <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Status Check Endpoint <span class="text-slate-300 font-normal">(optional)</span></label>
-                        <input type="url" name="status_endpoint" id="m_status_endpoint" placeholder="Leave empty to use main endpoint" class="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 font-mono focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 outline-none transition w-full">
+                        <input type="url" name="status_endpoint" id="m_status_endpoint" placeholder="Leave empty to use main endpoint" autocomplete="off" class="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 font-mono focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 outline-none transition w-full">
                     </div>
 
                     {{-- Credentials --}}
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">API Key <span class="text-red-400">*</span></label>
-                            <input type="text" name="api_key" id="m_api_key" required placeholder="API Key" class="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 font-mono focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 outline-none transition w-full">
+                            <input type="text" name="api_key" id="m_api_key" required placeholder="API Key" autocomplete="off" class="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 font-mono focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 outline-none transition w-full">
                         </div>
                         <div>
                             <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">API Secret</label>
-                            <input type="text" name="api_secret" id="m_api_secret" placeholder="Optional" class="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 font-mono focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 outline-none transition w-full">
+                            <input type="text" name="api_secret" id="m_api_secret" placeholder="Optional" autocomplete="off" class="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 font-mono focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/10 outline-none transition w-full">
                         </div>
                     </div>
 
@@ -889,6 +1074,8 @@
 
 @push('scripts')
 <script>
+    const IS_LOCKED = @json($isLocked);
+    const CAN_ADD_MORE = @json($canAddMore);
     function openDocs() {
         var content = document.getElementById('apiDocsContent');
         var chevron = document.getElementById('docsChevron');
@@ -918,7 +1105,29 @@
         }
     }
 
+    function switchDocTab(tabId, btn) {
+        document.querySelectorAll('.doc-tab-content').forEach(el => el.classList.add('hidden'));
+        document.getElementById(tabId + '-content').classList.remove('hidden');
+        
+        document.querySelectorAll('.doc-tab-btn').forEach(b => {
+            b.classList.remove('bg-[#2563EB]', 'text-white', 'font-bold');
+            b.classList.add('text-slate-600', 'hover:bg-slate-100', 'font-semibold');
+        });
+        
+        btn.classList.remove('text-slate-600', 'hover:bg-slate-100', 'font-semibold');
+        btn.classList.add('bg-[#2563EB]', 'text-white', 'font-bold');
+    }
+
     function openAddModal() {
+        if (IS_LOCKED) {
+            alert('API configurations are currently locked. You cannot add new configurations.');
+            return;
+        }
+        if (!CAN_ADD_MORE) {
+            alert('Maximum API connections limit reached. You cannot add any new configurations.');
+            return;
+        }
+
         document.getElementById('m_title').textContent = 'Add Network API';
         document.getElementById('m_submit').textContent = 'Save Configuration';
         document.getElementById('apiForm').reset();
@@ -927,8 +1136,8 @@
         document.getElementById('m_active').checked = true;
         document.getElementById('networkSelector').style.display = 'block';
         document.querySelectorAll('.network-option').forEach(b => { b.classList.remove('border-[#2563EB]','bg-blue-50'); b.classList.add('border-slate-200'); });
-        document.getElementById('m_headers').value = '{\n    "Content-Type": "application/json",\n    "Authorization": "Bearer {api_key}"\n}';
-        document.getElementById('m_template').value = '{\n    "phone": "{phone}",\n    "network": "{network}",\n    "package": "{package}",\n    "amount": "{amount}",\n    "payment_method": "{payment_method}",\n    "order_id": "{order_id}",\n    "reference": "{reference}"\n}';
+        document.getElementById('m_headers').value = '';
+        document.getElementById('m_template').value = '';
         document.getElementById('m_success').value = 'success';
         document.getElementById('m_data_field').value = 'data';
         document.getElementById('m_error').value = 'error';
@@ -938,6 +1147,11 @@
     }
 
     function editConfig(btn) {
+        if (IS_LOCKED) {
+            alert('API configurations are currently locked. You cannot modify existing configurations.');
+            return;
+        }
+
         document.getElementById('m_title').textContent = 'Edit ' + btn.dataset.network + ' API';
         document.getElementById('m_submit').textContent = 'Update Configuration';
         document.getElementById('apiForm').action = '{{ route("admin.api-config.store") }}';
@@ -960,7 +1174,13 @@
         document.getElementById('apiModal').classList.remove('hidden');
     }
 
-    function closeModal() { document.getElementById('apiModal').classList.add('hidden'); }
+    function closeModal() {
+        document.getElementById('apiModal').classList.add('hidden');
+        // Reset form so next open (Add or Edit) always starts fresh
+        document.getElementById('apiForm').reset();
+        document.getElementById('m_network').value = '';
+        document.querySelectorAll('.network-option').forEach(b => { b.classList.remove('border-[#2563EB]','bg-blue-50'); b.classList.add('border-slate-200'); });
+    }
 
     function validateNetwork() {
         const net = document.getElementById('m_network').value;
@@ -978,7 +1198,19 @@
         btn.classList.add('border-[#2563EB]','bg-blue-50');
     }
 
+    function handleToggle(form, isActive, network) {
+        if (IS_LOCKED) {
+            alert('API configurations are currently locked. You cannot toggle active status.');
+            return false;
+        }
+        return confirm((isActive ? 'Deactivate' : 'Activate') + ' the ' + network + ' API?');
+    }
+
     function deleteConfig(id, network) {
+        if (IS_LOCKED) {
+            alert('API configurations are currently locked. You cannot delete configurations.');
+            return;
+        }
         if (!confirm('Delete the ' + network + ' API configuration? This cannot be undone.')) return;
         const f = document.getElementById('deleteForm');
         f.action = '{{ url(config("app.admin_path") . "/api-config") }}/' + id;

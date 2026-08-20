@@ -21,6 +21,7 @@ class Payment extends Model
         'paystack_reference',
         'status',
         'verified_at',
+        'sender_name',
     ];
 
     protected function casts(): array

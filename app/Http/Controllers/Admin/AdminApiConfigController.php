@@ -12,12 +12,19 @@ class AdminApiConfigController extends Controller
     public function index()
     {
         $configs = ApiConfig::orderByDesc('is_active')->orderByDesc('updated_at')->get();
+        $isLocked = config('api-connections.locked', false);
+        $maxConnections = config('api-connections.max_connections', 3);
+        $canAddMore = $configs->count() < $maxConnections;
 
-        return view('admin.config.api-config', compact('configs'));
+        return view('admin.config.api-config', compact('configs', 'isLocked', 'canAddMore'));
     }
 
     public function store(Request $request)
     {
+        if (config('api-connections.locked', false)) {
+            return redirect()->back()->with('error', 'API configurations are currently locked and cannot be modified.');
+        }
+
         $request->validate([
             'network_type' => 'required|string|max:50',
             'api_name' => 'required|string|max:255',
@@ -41,6 +48,10 @@ class AdminApiConfigController extends Controller
             $this->validateJson($request, 'request_body_template');
 
             $existing = ApiConfig::where('network_type', $request->input('network_type'))->first();
+
+            if (!$existing && ApiConfig::count() >= config('api-connections.max_connections', 3)) {
+                return redirect()->back()->with('error', 'Maximum API connections limit reached.');
+            }
 
             $data = [
                 'network_type' => $request->input('network_type'),
@@ -84,6 +95,10 @@ class AdminApiConfigController extends Controller
 
     public function toggle(ApiConfig $apiConfig)
     {
+        if (config('api-connections.locked', false)) {
+            return redirect()->route('admin.api-config')->with('error', 'API configurations are currently locked.');
+        }
+
         try {
             $apiConfig->update([
                 'is_active' => ! $apiConfig->is_active,
@@ -100,6 +115,10 @@ class AdminApiConfigController extends Controller
 
     public function destroy(ApiConfig $apiConfig)
     {
+        if (config('api-connections.locked', false)) {
+            return redirect()->route('admin.api-config')->with('error', 'API configurations are currently locked.');
+        }
+
         try {
             $apiConfig->delete();
 
@@ -112,7 +131,6 @@ class AdminApiConfigController extends Controller
     public function testConnection(ApiConfig $apiConfig)
     {
         $endpoint = $apiConfig->endpoint_url;
-        $method = $apiConfig->request_method ?? 'POST';
         $timeout = max(5, min(30, intval($apiConfig->timeout_seconds ?? 10)));
         $headers = json_decode($apiConfig->request_headers ?? '{}', true) ?: [];
 
@@ -124,16 +142,6 @@ class AdminApiConfigController extends Controller
             $headers['Content-Type'] = 'application/json';
         }
 
-        $testData = [
-            'phone' => '233500000000',
-            'network' => $apiConfig->network_type,
-            'package' => '1024MB',
-            'amount' => 1,
-            'payment_method' => 'wallet',
-            'order_id' => 'TEST-'.time(),
-            'reference' => 'TEST-'.time(),
-        ];
-
         $startTime = microtime(true);
 
         try {
@@ -143,9 +151,9 @@ class AdminApiConfigController extends Controller
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_TIMEOUT => $timeout,
                 CURLOPT_CONNECTTIMEOUT => min(10, max(3, intval($timeout / 3))),
-                CURLOPT_CUSTOMREQUEST => $method,
+                CURLOPT_CUSTOMREQUEST => 'GET',
                 CURLOPT_HTTPHEADER => array_map(fn ($k, $v) => "{$k}: {$v}", array_keys($headers), array_values($headers)),
-                CURLOPT_POSTFIELDS => $method !== 'GET' ? json_encode($testData) : null,
+                CURLOPT_POSTFIELDS => null,
                 CURLOPT_SSL_VERIFYPEER => false,
                 CURLOPT_SSL_VERIFYHOST => false,
                 CURLOPT_FOLLOWLOCATION => true,
@@ -175,7 +183,7 @@ class AdminApiConfigController extends Controller
                     'message' => "cURL Error ({$curlErrno}): {$curlError}",
                     'details' => [
                         'endpoint' => $endpoint,
-                        'method' => $method,
+                        'method' => 'GET',
                         'timeout' => $timeout.'s',
                         'http_code' => 0,
                         'response_time' => $totalTime.'ms',
@@ -184,26 +192,21 @@ class AdminApiConfigController extends Controller
                 ]);
             }
 
-            $responseData = json_decode($response, true);
-            $successField = $apiConfig->response_success_field ?? 'success';
-            $isSuccess = isset($responseData[$successField])
-                ? (bool) $responseData[$successField]
-                : ($httpCode >= 200 && $httpCode < 300);
+            $isSuccess = ($httpCode > 0);
 
             return response()->json([
                 'success' => $isSuccess,
                 'status' => $isSuccess ? 'success' : 'failed',
                 'message' => $isSuccess
-                    ? "Connection successful — HTTP {$httpCode}"
+                    ? "Connection test successful — Host is reachable (HTTP {$httpCode})"
                     : "Connection failed — HTTP {$httpCode}",
                 'details' => [
                     'endpoint' => $endpoint,
-                    'method' => $method,
+                    'method' => 'GET',
                     'timeout' => $timeout.'s',
                     'http_code' => $httpCode,
                     'response_time' => $totalTime.'ms',
                     'curl_info' => $curlInfo,
-                    'response' => $responseData ? json_encode($responseData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) : $response,
                 ],
             ]);
 

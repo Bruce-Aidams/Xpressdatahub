@@ -32,7 +32,7 @@ use App\Http\Controllers\Auth\UserLoginController;
 use App\Http\Controllers\GuestShopController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\User\BulkOrderController;
-use App\Http\Controllers\User\CartController;
+
 use App\Http\Controllers\User\GuestCallbackController;
 use App\Http\Controllers\User\UserApiKeyController;
 use App\Http\Controllers\User\UserBalanceHistoryController;
@@ -109,9 +109,11 @@ Route::prefix(config('app.admin_path'))->name('admin.')->middleware('admin.auth'
 
     // Orders
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+    Route::post('/orders/bulk/status', [AdminOrderController::class, 'bulkStatusUpdate'])->name('orders.bulk.status');
+    Route::post('/orders/bulk/delete', [AdminOrderController::class, 'bulkDelete'])->name('orders.bulk.delete');
     Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::put('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.status');
-    Route::post('/orders/bulk/status', [AdminOrderController::class, 'bulkStatusUpdate'])->name('orders.bulk.status');
+    Route::delete('/orders/{order}', [AdminOrderController::class, 'destroy'])->name('orders.destroy');
     Route::get('/all-orders', [AdminAllOrderController::class, 'index'])->name('orders.all');
 
     // Agents
@@ -138,6 +140,11 @@ Route::prefix(config('app.admin_path'))->name('admin.')->middleware('admin.auth'
     Route::put('/payment-config', [AdminPaymentConfigController::class, 'update'])->name('payment-config.update');
     Route::get('/payment-config', [AdminPaymentConfigController::class, 'index'])->name('config.payment');
     Route::put('/payment-config', [AdminPaymentConfigController::class, 'update'])->name('config.payment.update');
+
+    // Manual Topups
+    Route::get('/manual-topups', [\App\Http\Controllers\Admin\AdminManualTopupController::class, 'index'])->name('manual-topups.index');
+    Route::post('/manual-topups/{payment}/approve', [\App\Http\Controllers\Admin\AdminManualTopupController::class, 'approve'])->name('manual-topups.approve');
+    Route::post('/manual-topups/{payment}/reject', [\App\Http\Controllers\Admin\AdminManualTopupController::class, 'reject'])->name('manual-topups.reject');
 
     // Config - Paystack Charge
     Route::get('/paystack-charge', [AdminPaystackChargeController::class, 'index'])->name('paystack-charge');
@@ -263,19 +270,12 @@ Route::prefix('user')->name('user.')->middleware('user.auth')->group(function ()
     // Wallet Topup
     Route::get('/wallet/topup', [UserWalletController::class, 'topupForm'])->name('wallet.topup');
     Route::post('/wallet/topup', [UserWalletController::class, 'initializeTopup'])->name('wallet.topup.init');
+    Route::post('/wallet/manual-topup', [UserWalletController::class, 'manualTopup'])->name('wallet.topup.manual');
     Route::get('/wallet/callback', [UserWalletController::class, 'callback'])->name('wallet.callback');
 
     // Buy Data
     Route::get('/buy-data', [UserDataController::class, 'index'])->name('buy-data');
     Route::post('/buy-data', [UserDataController::class, 'store'])->name('buy-data.store');
-
-    // Cart
-    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-    Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
-    Route::put('/cart/{cartItem}', [CartController::class, 'update'])->name('cart.update');
-    Route::delete('/cart/{cartItem}', [CartController::class, 'destroy'])->name('cart.destroy');
-    Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
-    Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
 
     // Notifications
     Route::get('/notifications', [UserNotificationController::class, 'index'])->name('notifications.index');
