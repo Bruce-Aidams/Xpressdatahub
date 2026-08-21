@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Agent;
 use App\Models\MinimumTopupConfig;
 use App\Models\Payment;
+use App\Models\PaymentConfig;
 use App\Models\PaystackTopupCharge;
 use App\Services\BalanceHistoryService;
 use App\Services\PaystackService;
@@ -27,9 +28,9 @@ class UserWalletController extends Controller
         $chargeAmount = $chargeConfig ? floatval($chargeConfig->charge_amount) : 0;
         $chargeType = $chargeConfig ? $chargeConfig->charge_type : 'fixed';
 
-        $momoNumberConfig = \App\Models\PaymentConfig::where('config_key', 'admin_momo_number')->first();
-        $momoNameConfig = \App\Models\PaymentConfig::where('config_key', 'admin_momo_name')->first();
-        
+        $momoNumberConfig = PaymentConfig::where('config_key', 'admin_momo_number')->first();
+        $momoNameConfig = PaymentConfig::where('config_key', 'admin_momo_name')->first();
+
         $momoNumber = $momoNumberConfig ? $momoNumberConfig->config_value : 'Not Configured';
         $momoName = $momoNameConfig ? $momoNameConfig->config_value : '';
 
@@ -178,7 +179,7 @@ class UserWalletController extends Controller
             'agent_id' => $userId,
             'amount' => $amount,
             'payment_method' => 'manual_momo',
-            'transaction_id' => 'MANUAL-' . strtoupper(Str::random(8)) . '-' . time(),
+            'transaction_id' => 'MANUAL-'.strtoupper(Str::random(8)).'-'.time(),
             'status' => 'pending',
             'sender_name' => $senderName,
         ]);

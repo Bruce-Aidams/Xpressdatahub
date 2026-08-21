@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\AdminUser;
+use App\Models\Agent;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Request;
@@ -121,7 +122,7 @@ class AdminAuthService
         ]);
 
         // Sync password back to agent account if one exists
-        $agent = \App\Models\Agent::where('username', $admin->username)
+        $agent = Agent::where('username', $admin->username)
             ->orWhere('email', $admin->email)
             ->first();
 

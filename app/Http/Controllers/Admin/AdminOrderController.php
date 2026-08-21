@@ -10,7 +10,6 @@ use App\Services\OrderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-
 class AdminOrderController extends Controller
 {
     public function __construct(
@@ -183,7 +182,7 @@ class AdminOrderController extends Controller
     public function bulkDelete(Request $request)
     {
         $request->validate([
-            'order_ids'   => 'required|array|min:1',
+            'order_ids' => 'required|array|min:1',
             'order_ids.*' => 'integer|exists:orders,id',
         ]);
 

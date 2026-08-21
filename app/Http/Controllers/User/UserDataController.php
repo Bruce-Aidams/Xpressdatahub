@@ -72,7 +72,12 @@ class UserDataController extends Controller
         // Remove empty networks so network tabs show N/A correctly
         $pricing = $expanded->filter(fn ($pkgs) => $pkgs->isNotEmpty());
 
-        return view('user.buy-data.index', compact('agent', 'pricing', 'isGuest'));
+        $momoNumberConfig = \App\Models\PaymentConfig::where('config_key', 'admin_momo_number')->first();
+        $momoNameConfig = \App\Models\PaymentConfig::where('config_key', 'admin_momo_name')->first();
+        $momoNumber = $momoNumberConfig ? $momoNumberConfig->config_value : 'Not Configured';
+        $momoName = $momoNameConfig ? $momoNameConfig->config_value : '';
+
+        return view('user.buy-data.index', compact('agent', 'pricing', 'isGuest', 'momoNumber', 'momoName'));
     }
 
     public function store(Request $request)
@@ -143,6 +148,39 @@ class UserDataController extends Controller
         $reference = ($isGuest ? 'GUEST-' : 'ORD-').strtoupper(Str::random(8)).'-'.time();
 
         if ($isGuest) {
+            $paymentMethod = $request->input('payment_method', 'paystack');
+            if ($paymentMethod === 'manual_momo') {
+                $request->validate([
+                    'sender_name' => 'required|string|max:255',
+                ]);
+            }
+
+            $guestId = session('guest_id');
+            if (! $guestId) {
+                $guestId = 'GST-'.strtoupper(Str::random(6));
+                session()->put('guest_id', $guestId);
+            }
+
+            if ($paymentMethod === 'manual_momo') {
+                Order::create([
+                    'agent_id' => null,
+                    'guest_id' => $guestId,
+                    'phone_number' => $validatedPhone,
+                    'network_type' => $networkType,
+                    'package_size' => $packageSize,
+                    'amount' => $amount,
+                    'payment_method' => 'manual_momo',
+                    'transaction_id' => $reference,
+                    'order_source' => 'guest',
+                    'order_reference' => $reference,
+                    'base_amount' => floatval($pricing->cost),
+                    'status' => 'payment_pending',
+                    'sender_name' => $request->input('sender_name'),
+                ]);
+
+                return redirect()->route('guest.order.success');
+            }
+
             $paystack = app(PaystackService::class);
             $callbackUrl = route('guest.callback');
             $email = 'guest-'.Str::random(6).'@guestorder.com';
@@ -164,12 +202,6 @@ class UserDataController extends Controller
             if (! $paystackResult['success']) {
                 return redirect()->back()
                     ->with('error', 'Failed to initialize payment. Please try again.');
-            }
-
-            $guestId = session('guest_id');
-            if (! $guestId) {
-                $guestId = 'GST-'.strtoupper(Str::random(6));
-                session()->put('guest_id', $guestId);
             }
 
             Order::create([
@@ -274,10 +306,15 @@ class UserDataController extends Controller
                             'status_updated_at' => now(),
                         ]);
                     } else {
+                        $orderService = app(OrderService::class);
+                        $orderService->updateOrderStatus(
+                            $orderId,
+                            'failed',
+                            $apiResult['error'] ?? 'API call failed',
+                            'system'
+                        );
                         Order::where('id', $orderId)->update([
-                            'status' => 'failed',
                             'api_response_data' => json_encode(['error' => $apiResult['error'] ?? 'API call failed']),
-                            'status_updated_at' => now(),
                         ]);
                     }
                 }

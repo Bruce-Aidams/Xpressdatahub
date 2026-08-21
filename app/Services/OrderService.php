@@ -201,6 +201,13 @@ class OrderService
     private function onOrderFailed(Order $order): void
     {
         try {
+            $refundService = app(RefundService::class);
+            $refundService->processRefund($order);
+        } catch (\Exception $e) {
+            Log::error("Refund trigger error for order #{$order->id}: {$e->getMessage()}");
+        }
+
+        try {
             $adminNotificationService = app(AdminNotificationService::class);
             $adminNotificationService->notifyAdmins([
                 'title' => 'Order Failed',

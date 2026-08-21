@@ -12,6 +12,7 @@ use App\Services\PasswordResetService;
 use App\Services\ReferralService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class AdminAgentController extends Controller
@@ -188,6 +189,7 @@ class AdminAgentController extends Controller
             if ($result['success']) {
                 $agent->refresh();
                 $this->syncAdminRole($agent);
+
                 return redirect()->back()
                     ->with('success', 'Agent status updated successfully.');
             }
@@ -314,7 +316,8 @@ class AdminAgentController extends Controller
                 ->with('success', "{$agent->username} has been promoted to administrator successfully.");
 
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Failed to promote agent to admin: ' . $e->getMessage());
+            Log::error('Failed to promote agent to admin: '.$e->getMessage());
+
             return redirect()->back()
                 ->with('error', 'Failed to promote agent to administrator.');
         }
@@ -334,7 +337,7 @@ class AdminAgentController extends Controller
                     'username' => $agent->username,
                     'email' => $agent->email,
                     'password_hash' => $agent->password_hash,
-                    'full_name' => trim($agent->first_name . ' ' . $agent->last_name),
+                    'full_name' => trim($agent->first_name.' '.$agent->last_name),
                     'role' => 'admin',
                     'is_active' => $isActive,
                 ]);
@@ -343,7 +346,7 @@ class AdminAgentController extends Controller
                     'username' => $agent->username,
                     'email' => $agent->email,
                     'password_hash' => $agent->password_hash,
-                    'full_name' => trim($agent->first_name . ' ' . $agent->last_name),
+                    'full_name' => trim($agent->first_name.' '.$agent->last_name),
                     'is_active' => $isActive,
                 ]);
             }

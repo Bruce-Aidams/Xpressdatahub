@@ -17,12 +17,12 @@ class StatusUpdateWebhookController extends Controller
 
     public function handle(Request $request)
     {
-        $payload  = $request->all();
+        $payload = $request->all();
         $rawInput = $request->getContent();
 
         Log::info('Webhook received: status-update', [
             'payload' => $payload,
-            'ip'      => $request->ip(),
+            'ip' => $request->ip(),
         ]);
 
         try {
@@ -79,10 +79,10 @@ class StatusUpdateWebhookController extends Controller
                 $this->logWebhook($order->id, $externalTransactionId, $rawInput, $mappedStatus, false);
 
                 return response()->json([
-                    'success'  => true,
-                    'message'  => 'Status unchanged',
+                    'success' => true,
+                    'message' => 'Status unchanged',
                     'order_id' => $order->id,
-                    'status'   => $mappedStatus,
+                    'status' => $mappedStatus,
                 ]);
             }
 
@@ -102,16 +102,16 @@ class StatusUpdateWebhookController extends Controller
             $this->logWebhook($order->id, $externalTransactionId, $rawInput, $mappedStatus, true);
 
             return response()->json([
-                'success'    => $result['success'],
-                'message'    => $result['message'],
-                'order_id'   => $order->id,
+                'success' => $result['success'],
+                'message' => $result['message'],
+                'order_id' => $order->id,
                 'old_status' => $oldStatus,
                 'new_status' => $mappedStatus,
             ]);
 
         } catch (\Exception $e) {
             Log::error("Webhook processing error: {$e->getMessage()}", [
-                'trace'   => $e->getTraceAsString(),
+                'trace' => $e->getTraceAsString(),
                 'payload' => $payload,
             ]);
             report($e);
@@ -132,36 +132,42 @@ class StatusUpdateWebhookController extends Controller
         // Our own local integer order ID
         if (! empty($payload['order_id'])) {
             $order = Order::find($payload['order_id']);
-            if ($order) return $order;
+            if ($order) {
+                return $order;
+            }
         }
 
         // Our generated reference string (e.g. ORD-XXXXXXXX)
         if (! empty($payload['order_reference'])) {
             $order = Order::where('order_reference', $payload['order_reference'])->first();
-            if ($order) return $order;
+            if ($order) {
+                return $order;
+            }
         }
 
         // External transaction / reference IDs from the provider
         $externalIds = array_values(array_filter([
             $payload['external_transaction_id'] ?? null,
-            $payload['transaction_id']          ?? null,
-            $payload['transactionId']           ?? null,
-            $payload['reference']               ?? null,
-            $payload['txn_id']                  ?? null,
-            $payload['txref']                   ?? null,
+            $payload['transaction_id'] ?? null,
+            $payload['transactionId'] ?? null,
+            $payload['reference'] ?? null,
+            $payload['txn_id'] ?? null,
+            $payload['txref'] ?? null,
         ]));
 
         foreach ($externalIds as $eid) {
             $order = Order::where('external_transaction_id', $eid)->first()
                 ?? Order::where('transaction_id', $eid)->first()
                 ?? Order::where('order_reference', $eid)->first();
-            if ($order) return $order;
+            if ($order) {
+                return $order;
+            }
         }
 
         // Fuzzy match: phone + package size (most recent pending/processing order)
-        $phone   = $payload['phoneNumber'] ?? $payload['phone_number'] ?? $payload['phone']   ?? null;
+        $phone = $payload['phoneNumber'] ?? $payload['phone_number'] ?? $payload['phone'] ?? null;
         $package = $payload['packageSize'] ?? $payload['package_size'] ?? $payload['package'] ?? null;
-        $amount  = $payload['amount']      ?? null;
+        $amount = $payload['amount'] ?? null;
 
         if ($phone && $package) {
             $query = Order::where('phone_number', $phone)
@@ -174,7 +180,9 @@ class StatusUpdateWebhookController extends Controller
             }
 
             $order = $query->first();
-            if ($order) return $order;
+            if ($order) {
+                return $order;
+            }
         }
 
         return null;
@@ -192,60 +200,60 @@ class StatusUpdateWebhookController extends Controller
 
         $statusMap = [
             // → delivered
-            'success'      => 'delivered',
-            'successful'   => 'delivered',
-            'delivered'    => 'delivered',
-            'completed'    => 'delivered',
-            'complete'     => 'delivered',
-            'fulfilled'    => 'delivered',
-            'done'         => 'delivered',
-            'sent'         => 'delivered',
+            'success' => 'delivered',
+            'successful' => 'delivered',
+            'delivered' => 'delivered',
+            'completed' => 'delivered',
+            'complete' => 'delivered',
+            'fulfilled' => 'delivered',
+            'done' => 'delivered',
+            'sent' => 'delivered',
 
             // → processing
-            'pending'      => 'processing',
-            'processing'   => 'processing',
-            'in_progress'  => 'processing',
-            'inprogress'   => 'processing',
-            'submitted'    => 'processing',
-            'queued'       => 'processing',
-            'initiated'    => 'processing',
+            'pending' => 'processing',
+            'processing' => 'processing',
+            'in_progress' => 'processing',
+            'inprogress' => 'processing',
+            'submitted' => 'processing',
+            'queued' => 'processing',
+            'initiated' => 'processing',
 
             // → failed
-            'failed'       => 'failed',
-            'failure'      => 'failed',
-            'error'        => 'failed',
+            'failed' => 'failed',
+            'failure' => 'failed',
+            'error' => 'failed',
             'unsuccessful' => 'failed',
-            'rejected'     => 'failed',
-            'declined'     => 'failed',
+            'rejected' => 'failed',
+            'declined' => 'failed',
 
             // → cancelled
-            'cancelled'    => 'cancelled',
-            'canceled'     => 'cancelled',
-            'refunded'     => 'cancelled',
-            'reversed'     => 'cancelled',
-            'void'         => 'cancelled',
-            'voided'       => 'cancelled',
+            'cancelled' => 'cancelled',
+            'canceled' => 'cancelled',
+            'refunded' => 'cancelled',
+            'reversed' => 'cancelled',
+            'void' => 'cancelled',
+            'voided' => 'cancelled',
         ];
 
         return $statusMap[strtolower(trim($externalStatus))] ?? null;
     }
 
     private function logWebhook(
-        int     $orderId,
+        int $orderId,
         ?string $externalTransactionId,
         ?string $rawInput,
-        string  $status,
-        bool    $processed
+        string $status,
+        bool $processed
     ): void {
         try {
             WebhookLog::create([
-                'order_id'                => $orderId,
-                'webhook_type'            => 'status_update',
+                'order_id' => $orderId,
+                'webhook_type' => 'status_update',
                 'external_transaction_id' => $externalTransactionId,
-                'payload'                 => $rawInput,
-                'response_status'         => $status,
-                'processed'               => $processed,
-                'created_at'              => now(),
+                'payload' => $rawInput,
+                'response_status' => $status,
+                'processed' => $processed,
+                'created_at' => now(),
             ]);
         } catch (\Exception $e) {
             report($e);

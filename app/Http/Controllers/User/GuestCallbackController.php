@@ -7,6 +7,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\ExternalApiService;
+use App\Services\OrderService;
 use App\Services\PaystackService;
 use Illuminate\Http\Request;
 
@@ -76,7 +77,8 @@ class GuestCallbackController extends Controller
                 ->with('order_reference', $reference);
         }
 
-        $order->update(['status' => 'failed']);
+        $orderService = app(OrderService::class);
+        $orderService->updateOrderStatus($order->id, 'failed', 'Payment verification failed', 'paystack');
 
         return redirect()->route('guest.order.success')
             ->with('error', 'Payment verification failed. Please contact support if you were charged.');

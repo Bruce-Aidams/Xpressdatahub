@@ -49,7 +49,7 @@ class AdminApiConfigController extends Controller
 
             $existing = ApiConfig::where('network_type', $request->input('network_type'))->first();
 
-            if (!$existing && ApiConfig::count() >= config('api-connections.max_connections', 3)) {
+            if (! $existing && ApiConfig::count() >= config('api-connections.max_connections', 3)) {
                 return redirect()->back()->with('error', 'Maximum API connections limit reached.');
             }
 

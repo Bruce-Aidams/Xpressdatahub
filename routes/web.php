@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\AdminBannerController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminDataIntegrationController;
 use App\Http\Controllers\Admin\AdminLowBalanceAlertController;
+use App\Http\Controllers\Admin\AdminManualTopupController;
 use App\Http\Controllers\Admin\AdminMinimumTopupController;
 use App\Http\Controllers\Admin\AdminNotificationController;
 use App\Http\Controllers\Admin\AdminOrderController;
@@ -32,7 +33,6 @@ use App\Http\Controllers\Auth\UserLoginController;
 use App\Http\Controllers\GuestShopController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\User\BulkOrderController;
-
 use App\Http\Controllers\User\GuestCallbackController;
 use App\Http\Controllers\User\UserApiKeyController;
 use App\Http\Controllers\User\UserBalanceHistoryController;
@@ -142,9 +142,9 @@ Route::prefix(config('app.admin_path'))->name('admin.')->middleware('admin.auth'
     Route::put('/payment-config', [AdminPaymentConfigController::class, 'update'])->name('config.payment.update');
 
     // Manual Topups
-    Route::get('/manual-topups', [\App\Http\Controllers\Admin\AdminManualTopupController::class, 'index'])->name('manual-topups.index');
-    Route::post('/manual-topups/{payment}/approve', [\App\Http\Controllers\Admin\AdminManualTopupController::class, 'approve'])->name('manual-topups.approve');
-    Route::post('/manual-topups/{payment}/reject', [\App\Http\Controllers\Admin\AdminManualTopupController::class, 'reject'])->name('manual-topups.reject');
+    Route::get('/manual-topups', [AdminManualTopupController::class, 'index'])->name('manual-topups.index');
+    Route::post('/manual-topups/{payment}/approve', [AdminManualTopupController::class, 'approve'])->name('manual-topups.approve');
+    Route::post('/manual-topups/{payment}/reject', [AdminManualTopupController::class, 'reject'])->name('manual-topups.reject');
 
     // Config - Paystack Charge
     Route::get('/paystack-charge', [AdminPaystackChargeController::class, 'index'])->name('paystack-charge');

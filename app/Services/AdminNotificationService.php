@@ -210,6 +210,7 @@ class AdminNotificationService
             $notification = Notification::create([
                 'title' => $title,
                 'message' => "[SYSTEM ALERT] $message",
+                'type' => 'admin',
                 'sender_id' => 0,
                 'sender_type' => 'system',
                 'recipient_type' => 'admin',

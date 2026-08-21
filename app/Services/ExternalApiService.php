@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\ApiConfig;
 use App\Models\ApiLog;
+use App\Models\Order;
 use App\Models\PaymentConfig;
 
 class ExternalApiService
@@ -157,14 +158,14 @@ class ExternalApiService
     {
         $template = $this->apiConfig['request_body_template'] ?? '{}';
         $capacityGb = round($capacityMb / 1024, 2);
-        
+
         $amount = $capacityMb; // fallback
         $reference = $localOrderId ?: ('ORDER-'.time().'-'.rand(100, 999));
         $orderId = $localOrderId;
         $packageVal = $capacityMb.'MB';
 
         if ($localOrderId) {
-            $order = \App\Models\Order::find($localOrderId);
+            $order = Order::find($localOrderId);
             if ($order) {
                 $amount = $order->amount;
                 $reference = $order->order_reference ?: $order->transaction_id ?: $localOrderId;

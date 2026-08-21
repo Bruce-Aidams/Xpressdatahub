@@ -142,18 +142,55 @@
             <div class="space-y-3 mt-7 relative z-10">
                 <label class="text-sm font-bold text-slate-800">4. Payment Method</label>
                 @if($isGuest ?? false)
-                    <div class="flex items-center justify-between p-4 rounded-2xl border-2 border-[#2563EB] bg-blue-50 ring-2 ring-[#2563EB] ring-offset-2">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
-                                <svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                        <label class="relative flex items-center justify-between p-4 rounded-2xl border-2 border-slate-200 cursor-pointer hover:border-[#2563EB] hover:bg-blue-50 transition-all" id="method-paystack-label">
+                            <input type="radio" name="guest_payment_method" value="paystack" class="peer sr-only" checked onchange="toggleGuestPayment()">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-slate-800">Paystack</p>
+                                    <p class="text-[10px] text-slate-500">Card / Bank</p>
+                                </div>
                             </div>
+                            <div class="w-5 h-5 rounded-full border-2 border-slate-300 flex items-center justify-center peer-checked:border-[#2563EB] peer-checked:bg-[#2563EB]">
+                                <svg class="w-3 h-3 text-white hidden peer-checked:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                            </div>
+                        </label>
+                        
+                        <label class="relative flex items-center justify-between p-4 rounded-2xl border-2 border-slate-200 cursor-pointer hover:border-[#2563EB] hover:bg-blue-50 transition-all" id="method-momo-label">
+                            <input type="radio" name="guest_payment_method" value="manual_momo" class="peer sr-only" onchange="toggleGuestPayment()">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-slate-800">MoMo Pay</p>
+                                    <p class="text-[10px] text-slate-500">Manual Transfer</p>
+                                </div>
+                            </div>
+                            <div class="w-5 h-5 rounded-full border-2 border-slate-300 flex items-center justify-center peer-checked:border-[#2563EB] peer-checked:bg-[#2563EB]">
+                                <svg class="w-3 h-3 text-white hidden peer-checked:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div id="momoDetailsSection" class="hidden space-y-4 p-4 rounded-2xl bg-amber-50 border border-amber-200">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-white rounded-xl border border-amber-100 shadow-sm">
                             <div>
-                                <p class="text-sm font-bold text-slate-800">Paystack</p>
-                                <p class="text-xs text-slate-500">Secure online payment</p>
+                                <p class="text-[10px] font-bold text-amber-600 uppercase tracking-wider">Send Payment To</p>
+                                <p class="text-sm font-black text-slate-800">{{ $momoName ?? 'Admin' }}</p>
+                                <p class="text-lg font-mono font-bold text-slate-800">{{ $momoNumber ?? 'Not Configured' }}</p>
                             </div>
                         </div>
-                        <svg class="w-6 h-6 text-[#2563EB]" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd"/></svg>
+                        <div class="space-y-1">
+                            <label class="text-xs font-bold text-slate-700">Name on MoMo Account</label>
+                            <input type="text" id="momoSenderName" placeholder="e.g. John Doe" class="w-full px-4 py-3 bg-white border border-amber-200 rounded-xl text-sm focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition">
+                            <p class="text-[10px] text-amber-700/70 mt-1">Provide the exact name you used for the transfer so we can verify your payment.</p>
+                        </div>
                     </div>
+
                 @else
                     <div class="flex items-center justify-between p-4 rounded-2xl border-2 border-[#2563EB] bg-blue-50 ring-2 ring-[#2563EB] ring-offset-2">
                         <div class="flex items-center gap-3">
@@ -314,6 +351,8 @@
                 <input type="hidden" name="network_type" id="formNetwork">
                 <input type="hidden" name="package_size" id="formPackage">
                 <input type="hidden" name="phone_number" id="formPhone">
+                <input type="hidden" name="payment_method" id="formPaymentMethod" value="paystack">
+                <input type="hidden" name="sender_name" id="formSenderName">
 
                 <div class="flex flex-col gap-2 mt-4">
                     <button type="submit"
@@ -474,7 +513,34 @@
             insufficientMsg.classList.toggle('hidden', selectedPrice === 0 || balanceOk);
         }
 
-        createOrderBtn.disabled = !(selectedNetwork && packageSelect.value && phoneValid && balanceOk);
+        var isMomoSelected = isGuest && document.querySelector('input[name="guest_payment_method"]:checked')?.value === 'manual_momo';
+        var senderNameValid = !isMomoSelected || (document.getElementById('momoSenderName')?.value.trim().length > 0);
+
+        createOrderBtn.disabled = !(selectedNetwork && packageSelect.value && phoneValid && balanceOk && senderNameValid);
+    }
+
+    if (isGuest) {
+        window.toggleGuestPayment = function() {
+            var method = document.querySelector('input[name="guest_payment_method"]:checked').value;
+            document.getElementById('momoDetailsSection').classList.toggle('hidden', method !== 'manual_momo');
+            
+            // Toggle active styling
+            document.getElementById('method-paystack-label').className = method === 'paystack' 
+                ? 'relative flex items-center justify-between p-4 rounded-2xl border-2 border-[#2563EB] bg-blue-50 cursor-pointer transition-all'
+                : 'relative flex items-center justify-between p-4 rounded-2xl border-2 border-slate-200 cursor-pointer hover:border-[#2563EB] hover:bg-blue-50 transition-all';
+                
+            document.getElementById('method-momo-label').className = method === 'manual_momo'
+                ? 'relative flex items-center justify-between p-4 rounded-2xl border-2 border-[#2563EB] bg-blue-50 cursor-pointer transition-all'
+                : 'relative flex items-center justify-between p-4 rounded-2xl border-2 border-slate-200 cursor-pointer hover:border-[#2563EB] hover:bg-blue-50 transition-all';
+                
+            validateForm();
+        };
+
+        var momoSenderName = document.getElementById('momoSenderName');
+        if (momoSenderName) {
+            momoSenderName.addEventListener('input', validateForm);
+        }
+        toggleGuestPayment(); // init styling
     }
 
     // ── MODAL ─────────────────────────────────────────────────
@@ -489,6 +555,19 @@
         document.getElementById('formNetwork').value = selectedNetwork;
         document.getElementById('formPackage').value = packageSelect.value;
         document.getElementById('formPhone').value   = phoneInput.value;
+        
+        if (isGuest) {
+            var pm = document.querySelector('input[name="guest_payment_method"]:checked').value;
+            document.getElementById('formPaymentMethod').value = pm;
+            if (pm === 'manual_momo') {
+                document.getElementById('formSenderName').value = document.getElementById('momoSenderName').value.trim();
+            } else {
+                document.getElementById('formSenderName').value = '';
+            }
+        } else {
+            document.getElementById('formPaymentMethod').value = 'wallet';
+            document.getElementById('formSenderName').value = '';
+        }
 
         confirmModal.classList.remove('opacity-0', 'pointer-events-none');
         confirmPanel.classList.remove('scale-95');

@@ -20,7 +20,7 @@ class BulkOrderController extends Controller
         $userId = session('user_id');
         $agent = Agent::find($userId);
 
-        if (!$agent) {
+        if (! $agent) {
             abort(403);
         }
 
@@ -43,8 +43,9 @@ class BulkOrderController extends Controller
 
         foreach ($request->orders as $order) {
             $prefix = substr($order['phone_number'], 0, 3);
-            if (!in_array($prefix, $networkPrefixes[$order['network_type']] ?? [])) {
+            if (! in_array($prefix, $networkPrefixes[$order['network_type']] ?? [])) {
                 $skipped++;
+
                 continue;
             }
 
@@ -57,8 +58,9 @@ class BulkOrderController extends Controller
                 })
                 ->first();
 
-            if (!$pricing) {
+            if (! $pricing) {
                 $skipped++;
+
                 continue;
             }
 
@@ -75,12 +77,12 @@ class BulkOrderController extends Controller
 
         if (empty($validOrders)) {
             return redirect()->route('user.buy-data')
-                ->with('error', 'No valid orders found. ' . $skipped . ' skipped.');
+                ->with('error', 'No valid orders found. '.$skipped.' skipped.');
         }
 
         if (floatval($agent->balance) < $totalAmount) {
             return redirect()->route('user.buy-data')
-                ->with('error', 'Insufficient balance for bulk order. Required: GH₵' . number_format($totalAmount, 2) . '. Your balance: GH₵' . number_format($agent->balance, 2));
+                ->with('error', 'Insufficient balance for bulk order. Required: GH₵'.number_format($totalAmount, 2).'. Your balance: GH₵'.number_format($agent->balance, 2));
         }
 
         DB::beginTransaction();
@@ -90,7 +92,7 @@ class BulkOrderController extends Controller
             $createdOrderIds = [];
 
             foreach ($validOrders as $item) {
-                $reference = 'BULK-' . strtoupper(Str::random(8)) . '-' . time();
+                $reference = 'BULK-'.strtoupper(Str::random(8)).'-'.time();
 
                 $result = $orderService->createOrder([
                     'agent_id' => $userId,
@@ -105,10 +107,11 @@ class BulkOrderController extends Controller
                     'base_amount' => $item['cost'],
                 ]);
 
-                if (!$result['success']) {
+                if (! $result['success']) {
                     DB::rollBack();
+
                     return redirect()->route('user.buy-data')
-                        ->with('error', 'Failed to create order for ' . $item['package_size'] . ' ' . $item['network_type'] . '. Please try again.');
+                        ->with('error', 'Failed to create order for '.$item['package_size'].' '.$item['network_type'].'. Please try again.');
                 }
 
                 $createdOrderIds[] = $result['order']['id'];
@@ -119,13 +122,15 @@ class BulkOrderController extends Controller
             $agent->update(['balance' => $newBalance]);
 
             BalanceHistoryService::log(
-                $userId, -$totalAmount, 'bulk_order', null, null, 'Bulk checkout - ' . count($createdOrderIds) . ' item(s)'
+                $userId, -$totalAmount, 'bulk_order', null, null, 'Bulk checkout - '.count($createdOrderIds).' item(s)'
             );
 
             // Deliver data for each order
             foreach ($createdOrderIds as $orderId) {
                 $order = Order::find($orderId);
-                if (!$order) continue;
+                if (! $order) {
+                    continue;
+                }
 
                 $externalApi = new ExternalApiService($order->network_type);
                 $capacityMb = $externalApi->convertPackageSize($order->package_size);
@@ -136,7 +141,7 @@ class BulkOrderController extends Controller
                         $order->network_type,
                         $capacityMb,
                         'wallet',
-                        (string)$order->id
+                        (string) $order->id
                     );
 
                     if ($apiResult['success']) {
@@ -151,25 +156,29 @@ class BulkOrderController extends Controller
 
                         $order->update([
                             'status' => 'processing',
-                            'external_transaction_id' => $externalTransactionId ? (string)$externalTransactionId : null,
+                            'external_transaction_id' => $externalTransactionId ? (string) $externalTransactionId : null,
                             'external_reference' => $externalReference,
                             'api_response_data' => json_encode($apiResult['data'] ?? []),
                             'status_updated_at' => now(),
                         ]);
                     } else {
-                        $order->update([
-                            'status' => 'failed',
-                            'api_response_data' => json_encode(['error' => $apiResult['error'] ?? 'API call failed']),
-                            'status_updated_at' => now(),
-                        ]);
+                        $this->orderService->updateOrderStatus(
+                            $order->id,
+                            'failed',
+                            $apiResult['error'] ?? 'API call failed',
+                            'system'
+                        );
+                        $order->update(['api_response_data' => json_encode(['error' => $apiResult['error'] ?? 'API call failed'])]);
                     }
                 }
             }
 
             DB::commit();
 
-            $msg = count($createdOrderIds) . ' bulk order(s) placed successfully! Total: GH₵' . number_format($totalAmount, 2);
-            if ($skipped > 0) $msg .= " ({$skipped} skipped)";
+            $msg = count($createdOrderIds).' bulk order(s) placed successfully! Total: GH₵'.number_format($totalAmount, 2);
+            if ($skipped > 0) {
+                $msg .= " ({$skipped} skipped)";
+            }
 
             return redirect()->route('user.orders.today')
                 ->with('success', $msg);

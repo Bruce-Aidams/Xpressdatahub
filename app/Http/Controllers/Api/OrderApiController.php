@@ -171,20 +171,15 @@ class OrderApiController extends Controller
                     'message' => 'Order submitted successfully and is now being processed',
                 ]);
             } else {
-                $apiResponseData = json_encode(['error' => $apiResult['error']]);
+                $this->orderService->updateOrderStatus(
+                    $orderId,
+                    'failed',
+                    'API call failed: '.($apiResult['error'] ?? 'Unknown error'),
+                    'system'
+                );
 
                 $order->update([
-                    'status' => 'failed',
-                    'api_response_data' => $apiResponseData,
-                    'status_updated_at' => now(),
-                ]);
-
-                DB::table('order_status_history')->insert([
-                    'order_id' => $orderId,
-                    'old_status' => 'pending',
-                    'new_status' => 'failed',
-                    'notes' => 'API call failed: '.($apiResult['error'] ?? 'Unknown error'),
-                    'created_at' => now(),
+                    'api_response_data' => json_encode(['error' => $apiResult['error']]),
                 ]);
 
                 DB::commit();
