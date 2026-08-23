@@ -55,13 +55,7 @@ class UserDataController extends Controller
             $expanded->put($net, collect());
         }
         foreach ($pricing as $network => $packages) {
-            if ($network === 'all') {
-                // Spread 'all'-network packages to every network bucket
-                foreach ($networks as $net) {
-                    $expanded->put($net, $expanded->get($net)->merge($packages));
-                }
-            } else {
-                // Add specific-network packages to their bucket
+            if ($network !== 'all') {
                 if (isset($expanded[$network])) {
                     $expanded->put($network, $expanded->get($network)->merge($packages));
                 } else {
@@ -94,11 +88,8 @@ class UserDataController extends Controller
         $packageSize = $request->input('package_size');
         $phoneNumber = $request->input('phone_number');
 
-        // Match the exact network OR packages set for 'all' networks
-        $pricingQuery = CustomPricing::where(function ($q) use ($networkType) {
-            $q->where('network_type', $networkType)
-                ->orWhere('network_type', 'all');
-        })
+        // Match the exact network
+        $pricingQuery = CustomPricing::where('network_type', $networkType)
             ->where('package_size', $packageSize)
             ->where('is_active', true);
 
@@ -299,12 +290,12 @@ class UserDataController extends Controller
                             ?? null;
 
                         Order::where('id', $orderId)->update([
-                            'status' => 'processing',
                             'external_transaction_id' => $externalTransactionId ? (string) $externalTransactionId : null,
                             'external_reference' => $externalReference,
                             'api_response_data' => json_encode($apiResult['data'] ?? []),
-                            'status_updated_at' => now(),
                         ]);
+                        $orderService = app(OrderService::class);
+                        $orderService->updateOrderStatus($orderId, 'processing', 'API call successful, processing', 'system');
                     } else {
                         $orderService = app(OrderService::class);
                         $orderService->updateOrderStatus(

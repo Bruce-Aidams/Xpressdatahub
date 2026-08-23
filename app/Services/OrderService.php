@@ -150,6 +150,18 @@ class OrderService
             if ($newStatus === 'failed' && $oldStatus !== 'failed') {
                 $this->onOrderFailed($order);
             }
+
+            if ($newStatus === 'processing' && $oldStatus !== 'processing') {
+                ApiPollingQueue::firstOrCreate(
+                    ['order_id' => $order->id],
+                    [
+                        'status' => 'pending',
+                        'attempts' => 0,
+                        'max_attempts' => 10,
+                        'next_attempt_at' => now()->addSeconds(30),
+                    ]
+                );
+            }
         } catch (\Exception $e) {
             Log::error("Side effects error for order #{$order->id}: {$e->getMessage()}");
         }

@@ -29,7 +29,7 @@ class AdminApiConfigController extends Controller
             'network_type' => 'required|string|max:50',
             'api_name' => 'required|string|max:255',
             'api_endpoint' => 'required|url|max:500',
-            'status_endpoint' => 'nullable|string|max:500',
+            'status_endpoint' => 'nullable|url|max:500',
             'api_key' => 'required|string|max:500',
             'api_secret' => 'nullable|string|max:500',
             'request_method' => 'nullable|string|in:GET,POST,PUT,PATCH',
@@ -130,6 +130,20 @@ class AdminApiConfigController extends Controller
 
     public function testConnection(ApiConfig $apiConfig)
     {
+        if (empty($apiConfig->request_headers) || empty($apiConfig->request_body_template) || empty($apiConfig->api_key) || empty($apiConfig->endpoint_url)) {
+            return response()->json([
+                'success' => false,
+                'status' => 'failed',
+                'message' => 'Connection failed — Missing required fields (Headers, Body Template, API Key, or Endpoint cannot be empty)',
+                'details' => [
+                    'endpoint' => $apiConfig->endpoint_url ?? 'N/A',
+                    'method' => 'GET',
+                    'http_code' => 0,
+                    'response_time' => '0ms',
+                ],
+            ]);
+        }
+
         $endpoint = $apiConfig->endpoint_url;
         $timeout = max(5, min(30, intval($apiConfig->timeout_seconds ?? 10)));
         $headers = json_decode($apiConfig->request_headers ?? '{}', true) ?: [];
@@ -192,14 +206,14 @@ class AdminApiConfigController extends Controller
                 ]);
             }
 
-            $isSuccess = ($httpCode > 0);
+            $isSuccess = ($httpCode >= 200 && $httpCode < 300);
 
             return response()->json([
                 'success' => $isSuccess,
                 'status' => $isSuccess ? 'success' : 'failed',
                 'message' => $isSuccess
-                    ? "Connection test successful — Host is reachable (HTTP {$httpCode})"
-                    : "Connection failed — HTTP {$httpCode}",
+                    ? "Connection test successful — Valid authentication (HTTP {$httpCode})"
+                    : "Connection failed — HTTP {$httpCode} (Invalid API Key or Error)",
                 'details' => [
                     'endpoint' => $endpoint,
                     'method' => 'GET',

@@ -56,18 +56,20 @@ class GuestCallbackController extends Controller
 
                 if ($apiResult['success']) {
                     $order->update([
-                        'status' => 'delivered',
                         'external_transaction_id' => $apiResult['data']['data']['transaction_id'] ?? null,
                     ]);
+                    $orderService = app(OrderService::class);
+                    $orderService->updateOrderStatus($order->id, 'processing', 'API call successful, processing', 'system');
 
                     return redirect()->route('guest.order.success')
                         ->with('success', 'Payment successful and data delivery initiated! Your order is being processed.')
                         ->with('order_reference', $reference);
                 } else {
-                    $order->update(['status' => 'processing']);
+                    $orderService = app(OrderService::class);
+                    $orderService->updateOrderStatus($order->id, 'failed', $apiResult['error'] ?? 'API call failed', 'system');
 
                     return redirect()->route('guest.order.success')
-                        ->with('success', 'Payment successful! Your data order is being processed. It may take a few minutes.')
+                        ->with('success', 'Payment successful! However, there was a delay processing your data order. Our support team has been notified.')
                         ->with('order_reference', $reference);
                 }
             }

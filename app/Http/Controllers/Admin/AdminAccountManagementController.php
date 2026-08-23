@@ -17,7 +17,8 @@ class AdminAccountManagementController extends Controller
 
     public function index(Request $request)
     {
-        $query = Agent::query();
+        $superAdminUsernames = \App\Models\AdminUser::where('role', 'super_admin')->pluck('username')->toArray();
+        $query = Agent::whereNotIn('username', $superAdminUsernames);
 
         if ($status = $request->input('status')) {
             $query->where('status', $status);
@@ -42,6 +43,12 @@ class AdminAccountManagementController extends Controller
 
     public function updateStatus(Request $request, Agent $agent)
     {
+        $isSuperAdmin = \App\Models\AdminUser::where('username', $agent->username)->where('role', 'super_admin')->exists();
+        if ($isSuperAdmin) {
+            return redirect()->back()
+                ->with('error', 'You cannot suspend or modify the super admin.');
+        }
+
         $request->validate([
             'status' => 'required|string|in:active,inactive,suspended',
             'reason' => 'nullable|string|max:500',

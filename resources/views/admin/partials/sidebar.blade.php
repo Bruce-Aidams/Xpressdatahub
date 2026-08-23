@@ -140,13 +140,7 @@
                 <div class="pt-4">
                     <p class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-slate-300">API</p>
                     <div class="mt-1 space-y-0.5">
-                        <a href="{{ route('admin.api-config') }}"
-                           class="nav-item flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200 {{ request()->routeIs('admin.api-config') ? 'bg-gradient-to-r from-[#2563EB]/10 to-[#2563EB]/5 text-[#2563EB] shadow-sm shadow-[#2563EB]/10' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700' }}">
-                            <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 {{ request()->routeIs('admin.api-config') ? 'bg-[#2563EB]/15' : 'bg-slate-100/80' }}">
-                                <x-heroicon-o-puzzle-piece class="w-4 h-4 {{ request()->routeIs('admin.api-config') ? 'text-[#2563EB]' : 'text-slate-400' }}" />
-                            </div>
-                            <span>API Config</span>
-                        </a>
+
                         <a href="{{ route('admin.api-keys.index') }}"
                            class="nav-item flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200 {{ request()->routeIs('admin.api-keys.*') ? 'bg-gradient-to-r from-[#2563EB]/10 to-[#2563EB]/5 text-[#2563EB] shadow-sm shadow-[#2563EB]/10' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700' }}">
                             <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 {{ request()->routeIs('admin.api-keys.*') ? 'bg-[#2563EB]/15' : 'bg-slate-100/80' }}">
@@ -154,10 +148,10 @@
                             </div>
                             <span>API Keys</span>
                         </a>
-                        <a href="{{ route('admin.api-config') }}#docs"
-                           class="nav-item flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700">
-                            <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 bg-slate-100/80">
-                                <x-heroicon-o-book-open class="w-4 h-4 text-slate-400" />
+                        <a href="{{ route('admin.api-documentation') }}"
+                           class="nav-item flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200 {{ request()->routeIs('admin.api-documentation') ? 'bg-gradient-to-r from-[#2563EB]/10 to-[#2563EB]/5 text-[#2563EB] shadow-sm shadow-[#2563EB]/10' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700' }}">
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 {{ request()->routeIs('admin.api-documentation') ? 'bg-[#2563EB]/15' : 'bg-slate-100/80' }}">
+                                <x-heroicon-o-book-open class="w-4 h-4 {{ request()->routeIs('admin.api-documentation') ? 'text-[#2563EB]' : 'text-slate-400' }}" />
                             </div>
                             <span>API Documentation</span>
                         </a>

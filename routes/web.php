@@ -171,6 +171,11 @@ Route::prefix(config('app.admin_path'))->name('admin.')->middleware('admin.auth'
     Route::post('/api-config/{apiConfig}/test', [AdminApiConfigController::class, 'testConnection'])->name('api-config.test');
     Route::delete('/api-config/{apiConfig}', [AdminApiConfigController::class, 'destroy'])->name('api-config.destroy');
 
+    // API Documentation
+    Route::get('/api-documentation', function () {
+        return view('admin.config.api-docs');
+    })->name('api-documentation');
+
     // API Keys
     Route::get('/api-keys', [AdminApiKeyController::class, 'index'])->name('api-keys.index');
     Route::post('/api-keys', [AdminApiKeyController::class, 'store'])->name('api-keys.store');

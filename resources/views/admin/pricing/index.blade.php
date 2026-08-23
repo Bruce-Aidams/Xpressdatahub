@@ -136,7 +136,7 @@
             <div>
                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Network Type *</label>
                 <select name="network_type" required class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-700 bg-slate-50 focus:outline-none focus:border-[#2563EB] transition">
-                    <option value="all">All Networks</option>
+                    <option value="" disabled selected>Select Network</option>
                     <option value="MTN">MTN</option>
                     <option value="AirtelTigo">AirtelTigo</option>
                     <option value="Telecel">Telecel</option>

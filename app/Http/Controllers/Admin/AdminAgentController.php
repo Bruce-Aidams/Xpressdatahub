@@ -25,7 +25,8 @@ class AdminAgentController extends Controller
 
     public function index(Request $request)
     {
-        $query = Agent::query();
+        $superAdminUsernames = \App\Models\AdminUser::where('role', 'super_admin')->pluck('username')->toArray();
+        $query = Agent::whereNotIn('username', $superAdminUsernames);
 
         if ($status = $request->input('status')) {
             $query->where('status', $status);
@@ -146,9 +147,10 @@ class AdminAgentController extends Controller
 
     public function destroy(Agent $agent)
     {
-        if (session('admin_role') !== 'super_admin') {
+        $isSuperAdmin = \App\Models\AdminUser::where('username', $agent->username)->where('role', 'super_admin')->exists();
+        if ($isSuperAdmin) {
             return redirect()->back()
-                ->with('error', 'Only super admins can delete agents.');
+                ->with('error', 'You cannot delete the super admin.');
         }
 
         try {
@@ -170,9 +172,10 @@ class AdminAgentController extends Controller
 
     public function updateStatus(Request $request, Agent $agent)
     {
-        if ($agent->role === 'administrator' && session('admin_role') !== 'super_admin') {
+        $isSuperAdmin = \App\Models\AdminUser::where('username', $agent->username)->where('role', 'super_admin')->exists();
+        if ($isSuperAdmin) {
             return redirect()->back()
-                ->with('error', 'Only super admins can modify the status of administrators.');
+                ->with('error', 'You cannot suspend or modify the super admin.');
         }
 
         $request->validate([

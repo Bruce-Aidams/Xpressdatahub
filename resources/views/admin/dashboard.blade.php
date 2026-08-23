@@ -295,7 +295,7 @@
                                 </div>
                                 <div>
                                     <span class="font-semibold text-slate-800 text-xs sm:text-sm">{{ $u->first_name ?? '' }} {{ $u->last_name ?? '' }}</span>
-                                    <p class="text-[10px] text-slate-400">@{{ $u->username }}</p>
+                                    <p class="text-[10px] text-slate-400">&#64;{{ $u->username }}</p>
                                 </div>
                             </div>
                         </td>

@@ -10,7 +10,7 @@ return [
     | modified, toggled, or deleted. New configurations cannot be added.
     |
     */
-    'locked' => env('API_CONFIG_LOCKED', true),
+    'locked' => env('API_CONFIG_LOCKED', false),
 
     /*
     |--------------------------------------------------------------------------
