@@ -4,17 +4,17 @@
 @section('page-description', 'Track your shop earnings')
 @section('content')
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-    <div class="bg-white border border-slate-100 shadow-sm rounded-2xl p-5">
-        <p class="text-xs text-slate-400">Total Profit</p>
-        <p class="text-2xl font-bold text-amber-400 mt-1">GH&#8373;{{ number_format($totalProfit ?? 0, 2) }}</p>
+    <div class="bg-moving-gradient text-white shadow-sm rounded-2xl p-5 border-0">
+        <p class="text-xs text-white/80 font-bold uppercase tracking-wider">Total Profit</p>
+        <p class="text-2xl font-black text-white mt-1">GH&#8373;{{ number_format($totalProfit ?? 0, 2) }}</p>
     </div>
-    <div class="bg-white border border-slate-100 shadow-sm rounded-2xl p-5">
-        <p class="text-xs text-slate-400">Withdrawn</p>
-        <p class="text-2xl font-bold text-cyan-400 mt-1">GH&#8373;{{ number_format($totalWithdrawn ?? 0, 2) }}</p>
+    <div class="bg-moving-gradient text-white shadow-sm rounded-2xl p-5 border-0">
+        <p class="text-xs text-white/80 font-bold uppercase tracking-wider">Withdrawn</p>
+        <p class="text-2xl font-black text-white mt-1">GH&#8373;{{ number_format($totalWithdrawn ?? 0, 2) }}</p>
     </div>
-    <div class="bg-white border border-slate-100 shadow-sm rounded-2xl p-5">
-        <p class="text-xs text-slate-400">Available</p>
-        <p class="text-2xl font-bold text-emerald-400 mt-1">GH&#8373;{{ number_format($available ?? 0, 2) }}</p>
+    <div class="bg-moving-gradient text-white shadow-sm rounded-2xl p-5 border-0">
+        <p class="text-xs text-white/80 font-bold uppercase tracking-wider">Available</p>
+        <p class="text-2xl font-black text-white mt-1">GH&#8373;{{ number_format($available ?? 0, 2) }}</p>
     </div>
 </div>
 

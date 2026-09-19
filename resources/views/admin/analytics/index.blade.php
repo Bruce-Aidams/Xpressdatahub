@@ -3,39 +3,39 @@
 @section('page-description', 'View sales analytics and charts')
 @section('content')
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-5 sm:mb-6">
-    <div class="bg-white border border-slate-100 shadow-sm rounded-2xl p-3 sm:p-5">
+    <div class="bg-moving-gradient-blue text-white shadow-sm rounded-2xl p-3 sm:p-5 border-0">
         <div class="flex items-center gap-2 sm:gap-3">
-            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#2563EB]/10 flex items-center justify-center"><x-heroicon-o-currency-dollar class="w-5 h-5" /></div>
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm"><x-heroicon-o-currency-dollar class="w-5 h-5 text-white" /></div>
             <div>
-                <p class="text-[10px] sm:text-xs text-slate-400 font-medium">Today's Revenue</p>
-                <p class="text-lg sm:text-2xl font-bold text-slate-800 mt-0.5">GH&#8373;{{ number_format($analytics['today_revenue'] ?? 0, 2) }}</p>
+                <p class="text-[10px] sm:text-xs text-white/80 font-bold uppercase tracking-wider">Today's Revenue</p>
+                <p class="text-lg sm:text-2xl font-black text-white mt-0.5">GH&#8373;{{ number_format($analytics['today_revenue'] ?? 0, 2) }}</p>
             </div>
         </div>
     </div>
-    <div class="bg-white border border-slate-100 shadow-sm rounded-2xl p-3 sm:p-5">
+    <div class="bg-moving-gradient-blue text-white shadow-sm rounded-2xl p-3 sm:p-5 border-0">
         <div class="flex items-center gap-2 sm:gap-3">
-            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-50 flex items-center justify-center"><x-heroicon-o-shopping-bag class="w-5 h-5" /></div>
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm"><x-heroicon-o-shopping-bag class="w-5 h-5 text-white" /></div>
             <div>
-                <p class="text-[10px] sm:text-xs text-slate-400 font-medium">Total Orders</p>
-                <p class="text-lg sm:text-2xl font-bold text-slate-800 mt-0.5">{{ number_format($analytics['today_orders'] ?? 0) }}</p>
+                <p class="text-[10px] sm:text-xs text-white/80 font-bold uppercase tracking-wider">Total Orders</p>
+                <p class="text-lg sm:text-2xl font-black text-white mt-0.5">{{ number_format($analytics['today_orders'] ?? 0) }}</p>
             </div>
         </div>
     </div>
-    <div class="bg-white border border-slate-100 shadow-sm rounded-2xl p-3 sm:p-5">
+    <div class="bg-moving-gradient-blue text-white shadow-sm rounded-2xl p-3 sm:p-5 border-0">
         <div class="flex items-center gap-2 sm:gap-3">
-            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-50 flex items-center justify-center"><x-heroicon-o-calendar class="w-5 h-5" /></div>
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm"><x-heroicon-o-calendar class="w-5 h-5 text-white" /></div>
             <div>
-                <p class="text-[10px] sm:text-xs text-slate-400 font-medium">This Month</p>
-                <p class="text-lg sm:text-2xl font-bold text-slate-800 mt-0.5">GH&#8373;{{ number_format($analytics['month_revenue'] ?? 0, 2) }}</p>
+                <p class="text-[10px] sm:text-xs text-white/80 font-bold uppercase tracking-wider">This Month</p>
+                <p class="text-lg sm:text-2xl font-black text-white mt-0.5">GH&#8373;{{ number_format($analytics['month_revenue'] ?? 0, 2) }}</p>
             </div>
         </div>
     </div>
-    <div class="bg-white border border-slate-100 shadow-sm rounded-2xl p-3 sm:p-5">
+    <div class="bg-moving-gradient-blue text-white shadow-sm rounded-2xl p-3 sm:p-5 border-0">
         <div class="flex items-center gap-2 sm:gap-3">
-            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-purple-50 flex items-center justify-center"><x-heroicon-o-chart-bar class="w-5 h-5" /></div>
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm"><x-heroicon-o-chart-bar class="w-5 h-5 text-white" /></div>
             <div>
-                <p class="text-[10px] sm:text-xs text-slate-400 font-medium">Success Rate</p>
-                <p class="text-lg sm:text-2xl font-bold text-slate-800 mt-0.5">{{ $analytics['success_rate'] ?? 0 }}%</p>
+                <p class="text-[10px] sm:text-xs text-white/80 font-bold uppercase tracking-wider">Success Rate</p>
+                <p class="text-lg sm:text-2xl font-black text-white mt-0.5">{{ $analytics['success_rate'] ?? 0 }}%</p>
             </div>
         </div>
     </div>

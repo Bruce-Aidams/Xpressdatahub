@@ -35,47 +35,47 @@
 {{-- Stat Cards Row --}}
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
     {{-- Total Orders --}}
-    <div class="bg-white border border-slate-100 rounded-2xl p-4 sm:p-5 shadow-sm">
+    <div class="bg-moving-gradient text-white rounded-2xl p-4 sm:p-5 shadow-sm border-0">
         <div class="flex items-center gap-3 mb-3">
-            <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
-                <x-heroicon-o-shopping-bag class="w-5 h-5 text-blue-500" />
+            <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                <x-heroicon-o-shopping-bag class="w-5 h-5 text-white" />
             </div>
-            <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wide">Total Orders</span>
+            <span class="text-[11px] font-bold text-white/80 uppercase tracking-wide">Total Orders</span>
         </div>
-        <p class="text-2xl font-bold text-slate-800 tabular-nums">{{ number_format($shop->total_orders ?? 0) }}</p>
+        <p class="text-2xl font-black text-white tabular-nums">{{ number_format($shop->total_orders ?? 0) }}</p>
     </div>
 
     {{-- Revenue --}}
-    <div class="bg-white border border-slate-100 rounded-2xl p-4 sm:p-5 shadow-sm">
+    <div class="bg-moving-gradient text-white rounded-2xl p-4 sm:p-5 shadow-sm border-0">
         <div class="flex items-center gap-3 mb-3">
-            <div class="w-9 h-9 rounded-xl bg-[#EA580C]/10 flex items-center justify-center">
-                <x-heroicon-o-currency-dollar class="w-5 h-5 text-[#EA580C]" />
+            <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                <x-heroicon-o-currency-dollar class="w-5 h-5 text-white" />
             </div>
-            <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wide">Revenue</span>
+            <span class="text-[11px] font-bold text-white/80 uppercase tracking-wide">Revenue</span>
         </div>
-        <p class="text-2xl font-bold text-slate-800 tabular-nums">GH&#8373;{{ number_format($shop->revenue ?? 0, 2) }}</p>
+        <p class="text-2xl font-black text-white tabular-nums">GH&#8373;{{ number_format($shop->revenue ?? 0, 2) }}</p>
     </div>
 
     {{-- Available Balance --}}
-    <div class="bg-white border border-slate-100 rounded-2xl p-4 sm:p-5 shadow-sm">
+    <div class="bg-moving-gradient text-white rounded-2xl p-4 sm:p-5 shadow-sm border-0">
         <div class="flex items-center gap-3 mb-3">
-            <div class="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center">
-                <x-heroicon-o-banknotes class="w-5 h-5 text-emerald-500" />
+            <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                <x-heroicon-o-banknotes class="w-5 h-5 text-white" />
             </div>
-            <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wide">Available Balance</span>
+            <span class="text-[11px] font-bold text-white/80 uppercase tracking-wide">Available Balance</span>
         </div>
-        <p class="text-2xl font-bold text-emerald-600 tabular-nums">GH&#8373;{{ number_format($earningsSummary['available_balance'] ?? 0, 2) }}</p>
+        <p class="text-2xl font-black text-white tabular-nums">GH&#8373;{{ number_format($earningsSummary['available_balance'] ?? 0, 2) }}</p>
     </div>
 
     {{-- Total Profit --}}
-    <div class="bg-white border border-slate-100 rounded-2xl p-4 sm:p-5 shadow-sm">
+    <div class="bg-moving-gradient text-white rounded-2xl p-4 sm:p-5 shadow-sm border-0">
         <div class="flex items-center gap-3 mb-3">
-            <div class="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center">
-                <x-heroicon-o-chart-bar class="w-5 h-5 text-purple-500" />
+            <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                <x-heroicon-o-chart-bar class="w-5 h-5 text-white" />
             </div>
-            <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wide">Total Profit</span>
+            <span class="text-[11px] font-bold text-white/80 uppercase tracking-wide">Total Profit</span>
         </div>
-        <p class="text-2xl font-bold text-slate-800 tabular-nums">GH&#8373;{{ number_format($earningsSummary['credited_profit'] ?? 0, 2) }}</p>
+        <p class="text-2xl font-black text-white tabular-nums">GH&#8373;{{ number_format($earningsSummary['credited_profit'] ?? 0, 2) }}</p>
     </div>
 </div>
 

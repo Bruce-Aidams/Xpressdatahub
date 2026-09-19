@@ -25,36 +25,36 @@
 
 {{-- Stats Row --}}
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-    <div class="stat-card bg-white border border-slate-100/80 rounded-2xl p-5 shadow-sm">
+    <div class="stat-card bg-moving-gradient-blue text-white rounded-2xl p-5 shadow-sm border-0">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Total Shops</p>
-                <p class="text-2xl font-black text-slate-800">{{ $totalShops }}</p>
+                <p class="text-[11px] font-bold uppercase tracking-wider text-white/80 mb-1">Total Shops</p>
+                <p class="text-2xl font-black text-white">{{ $totalShops }}</p>
             </div>
-            <div class="w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center">
-                <x-heroicon-o-building-storefront class="w-5 h-5 text-blue-500" />
+            <div class="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                <x-heroicon-o-building-storefront class="w-5 h-5 text-white" />
             </div>
         </div>
     </div>
-    <div class="stat-card bg-white border border-slate-100/80 rounded-2xl p-5 shadow-sm">
+    <div class="stat-card bg-moving-gradient-blue text-white rounded-2xl p-5 shadow-sm border-0">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Active</p>
-                <p class="text-2xl font-black text-emerald-600">{{ $activeCount }}</p>
+                <p class="text-[11px] font-bold uppercase tracking-wider text-white/80 mb-1">Active</p>
+                <p class="text-2xl font-black text-white">{{ $activeCount }}</p>
             </div>
-            <div class="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center">
-                <x-heroicon-o-check-circle class="w-5 h-5 text-emerald-500" />
+            <div class="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                <x-heroicon-o-check-circle class="w-5 h-5 text-white" />
             </div>
         </div>
     </div>
-    <div class="stat-card bg-white border border-slate-100/80 rounded-2xl p-5 shadow-sm">
+    <div class="stat-card bg-moving-gradient-blue text-white rounded-2xl p-5 shadow-sm border-0">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Inactive</p>
-                <p class="text-2xl font-black text-red-500">{{ $inactiveCount }}</p>
+                <p class="text-[11px] font-bold uppercase tracking-wider text-white/80 mb-1">Inactive</p>
+                <p class="text-2xl font-black text-white">{{ $inactiveCount }}</p>
             </div>
-            <div class="w-11 h-11 rounded-xl bg-red-50 flex items-center justify-center">
-                <x-heroicon-o-x-circle class="w-5 h-5 text-red-500" />
+            <div class="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                <x-heroicon-o-x-circle class="w-5 h-5 text-white" />
             </div>
         </div>
     </div>

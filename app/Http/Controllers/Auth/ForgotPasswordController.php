@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ForgotPasswordMail;
 use App\Models\Agent;
 use App\Models\PasswordResetToken;
 use App\Services\PasswordResetService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class ForgotPasswordController extends Controller
 {
@@ -48,17 +51,28 @@ class ForgotPasswordController extends Controller
         try {
             PasswordResetToken::create([
                 'email' => $email,
-                'token_hash' => password_hash($token, PASSWORD_DEFAULT),
+                'token' => \Illuminate\Support\Facades\Hash::make($token),
                 'otp_code' => $otp,
                 'expires_at' => $expiresAt,
-                'max_attempts' => 5,
             ]);
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Failed to generate reset token. Please try again.');
         }
 
+        // Send password reset email
+        try {
+            Mail::to($email)->send(new ForgotPasswordMail(
+                agentName: trim($agent->first_name . ' ' . $agent->last_name),
+                token: $token,
+                email: $email,
+                otp: $otp,
+            ));
+        } catch (\Exception $e) {
+            Log::error('Forgot password email failed: ' . $e->getMessage());
+        }
+
         return redirect()->route('password.reset', ['token' => $token, 'email' => $email])
-            ->with('success', 'A password reset link has been sent to your email.');
+            ->with('success', 'A password reset email has been sent to your inbox.');
     }
 }

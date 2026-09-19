@@ -61,6 +61,7 @@ class AdminPricingController extends Controller
             'cost' => 'required|numeric|min:0',
             'selling_price' => 'nullable|numeric|min:0',
             'is_active' => 'nullable|boolean',
+            'user_role' => 'nullable|string|in:agent,super_agent,dealers,all',
         ]);
 
         try {
@@ -68,6 +69,7 @@ class AdminPricingController extends Controller
                 'cost' => $request->input('cost'),
                 'selling_price' => $request->input('selling_price', $customPricing->selling_price),
                 'is_active' => $request->boolean('is_active', $customPricing->is_active),
+                'user_role' => $request->input('user_role', $customPricing->user_role),
                 'updated_at' => now(),
             ]);
 

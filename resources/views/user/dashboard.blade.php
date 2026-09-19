@@ -56,62 +56,62 @@ Welcome back, {{ $currentUser->username ?? '' }}
 <!-- 4 Top Metric Cards -->
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-5 sm:mb-6 lg:mb-8">
     <!-- Wallet Balance -->
-    <div class="bg-white border border-slate-100/80 rounded-2xl p-4 sm:p-6 shadow-sm flex items-center justify-between">
+    <div class="bg-moving-gradient text-white rounded-2xl p-4 sm:p-6 shadow-sm flex items-center justify-between border-0">
         <div>
-            <p class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider">Balance</p>
-            <p class="text-lg sm:text-2xl font-black text-slate-800 mt-1 sm:mt-2">GH&#8373;{{ number_format($agent->balance ?? 0, 2) }}</p>
+            <p class="text-[10px] sm:text-xs text-white/80 font-bold uppercase tracking-wider">Balance</p>
+            <p class="text-lg sm:text-2xl font-black text-white mt-1 sm:mt-2">GH&#8373;{{ number_format($agent->balance ?? 0, 2) }}</p>
             <div class="flex items-center gap-1 mt-1 sm:mt-2">
-                <span class="text-[10px] sm:text-xs font-bold {{ $spendChange >= 0 ? 'text-emerald-500' : 'text-red-500' }}">
+                <span class="text-[10px] sm:text-xs font-bold text-white/90">
                     {{ $spendChange >= 0 ? '+' : '' }}{{ $spendChange }}% this week
                 </span>
             </div>
         </div>
-        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#EA580C]/10 flex items-center justify-center">
-            <x-heroicon-o-wallet class="text-[#EA580C] w-5 h-5 sm:w-6 sm:h-6" />
+        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
+            <x-heroicon-o-wallet class="text-white w-5 h-5 sm:w-6 sm:h-6" />
         </div>
     </div>
 
     <!-- Today's Orders -->
-    <div class="bg-white border border-slate-100/80 rounded-2xl p-4 sm:p-6 shadow-sm flex items-center justify-between">
+    <div class="bg-moving-gradient text-white rounded-2xl p-4 sm:p-6 shadow-sm flex items-center justify-between border-0">
         <div>
-            <p class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider">Today</p>
-            <p class="text-lg sm:text-2xl font-black text-slate-800 mt-1 sm:mt-2">{{ $todayOrders }}</p>
+            <p class="text-[10px] sm:text-xs text-white/80 font-bold uppercase tracking-wider">Today</p>
+            <p class="text-lg sm:text-2xl font-black text-white mt-1 sm:mt-2">{{ $todayOrders }}</p>
             <div class="flex items-center gap-1 mt-1 sm:mt-2">
-                <span class="text-[10px] sm:text-xs font-bold text-slate-400">GH&#8373;{{ number_format($todaySpent, 2) }} spent</span>
+                <span class="text-[10px] sm:text-xs font-bold text-white/90">GH&#8373;{{ number_format($todaySpent, 2) }} spent</span>
             </div>
         </div>
-        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-blue-50 flex items-center justify-center">
-            <x-heroicon-o-shopping-bag class="text-blue-500 w-5 h-5 sm:w-6 sm:h-6" />
+        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
+            <x-heroicon-o-shopping-bag class="text-white w-5 h-5 sm:w-6 sm:h-6" />
         </div>
     </div>
 
     <!-- Total Orders -->
-    <div class="bg-white border border-slate-100/80 rounded-2xl p-4 sm:p-6 shadow-sm flex items-center justify-between">
+    <div class="bg-moving-gradient text-white rounded-2xl p-4 sm:p-6 shadow-sm flex items-center justify-between border-0">
         <div>
-            <p class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider">All Orders</p>
-            <p class="text-lg sm:text-2xl font-black text-slate-800 mt-1 sm:mt-2">{{ number_format($totalOrders) }}</p>
+            <p class="text-[10px] sm:text-xs text-white/80 font-bold uppercase tracking-wider">All Orders</p>
+            <p class="text-lg sm:text-2xl font-black text-white mt-1 sm:mt-2">{{ number_format($totalOrders) }}</p>
             <div class="flex items-center gap-1 mt-1 sm:mt-2">
-                <span class="text-[10px] sm:text-xs font-bold {{ $orderChange >= 0 ? 'text-emerald-500' : 'text-red-500' }}">
+                <span class="text-[10px] sm:text-xs font-bold text-white/90">
                     {{ $orderChange >= 0 ? '+' : '' }}{{ $orderChange }}% this week
                 </span>
             </div>
         </div>
-        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-emerald-50 flex items-center justify-center">
-            <x-heroicon-o-chart-bar class="text-emerald-500 w-5 h-5 sm:w-6 sm:h-6" />
+        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
+            <x-heroicon-o-chart-bar class="text-white w-5 h-5 sm:w-6 sm:h-6" />
         </div>
     </div>
 
     <!-- Referrals -->
-    <div class="bg-white border border-slate-100/80 rounded-2xl p-4 sm:p-6 shadow-sm flex items-center justify-between">
+    <div class="bg-moving-gradient text-white rounded-2xl p-4 sm:p-6 shadow-sm flex items-center justify-between border-0">
         <div>
-            <p class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider">Referrals</p>
-            <p class="text-lg sm:text-2xl font-black text-slate-800 mt-1 sm:mt-2">{{ $referralCount }}</p>
+            <p class="text-[10px] sm:text-xs text-white/80 font-bold uppercase tracking-wider">Referrals</p>
+            <p class="text-lg sm:text-2xl font-black text-white mt-1 sm:mt-2">{{ $referralCount }}</p>
             <div class="flex items-center gap-1 mt-1 sm:mt-2">
-                <span class="text-[10px] sm:text-xs font-bold text-[#EA580C]">GH&#8373;{{ number_format($referralEarnings, 2) }} earned</span>
+                <span class="text-[10px] sm:text-xs font-bold text-white/90">GH&#8373;{{ number_format($referralEarnings, 2) }} earned</span>
             </div>
         </div>
-        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-purple-50 flex items-center justify-center">
-            <x-heroicon-o-user-group class="text-purple-500 w-5 h-5 sm:w-6 sm:h-6" />
+        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
+            <x-heroicon-o-user-group class="text-white w-5 h-5 sm:w-6 sm:h-6" />
         </div>
     </div>
 </div>
@@ -394,6 +394,17 @@ Welcome back, {{ $currentUser->username ?? '' }}
     .animate-banner-out { animation: bannerOut 0.3s cubic-bezier(0.55, 0, 1, 0.45) forwards; }
     .banner-backdrop { animation: backdropFadeIn 0.3s ease forwards; }
     .banner-backdrop-out { animation: backdropFadeOut 0.3s ease forwards; }
+
+    @keyframes gradientMove {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    .bg-moving-gradient {
+        background: linear-gradient(-45deg, #EA580C, #F97316, #ec4899, #8b5cf6);
+        background-size: 400% 400%;
+        animation: gradientMove 15s ease infinite;
+    }
 </style>
 @endpush
 

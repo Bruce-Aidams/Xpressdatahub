@@ -8,33 +8,33 @@
 
     {{-- Stats Grid --}}
     <div class="grid grid-cols-2 gap-3">
-        <div class="bg-white border border-slate-100/80 shadow-sm rounded-2xl p-4">
-            <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center mb-3">
-                <x-heroicon-o-shopping-bag class="w-4 h-4 text-blue-500" />
+        <div class="bg-moving-gradient text-white shadow-sm rounded-2xl p-4 border-0">
+            <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm mb-3">
+                <x-heroicon-o-shopping-bag class="w-4 h-4 text-white" />
             </div>
-            <p class="text-2xl font-black text-slate-800">{{ $totalOrders }}</p>
-            <p class="text-[11px] text-slate-400 mt-0.5">Total Orders</p>
+            <p class="text-2xl font-black text-white">{{ $totalOrders }}</p>
+            <p class="text-[11px] text-white/80 font-bold uppercase tracking-wider mt-0.5">Total Orders</p>
         </div>
-        <div class="bg-white border border-slate-100/80 shadow-sm rounded-2xl p-4">
-            <div class="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center mb-3">
-                <x-heroicon-o-check-circle class="w-4 h-4 text-emerald-500" />
+        <div class="bg-moving-gradient text-white shadow-sm rounded-2xl p-4 border-0">
+            <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm mb-3">
+                <x-heroicon-o-check-circle class="w-4 h-4 text-white" />
             </div>
-            <p class="text-2xl font-black text-slate-800">{{ $completedOrders }}</p>
-            <p class="text-[11px] text-slate-400 mt-0.5">Delivered</p>
+            <p class="text-2xl font-black text-white">{{ $completedOrders }}</p>
+            <p class="text-[11px] text-white/80 font-bold uppercase tracking-wider mt-0.5">Delivered</p>
         </div>
-        <div class="bg-white border border-slate-100/80 shadow-sm rounded-2xl p-4">
-            <div class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center mb-3">
-                <x-heroicon-o-clock class="w-4 h-4 text-amber-500" />
+        <div class="bg-moving-gradient text-white shadow-sm rounded-2xl p-4 border-0">
+            <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm mb-3">
+                <x-heroicon-o-clock class="w-4 h-4 text-white" />
             </div>
-            <p class="text-2xl font-black text-slate-800">{{ $pendingOrders }}</p>
-            <p class="text-[11px] text-slate-400 mt-0.5">Pending</p>
+            <p class="text-2xl font-black text-white">{{ $pendingOrders }}</p>
+            <p class="text-[11px] text-white/80 font-bold uppercase tracking-wider mt-0.5">Pending</p>
         </div>
-        <div class="bg-white border border-slate-100/80 shadow-sm rounded-2xl p-4">
-            <div class="w-9 h-9 rounded-xl bg-[#EA580C]/10 flex items-center justify-center mb-3">
-                <x-heroicon-o-banknotes class="w-4 h-4 text-[#EA580C]" />
+        <div class="bg-moving-gradient text-white shadow-sm rounded-2xl p-4 border-0">
+            <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm mb-3">
+                <x-heroicon-o-banknotes class="w-4 h-4 text-white" />
             </div>
-            <p class="text-2xl font-black text-slate-800">GH&#8373;{{ number_format($totalSpent, 2) }}</p>
-            <p class="text-[11px] text-slate-400 mt-0.5">Total Spent</p>
+            <p class="text-2xl font-black text-white">GH&#8373;{{ number_format($totalSpent, 2) }}</p>
+            <p class="text-[11px] text-white/80 font-bold uppercase tracking-wider mt-0.5">Total Spent</p>
         </div>
     </div>
 

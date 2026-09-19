@@ -26,12 +26,15 @@
                     <div class="flex items-center gap-2">
                         <p class="text-sm font-bold text-slate-800">{{ $key->name ?? 'Unnamed Key' }}</p>
                     </div>
-                    <div class="flex items-center gap-2 mt-1.5">
-                        <span class="font-mono text-sm text-slate-600 bg-slate-50 px-3 py-1 rounded-lg">
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="font-mono text-sm text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
                             ••••••{{ substr($key->api_key, -6) }}
                         </span>
+                        <button type="button" onclick="document.getElementById('viewKeyModal-{{ $key->id }}').classList.remove('hidden')" class="px-3 py-1.5 text-xs font-bold text-[#EA580C] bg-orange-50 hover:bg-orange-100 rounded-lg transition">
+                            View Details
+                        </button>
                     </div>
-                    <p class="text-xs text-slate-400 mt-1">Created {{ $key->created_at?->format('M d, Y') ?? 'N/A' }}</p>
+                    <p class="text-xs text-slate-400 mt-2">Created {{ $key->created_at?->format('M d, Y') ?? 'N/A' }}</p>
                 </div>
 
                 <div class="flex items-center gap-3">
@@ -50,6 +53,45 @@
                             </button>
                         </form>
                     @endif
+                </div>
+            </div>
+            
+            {{-- View Key Modal --}}
+            <div id="viewKeyModal-{{ $key->id }}" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
+                    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-slate-800">API Key Details</h3>
+                        <button onclick="document.getElementById('viewKeyModal-{{ $key->id }}').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 transition">
+                            <x-heroicon-o-x-mark class="w-5 h-5" />
+                        </button>
+                    </div>
+                    <div class="p-6 space-y-6">
+                        <div>
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">API Key</label>
+                            <div class="flex items-center gap-2">
+                                <input type="password" readonly value="{{ $key->api_key }}" class="w-full font-mono text-sm text-slate-800 bg-slate-50 px-4 py-3 rounded-xl border border-slate-200 outline-none" id="modal-key-{{ $key->id }}">
+                                <button type="button" onclick="toggleVisibility('modal-key-{{ $key->id }}', this)" class="shrink-0 p-3 text-slate-400 hover:text-[#EA580C] bg-white rounded-xl border border-slate-100 shadow-sm transition" title="Toggle visibility">
+                                    <x-heroicon-o-eye class="w-5 h-5" />
+                                </button>
+                                <button type="button" onclick="copyToClipboard('modal-key-{{ $key->id }}', this)" class="shrink-0 p-3 text-slate-400 hover:text-emerald-500 bg-white rounded-xl border border-slate-100 shadow-sm transition" title="Copy to clipboard">
+                                    <x-heroicon-o-clipboard-document class="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">API Secret</label>
+                            <div class="flex items-center gap-2">
+                                <input type="password" readonly value="{{ $key->api_secret }}" class="w-full font-mono text-sm text-slate-800 bg-slate-50 px-4 py-3 rounded-xl border border-slate-200 outline-none" id="modal-secret-{{ $key->id }}">
+                                <button type="button" onclick="toggleVisibility('modal-secret-{{ $key->id }}', this)" class="shrink-0 p-3 text-slate-400 hover:text-[#EA580C] bg-white rounded-xl border border-slate-100 shadow-sm transition" title="Toggle visibility">
+                                    <x-heroicon-o-eye class="w-5 h-5" />
+                                </button>
+                                <button type="button" onclick="copyToClipboard('modal-secret-{{ $key->id }}', this)" class="shrink-0 p-3 text-slate-400 hover:text-emerald-500 bg-white rounded-xl border border-slate-100 shadow-sm transition" title="Copy to clipboard">
+                                    <x-heroicon-o-clipboard-document class="w-5 h-5" />
+                                </button>
+                            </div>
+                            <p class="text-[10px] text-red-500 mt-2 font-medium flex items-center gap-1"><x-heroicon-o-exclamation-triangle class="w-3.5 h-3.5" /> Keep this secret safe. Do not share it publicly.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         @empty
@@ -112,3 +154,44 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    function toggleVisibility(inputId, button) {
+        const input = document.getElementById(inputId);
+        const icon = button.querySelector('svg');
+        
+        if (input.type === 'password') {
+            input.type = 'text';
+            // Simple visual toggle for the icon if needed, though Heroicons would need swapping.
+            // For now, it just works to show the text.
+            button.classList.add('text-[#EA580C]');
+        } else {
+            input.type = 'password';
+            button.classList.remove('text-[#EA580C]');
+        }
+    }
+
+    function copyToClipboard(inputId, button) {
+        const input = document.getElementById(inputId);
+        
+        // Temporarily change to text so we can copy if it's a password type
+        const originalType = input.type;
+        input.type = 'text';
+        
+        input.select();
+        input.setSelectionRange(0, 99999); /* For mobile devices */
+        document.execCommand("copy");
+        
+        // Restore original type
+        input.type = originalType;
+
+        // Visual feedback
+        const originalColor = button.className;
+        button.className = "p-1.5 text-emerald-500 transition";
+        setTimeout(() => {
+            button.className = originalColor;
+        }, 1500);
+    }
+</script>
+@endpush

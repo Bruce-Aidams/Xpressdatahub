@@ -10,22 +10,22 @@
 </div>
 
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-    <div class="bg-white border border-slate-100/80 rounded-2xl p-5 shadow-sm flex items-center justify-between">
+    <div class="bg-moving-gradient text-white rounded-2xl p-5 shadow-sm flex items-center justify-between border-0">
         <div>
-            <p class="text-xs text-slate-400 font-medium">Total Referrals</p>
-            <p class="text-2xl font-black text-slate-800 mt-1">{{ $totalReferrals ?? 0 }}</p>
+            <p class="text-xs text-white/80 font-bold uppercase tracking-wider">Total Referrals</p>
+            <p class="text-2xl font-black text-white mt-1">{{ $totalReferrals ?? 0 }}</p>
         </div>
-        <div class="bg-blue-50 p-3 rounded-xl">
-            <x-heroicon-o-users class="w-6 h-6 text-blue-500" />
+        <div class="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+            <x-heroicon-o-users class="w-6 h-6 text-white" />
         </div>
     </div>
-    <div class="bg-white border border-slate-100/80 rounded-2xl p-5 shadow-sm flex items-center justify-between">
+    <div class="bg-moving-gradient text-white rounded-2xl p-5 shadow-sm flex items-center justify-between border-0">
         <div>
-            <p class="text-xs text-slate-400 font-medium">Total Earnings</p>
-            <p class="text-2xl font-black text-slate-800 mt-1">GH&#8373;{{ number_format($totalEarnings ?? 0, 2) }}</p>
+            <p class="text-xs text-white/80 font-bold uppercase tracking-wider">Total Earnings</p>
+            <p class="text-2xl font-black text-white mt-1">GH&#8373;{{ number_format($totalEarnings ?? 0, 2) }}</p>
         </div>
-        <div class="bg-[#EA580C]/10 p-3 rounded-xl">
-            <x-heroicon-o-currency-dollar class="w-6 h-6 text-[#EA580C]" />
+        <div class="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+            <x-heroicon-o-currency-dollar class="w-6 h-6 text-white" />
         </div>
     </div>
 </div>

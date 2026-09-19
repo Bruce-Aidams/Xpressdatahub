@@ -19,7 +19,7 @@ class PasswordResetService
     public function verifyToken(string $token, string $email): ?array
     {
         $record = PasswordResetToken::where('email', $email)
-            ->where('used_at', null)
+            ->where('used', false)
             ->where('expires_at', '>', now())
             ->orderByDesc('created_at')
             ->first();
@@ -28,17 +28,11 @@ class PasswordResetService
             return null;
         }
 
-        if ($record->attempts >= $record->max_attempts) {
-            return null;
-        }
-
-        if (password_verify($token, $record->token_hash)) {
-            $record->update(['used_at' => now()]);
+        if (\Illuminate\Support\Facades\Hash::check($token, $record->token)) {
+            $record->update(['used' => true]);
 
             return ['valid' => true, 'token_id' => $record->id];
         }
-
-        $record->increment('attempts');
 
         return null;
     }
@@ -122,16 +116,14 @@ class PasswordResetService
     public function cleanupTokens(): array
     {
         $expired = PasswordResetToken::where('expires_at', '<', now())->delete();
-        $used = PasswordResetToken::where('used_at', '!=', null)
+        $used = PasswordResetToken::where('used', true)
             ->where('created_at', '<', now()->subHour())
             ->delete();
-        $maxAttempts = PasswordResetToken::whereColumn('attempts', '>=', 'max_attempts')->delete();
 
         return [
             'expired' => $expired,
             'used' => $used,
-            'max_attempts' => $maxAttempts,
-            'total' => $expired + $used + $maxAttempts,
+            'total' => $expired + $used,
         ];
     }
 

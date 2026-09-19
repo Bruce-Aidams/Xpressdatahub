@@ -332,6 +332,11 @@ class AdminAgentController extends Controller
             ->orWhere('email', $agent->email)
             ->first();
 
+        // Protect super_admin accounts from being accidentally modified or deactivated
+        if ($existingAdmin && $existingAdmin->role === 'super_admin') {
+            return;
+        }
+
         $isActive = ($agent->role === 'administrator' && $agent->status === 'active');
 
         if ($agent->role === 'administrator') {

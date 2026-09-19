@@ -23,31 +23,31 @@
         $highestPrice = $totalPackages > 0 ? $pricing->max('selling_price') : 0;
     @endphp
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="bg-white border border-slate-100/80 rounded-2xl shadow-sm p-5 flex items-center gap-4">
-            <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-                <x-heroicon-o-cube class="w-5 h-5 text-blue-500" />
+        <div class="bg-moving-gradient text-white rounded-2xl shadow-sm p-5 flex items-center gap-4 border-0">
+            <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                <x-heroicon-o-cube class="w-5 h-5 text-white" />
             </div>
             <div>
-                <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Total Packages</p>
-                <p class="text-xl font-bold text-slate-800">{{ $totalPackages }}</p>
+                <p class="text-[11px] font-bold uppercase tracking-wider text-white/80">Total Packages</p>
+                <p class="text-xl font-black text-white">{{ $totalPackages }}</p>
             </div>
         </div>
-        <div class="bg-white border border-slate-100/80 rounded-2xl shadow-sm p-5 flex items-center gap-4">
-            <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                <x-heroicon-o-chart-bar class="w-5 h-5 text-emerald-500" />
+        <div class="bg-moving-gradient text-white rounded-2xl shadow-sm p-5 flex items-center gap-4 border-0">
+            <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                <x-heroicon-o-chart-bar class="w-5 h-5 text-white" />
             </div>
             <div>
-                <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Average Margin</p>
-                <p class="text-xl font-bold text-slate-800">GH&#8373;{{ number_format($avgMargin, 2) }}</p>
+                <p class="text-[11px] font-bold uppercase tracking-wider text-white/80">Average Margin</p>
+                <p class="text-xl font-black text-white">GH&#8373;{{ number_format($avgMargin, 2) }}</p>
             </div>
         </div>
-        <div class="bg-white border border-slate-100/80 rounded-2xl shadow-sm p-5 flex items-center gap-4">
-            <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
-                <x-heroicon-o-arrow-trending-up class="w-5 h-5 text-amber-500" />
+        <div class="bg-moving-gradient text-white rounded-2xl shadow-sm p-5 flex items-center gap-4 border-0">
+            <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                <x-heroicon-o-arrow-trending-up class="w-5 h-5 text-white" />
             </div>
             <div>
-                <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Highest Price</p>
-                <p class="text-xl font-bold text-slate-800">GH&#8373;{{ number_format($highestPrice, 2) }}</p>
+                <p class="text-[11px] font-bold uppercase tracking-wider text-white/80">Highest Price</p>
+                <p class="text-xl font-black text-white">GH&#8373;{{ number_format($highestPrice, 2) }}</p>
             </div>
         </div>
     </div>

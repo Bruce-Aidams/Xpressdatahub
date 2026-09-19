@@ -92,16 +92,7 @@
                         class="w-full px-5 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl text-base text-slate-800 focus:border-[#2563EB] focus:bg-white outline-none transition font-medium appearance-none shadow-sm"
                         required>
                         <option value="">Choose a package…</option>
-                        @foreach($pricing as $network => $packages)
-                            @foreach($packages as $pkg)
-                                <option
-                                    value="{{ $pkg->package_size }}"
-                                    data-network="{{ $network }}"
-                                    data-price="{{ $pkg->selling_price }}">
-                                    {{ $pkg->package_size }} — GH&#8373;{{ number_format($pkg->selling_price, 2) }}
-                                </option>
-                            @endforeach
-                        @endforeach
+                        {{-- Options are populated dynamically by JavaScript to fix mobile browser compatibility --}}
                     </select>
                     <div class="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none">
                         <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/></svg>
@@ -462,11 +453,18 @@
     }
 
     function filterPackages(network) {
-        var opts = packageSelect.options;
-        for (var i = 0; i < opts.length; i++) {
-            if (!opts[i].value) continue;
-            opts[i].style.display = (opts[i].dataset.network === network) ? '' : 'none';
-        }
+        packageSelect.innerHTML = '<option value="">Choose a package…</option>';
+        
+        var packages = pricingData[network] || [];
+        packages.forEach(function(pkg) {
+            var opt = document.createElement('option');
+            opt.value = pkg.size;
+            opt.dataset.network = network;
+            opt.dataset.price = pkg.price;
+            opt.textContent = pkg.size + ' — GH\u20B5' + parseFloat(pkg.price).toFixed(2);
+            packageSelect.appendChild(opt);
+        });
+
         packageSelect.value = '';
         selectedPrice = 0;
         validateForm();

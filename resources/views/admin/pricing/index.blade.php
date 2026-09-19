@@ -216,8 +216,12 @@
             </div>
             <div>
                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">User Role</label>
-                <input type="text" id="edit_user_role" readonly
-                       class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-500 bg-slate-100 cursor-not-allowed">
+                <select name="user_role" id="edit_user_role" required class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-700 bg-slate-50 focus:outline-none focus:border-[#2563EB] transition">
+                    <option value="agent">Agent</option>
+                    <option value="all">All Roles</option>
+                    <option value="super_agent">Super Agent</option>
+                    <option value="dealers">Dealers</option>
+                </select>
             </div>
             <div class="flex gap-3 pt-2">
                 <button type="button" onclick="document.getElementById('editPricingModal').classList.add('hidden')"

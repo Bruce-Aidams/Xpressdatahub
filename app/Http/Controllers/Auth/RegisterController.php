@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\WelcomeMail;
 use App\Models\Agent;
 use App\Services\PasswordResetService;
 use App\Services\ReferralService;
 use App\Services\ShopService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class RegisterController extends Controller
 {
@@ -71,6 +74,16 @@ class RegisterController extends Controller
             }
 
             $this->shopService->createShopForUser($agent->id, $agent->username);
+
+            // Send welcome email
+            try {
+                Mail::to($agent->email)->send(new WelcomeMail(
+                    agentName: trim($agent->first_name . ' ' . $agent->last_name),
+                    username: $agent->username,
+                ));
+            } catch (\Exception $e) {
+                Log::error('Welcome email failed: ' . $e->getMessage());
+            }
 
             return redirect()->route('pending.approval')
                 ->with('success', 'Account created successfully! Please wait for admin approval.');

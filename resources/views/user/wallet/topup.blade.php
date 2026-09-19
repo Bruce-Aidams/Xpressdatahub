@@ -9,14 +9,14 @@
         <p class="text-sm text-slate-400 mt-1">Fund your wallet via Paystack or MTN MoMo</p>
     </div>
 
-    <div class="bg-white border border-slate-100/80 rounded-2xl p-6 shadow-sm mb-6">
+    <div class="bg-moving-gradient text-white rounded-2xl p-6 shadow-sm mb-6 border-0">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Current Balance</p>
-                <p class="text-3xl font-black text-[#EA580C] mt-1">GH&#8373;{{ number_format($agent->balance ?? 0, 2) }}</p>
+                <p class="text-[11px] font-bold uppercase tracking-wider text-white/80">Current Balance</p>
+                <p class="text-3xl font-black text-white mt-1">GH&#8373;{{ number_format($agent->balance ?? 0, 2) }}</p>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-[#EA580C]/10 flex items-center justify-center">
-                <x-heroicon-o-banknotes class="w-6 h-6 text-[#EA580C]" />
+            <div class="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                <x-heroicon-o-banknotes class="w-6 h-6 text-white" />
             </div>
         </div>
     </div>

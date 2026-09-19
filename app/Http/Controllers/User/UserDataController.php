@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Mail\OrderConfirmationMail;
 use App\Models\Agent;
 use App\Models\CustomPricing;
 use App\Models\Order;
@@ -12,6 +13,8 @@ use App\Services\OrderService;
 use App\Services\PaystackService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class UserDataController extends Controller
@@ -264,6 +267,23 @@ class UserDataController extends Controller
             );
 
             DB::commit();
+
+            // Send order confirmation email
+            try {
+                if ($agent->email) {
+                    Mail::to($agent->email)->send(new OrderConfirmationMail(
+                        agentName: trim($agent->first_name . ' ' . $agent->last_name),
+                        network: $networkType,
+                        packageSize: $packageSize,
+                        phoneNumber: $validatedPhone,
+                        amount: $amount,
+                        orderId: (string) ($result['order']['id'] ?? 'N/A'),
+                        status: 'pending',
+                    ));
+                }
+            } catch (\Exception $e) {
+                Log::error('Order confirmation email failed: ' . $e->getMessage());
+            }
 
             $externalApi = new ExternalApiService($networkType);
             $capacityMb = $externalApi->convertPackageSize($packageSize);

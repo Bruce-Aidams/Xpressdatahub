@@ -5,56 +5,56 @@
 
 {{-- Metric Cards --}}
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5 mb-6 lg:mb-8">
-    <div class="bg-white rounded-2xl border border-slate-100 p-3 sm:p-5 shadow-sm flex items-center justify-between">
+    <div class="bg-moving-gradient-blue text-white rounded-2xl p-3 sm:p-5 shadow-sm flex items-center justify-between border-0">
         <div>
-            <p class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">Revenue</p>
-            <p class="text-lg sm:text-2xl font-black text-slate-800 mt-1">GH&#8373;{{ number_format($stats['revenue'] ?? 0, 0) }}</p>
+            <p class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/80">Revenue</p>
+            <p class="text-lg sm:text-2xl font-black text-white mt-1">GH&#8373;{{ number_format($stats['revenue'] ?? 0, 0) }}</p>
             <div class="flex items-center gap-1 mt-1">
-                <span class="text-[10px] sm:text-xs font-bold {{ $revenueChange >= 0 ? 'text-emerald-500' : 'text-red-500' }}">{{ $revenueChange >= 0 ? '+' : '' }}{{ $revenueChange }}%</span>
-                <x-dynamic-component :component="$revenueChange >= 0 ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down'" class="{{ $revenueChange >= 0 ? 'text-emerald-500' : 'text-red-500' }} text-[8px] sm:text-[9px]" />
+                <span class="text-[10px] sm:text-xs font-bold text-white/90">{{ $revenueChange >= 0 ? '+' : '' }}{{ $revenueChange }}%</span>
+                <x-dynamic-component :component="$revenueChange >= 0 ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down'" class="text-white/90 text-[8px] sm:text-[9px]" />
             </div>
         </div>
-        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#2563EB]/10 flex items-center justify-center shrink-0">
-            <x-heroicon-o-currency-dollar class="w-5 h-5" />
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm shrink-0">
+            <x-heroicon-o-currency-dollar class="w-5 h-5 text-white" />
         </div>
     </div>
-    <div class="bg-white rounded-2xl border border-slate-100 p-3 sm:p-5 shadow-sm flex items-center justify-between">
+    <div class="bg-moving-gradient-blue text-white rounded-2xl p-3 sm:p-5 shadow-sm flex items-center justify-between border-0">
         <div>
-            <p class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">Orders</p>
-            <p class="text-lg sm:text-2xl font-black text-slate-800 mt-1">{{ number_format($stats['total_orders'] ?? 0) }}</p>
+            <p class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/80">Orders</p>
+            <p class="text-lg sm:text-2xl font-black text-white mt-1">{{ number_format($stats['total_orders'] ?? 0) }}</p>
             <div class="flex items-center gap-1 mt-1">
-                <span class="text-[10px] sm:text-xs font-bold {{ $orderChange >= 0 ? 'text-emerald-500' : 'text-red-500' }}">{{ $orderChange >= 0 ? '+' : '' }}{{ $orderChange }}%</span>
-                <x-dynamic-component :component="$orderChange >= 0 ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down'" class="{{ $orderChange >= 0 ? 'text-emerald-500' : 'text-red-500' }} text-[8px] sm:text-[9px]" />
+                <span class="text-[10px] sm:text-xs font-bold text-white/90">{{ $orderChange >= 0 ? '+' : '' }}{{ $orderChange }}%</span>
+                <x-dynamic-component :component="$orderChange >= 0 ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down'" class="text-white/90 text-[8px] sm:text-[9px]" />
             </div>
         </div>
-        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-            <x-heroicon-o-shopping-bag class="w-5 h-5" />
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm shrink-0">
+            <x-heroicon-o-shopping-bag class="w-5 h-5 text-white" />
         </div>
     </div>
-    <div class="bg-white rounded-2xl border border-slate-100 p-3 sm:p-5 shadow-sm flex items-center justify-between">
+    <div class="bg-moving-gradient-blue text-white rounded-2xl p-3 sm:p-5 shadow-sm flex items-center justify-between border-0">
         <div>
-            <p class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">Agents</p>
-            <p class="text-lg sm:text-2xl font-black text-slate-800 mt-1">{{ number_format($stats['total_agents'] ?? 0) }}</p>
+            <p class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/80">Agents</p>
+            <p class="text-lg sm:text-2xl font-black text-white mt-1">{{ number_format($stats['total_agents'] ?? 0) }}</p>
             <div class="flex items-center gap-1 mt-1">
-                <span class="text-[10px] sm:text-xs font-bold {{ $agentChange >= 0 ? 'text-emerald-500' : 'text-red-500' }}">{{ $agentChange >= 0 ? '+' : '' }}{{ $agentChange }}%</span>
-                <x-dynamic-component :component="$agentChange >= 0 ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down'" class="{{ $agentChange >= 0 ? 'text-emerald-500' : 'text-red-500' }} text-[8px] sm:text-[9px]" />
+                <span class="text-[10px] sm:text-xs font-bold text-white/90">{{ $agentChange >= 0 ? '+' : '' }}{{ $agentChange }}%</span>
+                <x-dynamic-component :component="$agentChange >= 0 ? 'heroicon-o-chevron-up' : 'heroicon-o-chevron-down'" class="text-white/90 text-[8px] sm:text-[9px]" />
             </div>
         </div>
-        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
-            <x-heroicon-o-users class="w-5 h-5" />
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm shrink-0">
+            <x-heroicon-o-users class="w-5 h-5 text-white" />
         </div>
     </div>
-    <div class="bg-white rounded-2xl border border-slate-100 p-3 sm:p-5 shadow-sm flex items-center justify-between">
+    <div class="bg-moving-gradient-blue text-white rounded-2xl p-3 sm:p-5 shadow-sm flex items-center justify-between border-0">
         <div>
-            <p class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-400">Active Shops</p>
-            <p class="text-lg sm:text-2xl font-black text-slate-800 mt-1">{{ number_format($stats['active_shops'] ?? 0) }}</p>
+            <p class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-white/80">Active Shops</p>
+            <p class="text-lg sm:text-2xl font-black text-white mt-1">{{ number_format($stats['active_shops'] ?? 0) }}</p>
             <div class="flex items-center gap-1 mt-1">
-                <span class="text-[10px] sm:text-xs font-bold text-[#2563EB]">{{ $shopChange }}% active</span>
-                <x-heroicon-o-chevron-up class="w-5 h-5" />
+                <span class="text-[10px] sm:text-xs font-bold text-white/90">{{ $shopChange }}% active</span>
+                <x-heroicon-o-chevron-up class="w-3 h-3 text-white/90" />
             </div>
         </div>
-        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
-            <x-heroicon-o-building-storefront class="w-5 h-5" />
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm shrink-0">
+            <x-heroicon-o-building-storefront class="w-5 h-5 text-white" />
         </div>
     </div>
 </div>
