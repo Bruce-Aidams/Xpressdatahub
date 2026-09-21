@@ -5,7 +5,7 @@
 <!-- 4 Top Metric Cards (SaaS Style) -->
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 lg:mb-8">
     <!-- Card 1: Revenue -->
-    <div class="bg-moving-gradient-blue text-white rounded-2xl p-4 sm:p-6 shadow-sm flex items-center justify-between border-0">
+    <div class="stat-card bg-moving-gradient-blue text-white rounded-2xl p-4 sm:p-6 shadow-sm flex items-center justify-between border-0">
         <div>
             <p class="text-[10px] sm:text-xs text-white/80 font-bold uppercase tracking-wider">Revenue</p>
             <p class="text-lg sm:text-2xl font-black text-white mt-1 sm:mt-2">GH&#8373;{{ number_format($stats['revenue'] ?? 0, 2) }}</p>
@@ -22,7 +22,7 @@
     </div>
 
     <!-- Card 2: Orders -->
-    <div class="bg-moving-gradient-blue text-white rounded-2xl p-4 sm:p-6 shadow-sm flex items-center justify-between border-0">
+    <div class="stat-card bg-moving-gradient-blue text-white rounded-2xl p-4 sm:p-6 shadow-sm flex items-center justify-between border-0">
         <div>
             <p class="text-[10px] sm:text-xs text-white/80 font-bold uppercase tracking-wider">Orders</p>
             <p class="text-lg sm:text-2xl font-black text-white mt-1 sm:mt-2">{{ number_format($stats['total_orders'] ?? 0) }}</p>
@@ -39,7 +39,7 @@
     </div>
 
     <!-- Card 3: Total Agents -->
-    <div class="bg-moving-gradient-blue text-white rounded-2xl p-4 sm:p-6 shadow-sm flex items-center justify-between border-0">
+    <div class="stat-card bg-moving-gradient-blue text-white rounded-2xl p-4 sm:p-6 shadow-sm flex items-center justify-between border-0">
         <div>
             <p class="text-[10px] sm:text-xs text-white/80 font-bold uppercase tracking-wider">Agents</p>
             <p class="text-lg sm:text-2xl font-black text-white mt-1 sm:mt-2">{{ number_format($stats['total_agents'] ?? 0) }}</p>
@@ -56,7 +56,7 @@
     </div>
 
     <!-- Card 4: Active Shops -->
-    <div class="bg-moving-gradient-blue text-white rounded-2xl p-4 sm:p-6 shadow-sm flex items-center justify-between border-0">
+    <div class="stat-card bg-moving-gradient-blue text-white rounded-2xl p-4 sm:p-6 shadow-sm flex items-center justify-between border-0">
         <div>
             <p class="text-[10px] sm:text-xs text-white/80 font-bold uppercase tracking-wider">Shops</p>
             <p class="text-lg sm:text-2xl font-black text-white mt-1 sm:mt-2">{{ number_format($stats['active_shops'] ?? 0) }}</p>
@@ -89,7 +89,7 @@
             {{-- Grid lines --}}
             <div class="absolute inset-0 flex flex-col justify-between px-1 sm:px-2 pb-6 pointer-events-none">
                 @for($i = 0; $i < 4; $i++)
-                    <div class="border-b border-slate-100 w-full"></div>
+                    <div class="border-b border-dashed border-slate-100/80 w-full"></div>
                 @endfor
             </div>
             {{-- Bars --}}
@@ -101,10 +101,13 @@
                     @endphp
                     <div class="flex-1 flex flex-col items-center gap-1 sm:gap-2 h-full justify-end">
                         @if($dayData['count'] > 0)
-                        <span class="text-[8px] sm:text-[10px] font-bold text-slate-700">{{ $dayData['count'] }}</span>
+                        <span class="text-[8px] sm:text-[10px] font-bold {{ $isToday ? 'text-blue-700' : 'text-slate-500' }}">{{ $dayData['count'] }}</span>
                         @endif
-                        <div class="w-full {{ $isToday ? 'bg-slate-800 shadow-lg shadow-slate-200' : 'bg-slate-100 hover:bg-slate-200' }} rounded-t-lg transition-all duration-500" style="height: {{ max($height, 3) }}%;"></div>
-                        <span class="text-[8px] sm:text-[10px] {{ $isToday ? 'font-bold text-slate-800' : 'text-slate-400 font-medium' }}">{{ $dayData['day'] }}</span>
+                        <div class="w-full rounded-t-xl transition-all duration-500"
+                             style="height: {{ max($height, 3) }}%; background: {{ $isToday ? 'linear-gradient(180deg, #2563eb, #4f46e5)' : 'linear-gradient(180deg, #bfdbfe, #dbeafe)' }};
+                                    {{ $isToday ? 'box-shadow: 0 4px 14px -3px rgba(37,99,235,0.4);' : '' }}"
+                        ></div>
+                        <span class="text-[8px] sm:text-[10px] {{ $isToday ? 'font-bold text-blue-700' : 'text-slate-400 font-medium' }}">{{ $dayData['day'] }}</span>
                     </div>
                 @endforeach
             </div>
@@ -126,12 +129,20 @@
         @endphp
         <div class="relative w-32 h-32 sm:w-40 sm:h-40 mx-auto flex items-center justify-center">
             <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="40" stroke="#f1f5f9" stroke-width="8" fill="transparent"></circle>
-                <circle cx="50" cy="50" r="40" stroke="#1e293b" stroke-width="8" fill="transparent" 
-                        stroke-dasharray="251.2" stroke-dashoffset="{{ $dashOffset }}" stroke-linecap="round"></circle>
+                <defs>
+                    <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#2563eb" />
+                        <stop offset="50%" stop-color="#7c3aed" />
+                        <stop offset="100%" stop-color="#0d9488" />
+                    </linearGradient>
+                </defs>
+                <circle cx="50" cy="50" r="40" stroke="#e2e8f0" stroke-width="8" fill="transparent"></circle>
+                <circle cx="50" cy="50" r="40" stroke="url(#gaugeGrad)" stroke-width="8" fill="transparent" 
+                        stroke-dasharray="251.2" stroke-dashoffset="{{ $dashOffset }}" stroke-linecap="round"
+                        style="filter: drop-shadow(0 2px 6px rgba(37,99,235,0.3));"></circle>
             </svg>
             <div class="absolute text-center">
-                <span class="text-2xl sm:text-3xl font-black text-slate-800">{{ $activePercentage }}%</span>
+                <span class="text-2xl sm:text-3xl font-black bg-gradient-to-r from-blue-600 via-violet-600 to-teal-500 bg-clip-text text-transparent">{{ $activePercentage }}%</span>
                 <p class="text-[8px] sm:text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Active</p>
             </div>
         </div>
@@ -159,26 +170,46 @@
             </div>
         </div>
         @php
-            $networkColors = ['MTN' => '#F59E0B', 'Telecel' => '#EF4444', 'AirtelTigo' => '#3B82F6'];
+            $networkColors = ['MTN' => '#f59e0b', 'Telecel' => '#ef4444', 'AirtelTigo' => '#3b82f6'];
+            $networkGradients = [
+                'MTN'        => ['#f59e0b', '#f97316'],
+                'Telecel'    => ['#ef4444', '#ec4899'],
+                'AirtelTigo' => ['#3b82f6', '#6366f1'],
+            ];
             $networkLabels = ['MTN' => 'MTN', 'Telecel' => 'Telecel', 'AirtelTigo' => 'AirtelTigo'];
             $circumference = 238.7;
             $cumulativeOffset = 0;
+            $gradIdx = 0;
         @endphp
         <div class="relative w-32 h-32 sm:w-36 sm:h-36 mx-auto flex items-center justify-center my-2">
             <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                <defs>
+                    @forelse($networkStats as $net)
+                        @php
+                            $gColors = $networkGradients[$net->network_type] ?? ['#94A3B8', '#cbd5e1'];
+                        @endphp
+                        <linearGradient id="donutGrad{{ $gradIdx }}" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="{{ $gColors[0] }}" />
+                            <stop offset="100%" stop-color="{{ $gColors[1] }}" />
+                        </linearGradient>
+                        @php $gradIdx++; @endphp
+                    @empty
+                    @endforelse
+                </defs>
+                @php $gradIdx = 0; @endphp
                 @forelse($networkStats as $net)
                     @php
                         $pct = $totalNetworkOrders > 0 ? ($net->total / $totalNetworkOrders) : 0;
                         $dashLen = $circumference * $pct;
-                        $color = $networkColors[$net->network_type] ?? '#94A3B8';
                         $rotation = ($cumulativeOffset / $circumference) * 360;
                     @endphp
-                    <circle cx="50" cy="50" r="38" stroke="{{ $color }}" stroke-width="10" fill="transparent"
+                    <circle cx="50" cy="50" r="38" stroke="url(#donutGrad{{ $gradIdx }})" stroke-width="10" fill="transparent"
                             stroke-dasharray="{{ $dashLen }} {{ $circumference - $dashLen }}"
-                            transform="rotate({{ $rotation }} 50 50)"></circle>
-                    @php $cumulativeOffset += $dashLen; @endphp
+                            transform="rotate({{ $rotation }} 50 50)"
+                            style="filter: drop-shadow(0 1px 3px rgba(0,0,0,0.1));"></circle>
+                    @php $cumulativeOffset += $dashLen; $gradIdx++; @endphp
                 @empty
-                    <circle cx="50" cy="50" r="38" stroke="#f1f5f9" stroke-width="10" fill="transparent"></circle>
+                    <circle cx="50" cy="50" r="38" stroke="#e2e8f0" stroke-width="10" fill="transparent"></circle>
                 @endforelse
             </svg>
             <div class="absolute text-center">
@@ -186,18 +217,23 @@
                 <p class="text-[8px] sm:text-[9px] text-slate-400 font-bold uppercase">Orders</p>
             </div>
         </div>
-        <div class="space-y-1.5 mt-3 sm:mt-4 text-[10px] sm:text-xs font-semibold text-slate-600">
+        <div class="space-y-2.5 mt-3 sm:mt-4 text-[10px] sm:text-xs font-semibold text-slate-600">
             @forelse($networkStats as $net)
                 @php
                     $pct = $totalNetworkOrders > 0 ? round(($net->total / $totalNetworkOrders) * 100) : 0;
                     $color = $networkColors[$net->network_type] ?? '#94A3B8';
                 @endphp
-                <div class="flex justify-between items-center">
-                    <span class="flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full" style="background: {{ $color }}"></span>
-                        {{ $net->network_type }}
-                    </span>
-                    <span>{{ $pct }}%</span>
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full shadow-sm" style="background: {{ $color }}"></span>
+                            {{ $net->network_type }}
+                        </span>
+                        <span class="font-bold">{{ $pct }}%</span>
+                    </div>
+                    <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full rounded-full transition-all duration-700" style="width: {{ $pct }}%; background: {{ $color }};"></div>
+                    </div>
                 </div>
             @empty
                 <div class="text-center text-slate-400 py-2">No network data yet</div>
