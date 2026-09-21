@@ -267,8 +267,12 @@ Route::prefix('user')->name('user.')->middleware('user.auth')->group(function ()
     Route::put('/password', [UserPasswordController::class, 'update'])->name('password.update');
     Route::get('/referrals', [UserReferralController::class, 'index'])->name('referrals.index');
     Route::get('/shop', [UserShopController::class, 'index'])->name('shop.index');
+    Route::post('/shop', [UserShopController::class, 'store'])->name('shop.store');
     Route::put('/shop', [UserShopController::class, 'update'])->name('shop.update');
     Route::get('/shop/pricing', [UserShopController::class, 'pricing'])->name('shop.pricing');
+    Route::post('/shop/pricing/add', [UserShopController::class, 'addPackage'])->name('shop.pricing.add');
+    Route::put('/shop/pricing/{pricingId}', [UserShopController::class, 'updatePricing'])->name('shop.pricing.update');
+    Route::delete('/shop/pricing/{pricingId}', [UserShopController::class, 'removePackage'])->name('shop.pricing.remove');
     Route::get('/shop-profits', [UserShopProfitController::class, 'index'])->name('shop-profits.index');
     Route::post('/shop-profits/withdraw', [UserShopProfitController::class, 'index'])->name('shop-profits.withdraw');
 
