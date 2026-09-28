@@ -1,12 +1,12 @@
 @extends('layouts.user')
 @section('title', 'Top Up Wallet')
 @section('page-title', 'Top Up Wallet')
-@section('page-description', 'Fund your wallet via Paystack')
+@section('page-description', 'Fund your wallet via MTN MoMo')
 @section('content')
 <div class="max-w-lg mx-auto">
     <div class="mb-6">
         <h1 class="text-2xl font-black text-slate-800">Top Up Wallet</h1>
-        <p class="text-sm text-slate-400 mt-1">Fund your wallet via Paystack or MTN MoMo</p>
+        <p class="text-sm text-slate-400 mt-1">Fund your wallet via MTN MoMo</p>
     </div>
 
     <div class="bg-moving-gradient text-white rounded-2xl p-6 shadow-sm mb-6 border-0">
@@ -22,12 +22,14 @@
     </div>
 
     <div class="bg-white border border-slate-100/80 rounded-2xl shadow-sm overflow-hidden mb-6">
+        {{--
         <div class="flex border-b border-slate-100">
             <button type="button" id="tabPaystack" onclick="switchTab('paystack')" class="flex-1 py-4 text-sm font-bold text-[#EA580C] border-b-2 border-[#EA580C] bg-orange-50/50 transition">Paystack</button>
             <button type="button" id="tabMomo" onclick="switchTab('momo')" class="flex-1 py-4 text-sm font-bold text-slate-500 border-b-2 border-transparent hover:text-slate-700 hover:bg-slate-50 transition">MTN MoMo</button>
         </div>
+        --}}
         
-        {{-- Paystack Tab --}}
+        {{-- Paystack Tab
         <div id="contentPaystack" class="block">
             <div class="px-6 py-4 border-b border-slate-100">
                 <h3 class="text-sm font-bold text-slate-800">Top Up via Paystack</h3>
@@ -95,9 +97,10 @@
             </div>
         </div>
         </div>
+        --}}
 
         {{-- MoMo Tab --}}
-        <div id="contentMomo" class="hidden">
+        <div id="contentMomo" class="block">
             <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
                 <h3 class="text-sm font-bold text-slate-800">Manual MTN MoMo Top-up</h3>
             </div>
@@ -160,6 +163,7 @@
     var chargeType = '{{ $chargeType }}';
 
     function updateTotals() {
+        if (!amountInput) return; // Prevent error if amountInput is not found (when paystack is disabled)
         var amount = parseFloat(amountInput.value) || 0;
         var fee = 0;
         if (chargeType === 'percentage') {
@@ -169,15 +173,18 @@
         }
         var total = amount + fee;
 
-        amountDisplay.textContent = 'GH\u20B5' + amount.toFixed(2);
+        if (amountDisplay) amountDisplay.textContent = 'GH\u20B5' + amount.toFixed(2);
         if (feeDisplay) feeDisplay.textContent = 'GH\u20B5' + fee.toFixed(2);
         if (totalDisplay) totalDisplay.textContent = total.toFixed(2);
-        totalPayable.textContent = 'GH\u20B5' + total.toFixed(2);
+        if (totalPayable) totalPayable.textContent = 'GH\u20B5' + total.toFixed(2);
     }
 
-    amountInput.addEventListener('input', updateTotals);
-    updateTotals();
+    if (amountInput) {
+        amountInput.addEventListener('input', updateTotals);
+        updateTotals();
+    }
 
+    /*
     function switchTab(tab) {
         var tabPaystack = document.getElementById('tabPaystack');
         var tabMomo = document.getElementById('tabMomo');
@@ -196,6 +203,7 @@
             contentPaystack.className = 'hidden';
         }
     }
+    */
 </script>
 @endpush
 @endsection

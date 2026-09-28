@@ -265,9 +265,13 @@ class AdminAgentController extends Controller
     {
         $pendingAgents = Agent::where('is_approved', false)
             ->orderByDesc('created_at')
-            ->paginate(25);
+            ->paginate(15, ['*'], 'pending_page');
 
-        return view('admin.agents.pending', compact('pendingAgents'));
+        $approvedAgents = Agent::where('is_approved', true)
+            ->orderByDesc('approved_at')
+            ->paginate(15, ['*'], 'approved_page');
+
+        return view('admin.agents.pending', compact('pendingAgents', 'approvedAgents'));
     }
 
     public function approve(Agent $agent)
@@ -275,6 +279,7 @@ class AdminAgentController extends Controller
         try {
             $agent->update([
                 'is_approved' => true,
+                'approved_at' => now(),
                 'updated_at' => now(),
             ]);
 

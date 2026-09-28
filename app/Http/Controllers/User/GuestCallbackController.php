@@ -55,8 +55,13 @@ class GuestCallbackController extends Controller
                 );
 
                 if ($apiResult['success']) {
+                    $externalTransactionId = $apiResult['data']['data']['transaction_id']
+                        ?? $apiResult['data']['transaction_id']
+                        ?? null;
                     $order->update([
-                        'external_transaction_id' => $apiResult['data']['data']['transaction_id'] ?? null,
+                        'external_transaction_id' => $externalTransactionId ? (string) $externalTransactionId : null,
+                        'api_response_data' => json_encode($apiResult['data'] ?? []),
+                        'order_source' => 'api',
                     ]);
                     $orderService = app(OrderService::class);
                     $orderService->updateOrderStatus($order->id, 'processing', 'API call successful, processing', 'system');
@@ -65,11 +70,23 @@ class GuestCallbackController extends Controller
                         ->with('success', 'Payment successful and data delivery initiated! Your order is being processed.')
                         ->with('order_reference', $reference);
                 } else {
+                    // Payment succeeded but API failed — mark as failed, log for admin
+                    \Illuminate\Support\Facades\Log::error("Guest API delivery failed after successful Paystack payment. Order #{$order->id}", [
+                        'reference' => $reference,
+                        'network'   => $order->network_type,
+                        'package'   => $order->package_size,
+                        'phone'     => $order->phone_number,
+                        'error'     => $apiResult['error'] ?? 'Unknown API error',
+                    ]);
+
+                    $order->update([
+                        'api_response_data' => json_encode(['error' => $apiResult['error'] ?? 'API call failed']),
+                    ]);
                     $orderService = app(OrderService::class);
                     $orderService->updateOrderStatus($order->id, 'failed', $apiResult['error'] ?? 'API call failed', 'system');
 
                     return redirect()->route('guest.order.success')
-                        ->with('success', 'Payment successful! However, there was a delay processing your data order. Our support team has been notified.')
+                        ->with('success', 'Payment received! However, there was a delay processing your data order. Our support team has been notified and will fulfil it shortly.')
                         ->with('order_reference', $reference);
                 }
             }

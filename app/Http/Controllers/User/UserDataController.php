@@ -313,10 +313,29 @@ class UserDataController extends Controller
                             'external_transaction_id' => $externalTransactionId ? (string) $externalTransactionId : null,
                             'external_reference' => $externalReference,
                             'api_response_data' => json_encode($apiResult['data'] ?? []),
+                            'order_source' => 'api',
                         ]);
                         $orderService = app(OrderService::class);
                         $orderService->updateOrderStatus($orderId, 'processing', 'API call successful, processing', 'system');
                     } else {
+                        // ❌ API failed — refund the agent's balance automatically
+                        Log::warning("External API failed for order {$orderId}. Refunding agent {$userId} GH₵{$amount}.", [
+                            'error' => $apiResult['error'] ?? 'Unknown',
+                        ]);
+
+                        $agent->refresh();
+                        $refundedBalance = floatval($agent->balance) + $amount;
+                        $agent->update(['balance' => $refundedBalance]);
+
+                        BalanceHistoryService::log(
+                            $userId,
+                            $amount,
+                            'refund',
+                            $orderId,
+                            null,
+                            "Auto-refund: API failed for order #{$orderId} ({$networkType} {$packageSize} to {$validatedPhone})"
+                        );
+
                         $orderService = app(OrderService::class);
                         $orderService->updateOrderStatus(
                             $orderId,
@@ -327,6 +346,9 @@ class UserDataController extends Controller
                         Order::where('id', $orderId)->update([
                             'api_response_data' => json_encode(['error' => $apiResult['error'] ?? 'API call failed']),
                         ]);
+
+                        return redirect()->route('user.orders.today')
+                            ->with('error', 'Order failed: The data vendor could not process your request. Your wallet has been refunded GH₵'.number_format($amount, 2).'.');
                     }
                 }
             }

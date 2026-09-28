@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\AdminBannerController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminDataIntegrationController;
 use App\Http\Controllers\Admin\AdminLowBalanceAlertController;
+use App\Http\Controllers\Admin\AdminMaintenanceController;
 use App\Http\Controllers\Admin\AdminManualTopupController;
 use App\Http\Controllers\Admin\AdminMinimumTopupController;
 use App\Http\Controllers\Admin\AdminNotificationController;
@@ -140,6 +141,10 @@ Route::prefix(config('app.admin_path'))->name('admin.')->middleware('admin.auth'
     Route::put('/payment-config', [AdminPaymentConfigController::class, 'update'])->name('payment-config.update');
     Route::get('/payment-config', [AdminPaymentConfigController::class, 'index'])->name('config.payment');
     Route::put('/payment-config', [AdminPaymentConfigController::class, 'update'])->name('config.payment.update');
+
+    // Maintenance Mode
+    Route::get('/maintenance-mode', [AdminMaintenanceController::class, 'index'])->name('config.maintenance');
+    Route::put('/maintenance-mode', [AdminMaintenanceController::class, 'toggle'])->name('config.maintenance.toggle');
 
     // Manual Topups
     Route::get('/manual-topups', [AdminManualTopupController::class, 'index'])->name('manual-topups.index');

@@ -127,8 +127,8 @@
             $activePercentage = $totalShops > 0 ? round(($activeShops / $totalShops) * 100) : 0;
             $dashOffset = 251.2 - (251.2 * $activePercentage / 100);
         @endphp
-        <div class="relative w-32 h-32 sm:w-40 sm:h-40 mx-auto flex items-center justify-center">
-            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+        <div class="relative w-3/5 max-w-[160px] aspect-square mx-auto flex items-center justify-center">
+            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
                 <defs>
                     <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                         <stop offset="0%" stop-color="#2563eb" />
@@ -181,8 +181,8 @@
             $cumulativeOffset = 0;
             $gradIdx = 0;
         @endphp
-        <div class="relative w-32 h-32 sm:w-36 sm:h-36 mx-auto flex items-center justify-center my-2">
-            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+        <div class="relative w-3/5 max-w-[144px] aspect-square mx-auto flex items-center justify-center my-2">
+            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
                 <defs>
                     @forelse($networkStats as $net)
                         @php

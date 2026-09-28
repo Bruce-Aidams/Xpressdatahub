@@ -43,7 +43,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Approved Today</p>
-                <p class="text-2xl font-black text-emerald-600">{{ \App\Models\Agent::where('is_approved', true)->whereDate('updated_at', today())->count() }}</p>
+                <p class="text-2xl font-black text-emerald-600">{{ \App\Models\Agent::where('is_approved', true)->whereDate('approved_at', today())->count() }}</p>
             </div>
             <div class="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center">
                 <x-heroicon-o-check-circle class="w-5 h-5 text-emerald-500" />
@@ -78,7 +78,7 @@
                                 </div>
                                 <div>
                                     <p class="font-bold text-slate-800 text-xs">{{ $agent->first_name }} {{ $agent->last_name }}</p>
-                                    <p class="text-[11px] text-slate-400">@{{ $agent->username }}</p>
+                                    <p class="text-[11px] text-slate-400">{{ '@' . $agent->username }}</p>
                                 </div>
                             </div>
                         </td>
@@ -140,7 +140,78 @@
 
     @if($pendingAgents->hasPages())
         <div class="px-6 py-4 border-t border-slate-100">
-            {{ $pendingAgents->links('pagination::tailwind') }}
+            {{ $pendingAgents->appends(['approved_page' => request('approved_page')])->links('pagination::tailwind') }}
+        </div>
+    @endif
+</div>
+
+{{-- Approved Users Table --}}
+<div class="bg-white border border-slate-100/80 rounded-2xl shadow-sm overflow-hidden mt-6">
+    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+        <h3 class="text-sm font-bold text-slate-800">Recently Approved Registrations</h3>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+            <thead>
+                <tr class="bg-slate-50/60 border-b border-slate-100">
+                    <th class="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">User</th>
+                    <th class="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-slate-400 hidden sm:table-cell">Contact</th>
+                    <th class="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-slate-400 hidden md:table-cell">Approved At</th>
+                    <th class="px-6 py-3.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                @forelse($approvedAgents as $agent)
+                    <tr class="hover:bg-emerald-50/20 transition">
+                        {{-- User --}}
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2563EB] to-[#60A5FA] flex items-center justify-center text-white text-sm font-bold shrink-0">
+                                    {{ strtoupper(substr($agent->first_name, 0, 1)) }}{{ strtoupper(substr($agent->last_name, 0, 1)) }}
+                                </div>
+                                <div>
+                                    <p class="font-bold text-slate-800 text-xs">{{ $agent->first_name }} {{ $agent->last_name }}</p>
+                                    <p class="text-[11px] text-slate-400">{{ '@' . $agent->username }}</p>
+                                </div>
+                            </div>
+                        </td>
+
+                        {{-- Contact --}}
+                        <td class="px-6 py-4 hidden sm:table-cell">
+                            <div>
+                                <p class="text-xs text-slate-600">{{ $agent->email }}</p>
+                                <p class="text-[10px] text-slate-400">{{ $agent->phone ?? 'N/A' }}</p>
+                            </div>
+                        </td>
+
+                        {{-- Approved At --}}
+                        <td class="px-6 py-4 hidden md:table-cell">
+                            <p class="text-xs text-slate-500">{{ $agent->approved_at ? $agent->approved_at->format('M d, Y h:i A') : 'N/A' }}</p>
+                            <p class="text-[10px] text-slate-400">{{ $agent->approved_at ? $agent->approved_at->diffForHumans() : '' }}</p>
+                        </td>
+
+                        {{-- Status --}}
+                        <td class="px-6 py-4">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 rounded-lg border border-emerald-100">
+                                <x-heroicon-o-check-circle class="w-3.5 h-3.5" />
+                                Approved
+                            </span>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="4" class="px-6 py-12 text-center">
+                            <p class="text-sm font-semibold text-slate-500">No approved registrations yet.</p>
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    @if($approvedAgents->hasPages())
+        <div class="px-6 py-4 border-t border-slate-100">
+            {{ $approvedAgents->appends(['pending_page' => request('pending_page')])->links('pagination::tailwind') }}
         </div>
     @endif
 </div>

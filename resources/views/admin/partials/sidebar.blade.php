@@ -133,6 +133,13 @@
                             </div>
                             <span>Referral Config</span>
                         </a>
+                        <a href="{{ route('admin.config.maintenance') }}"
+                           class="nav-item flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200 {{ request()->routeIs('admin.config.maintenance') ? 'bg-gradient-to-r from-[#2563EB]/10 to-[#2563EB]/5 text-[#2563EB] shadow-sm shadow-[#2563EB]/10' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700' }}">
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 {{ request()->routeIs('admin.config.maintenance') ? 'bg-[#2563EB]/15' : 'bg-slate-100/80' }}">
+                                <x-heroicon-o-wrench-screwdriver class="w-4 h-4 {{ request()->routeIs('admin.config.maintenance') ? 'text-[#2563EB]' : 'text-slate-400' }}" />
+                            </div>
+                            <span>Maintenance Mode</span>
+                        </a>
                     </div>
                 </div>
 

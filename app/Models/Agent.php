@@ -30,6 +30,7 @@ class Agent extends Model
         'device_id',
         'referral_code',
         'referred_by',
+        'approved_at',
     ];
 
     protected $hidden = [
@@ -42,6 +43,7 @@ class Agent extends Model
             'balance' => 'decimal:2',
             'is_approved' => 'boolean',
             'created_at' => 'datetime',
+            'approved_at' => 'datetime',
         ];
     }
 
