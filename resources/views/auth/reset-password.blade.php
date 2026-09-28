@@ -41,7 +41,6 @@
 
             <form method="POST" action="{{ route('password.reset.post') }}" class="space-y-4 max-w-sm" id="resetForm">
                 @csrf
-                <input type="hidden" name="token" value="{{ $token }}">
                 <input type="hidden" name="email" value="{{ $email }}">
 
                 <div class="relative">

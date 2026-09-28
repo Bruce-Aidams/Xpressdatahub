@@ -29,6 +29,10 @@ class EnsureUserAuthenticated
             return $next($request);
         }
 
+        if (session()->has('remember_user')) {
+             config(['session.lifetime' => 43200]);
+        }
+
         if (! session('user_id')) {
             return redirect()->route('login')
                 ->with('error', 'Please log in to continue.');

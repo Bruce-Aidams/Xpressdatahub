@@ -22,6 +22,34 @@ class ForgotPasswordController extends Controller
         return view('auth.forgot-password');
     }
 
+    public function showOtpForm(Request $request)
+    {
+        return view('auth.otp-verification', ['email' => $request->query('email')]);
+    }
+
+    public function verifyOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'otp' => 'required|digits:6',
+        ]);
+
+        $record = PasswordResetToken::where('email', $request->email)
+            ->where('otp_code', $request->otp)
+            ->where('used', false)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if (! $record) {
+            return redirect()->back()->with('error', 'Invalid or expired OTP.');
+        }
+
+        // Store OTP in session or somewhere to verify in reset form
+        session(['otp_verified_email' => $request->email]);
+
+        return redirect()->route('password.reset', ['email' => $request->email]);
+    }
+
     public function sendResetLink(Request $request)
     {
         $request->validate([
@@ -42,29 +70,27 @@ class ForgotPasswordController extends Controller
                 ->with('error', 'Too many reset attempts. Please try again later.');
         }
 
-        $token = $this->resetService->generateToken();
         $otp = $this->resetService->generateOTP();
-
-        $validation = $this->resetService->validatePasswordStrength($token);
-        $expiresAt = now()->addMinutes(60);
+        $expiresAt = now()->addMinutes(10); // OTP expires quicker
 
         try {
             PasswordResetToken::create([
                 'email' => $email,
-                'token' => \Illuminate\Support\Facades\Hash::make($token),
+                'token' => \Illuminate\Support\Facades\Hash::make('temporary'),
                 'otp_code' => $otp,
                 'expires_at' => $expiresAt,
             ]);
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Failed to generate reset token. Please try again.');
+                ->with('error', 'Failed to generate reset code. Please try again.');
         }
 
-        // Send password reset email
+        // Send OTP email
         try {
-            Mail::to($email)->send(new ForgotPasswordMail(
+            // Need a mailer that accepts OTP only or just reuse class if appropriate
+            Mail::to($email)->send(new \App\Mail\ForgotPasswordMail(
                 agentName: trim($agent->first_name . ' ' . $agent->last_name),
-                token: $token,
+                token: '',
                 email: $email,
                 otp: $otp,
             ));
@@ -72,7 +98,7 @@ class ForgotPasswordController extends Controller
             Log::error('Forgot password email failed: ' . $e->getMessage());
         }
 
-        return redirect()->route('password.reset', ['token' => $token, 'email' => $email])
-            ->with('success', 'A password reset email has been sent to your inbox.');
+        return redirect()->route('password.otp', ['email' => $email])
+            ->with('success', 'A verification code has been sent to your email.');
     }
 }

@@ -91,6 +91,13 @@
                     <button type="submit" class="w-full py-3.5 bg-[#EA580C] hover:bg-orange-700 text-white text-sm font-medium rounded-full transition-all shadow-md shadow-orange-500/30">
                         Login
                     </button>
+                    <!-- Remember Me -->
+                    <div class="flex items-center justify-between px-1">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="remember" class="w-4 h-4 rounded border-gray-300 text-[#EA580C] focus:ring-[#EA580C]">
+                            <span class="text-xs text-slate-600">Remember Me</span>
+                        </label>
+                    </div>
                     <a href="{{ route('register') }}" class="w-full flex justify-center items-center py-3.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-full transition-all shadow-sm">
                         Create an Account
                     </a>

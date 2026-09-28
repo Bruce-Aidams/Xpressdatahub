@@ -41,6 +41,7 @@ class UserLoginController extends Controller
         $request->validate([
             'username' => 'required|string',
             'password' => 'required|string',
+            'remember' => 'nullable|string',
         ]);
 
         $agent = Agent::where('username', $request->input('username'))
@@ -69,6 +70,12 @@ class UserLoginController extends Controller
         session()->put('username', $agent->username);
         session()->put('role', $agent->role);
         session()->put('user_login_time', now()->timestamp);
+
+        // Persistent Session Logic
+        if ($request->has('remember')) {
+            session(['remember_user' => true]);
+            config(['session.lifetime' => 43200]); // Extend to 30 days
+        }
 
         $this->loginTracker->logLogin(
             $agent->id,

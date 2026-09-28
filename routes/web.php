@@ -92,7 +92,9 @@ Route::middleware('guest')->group(function () {
     // Password Reset
     Route::get('/forgot-password', [ForgotPasswordController::class, 'showForm'])->name('password.request');
     Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink'])->name('password.email');
-    Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showForm'])->name('password.reset');
+    Route::get('/otp-verification', [ForgotPasswordController::class, 'showOtpForm'])->name('password.otp');
+    Route::post('/otp-verification', [ForgotPasswordController::class, 'verifyOtp'])->name('password.otp.verify');
+    Route::get('/reset-password', [ResetPasswordController::class, 'showForm'])->name('password.reset');
     Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.reset.post');
 });
 

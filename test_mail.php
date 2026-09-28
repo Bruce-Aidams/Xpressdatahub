@@ -6,7 +6,7 @@ $kernel->bootstrap();
 
 try {
     \Illuminate\Support\Facades\Mail::raw('Test email', function ($msg) {
-        $msg->to('bruce@example.com')->subject('Test');
+        $msg->to('bruce.code.ai@gmail.com')->subject('Test');
     });
     echo "Success\n";
 } catch (\Exception $e) {

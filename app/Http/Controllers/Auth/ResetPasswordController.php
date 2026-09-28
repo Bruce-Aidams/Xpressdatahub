@@ -17,42 +17,38 @@ class ResetPasswordController extends Controller
 
     public function showForm(Request $request)
     {
-        $token = $request->route('token');
         $email = $request->query('email', $request->input('email'));
+        $verifiedEmail = $request->session()->get('otp_verified_email');
 
-        if (! $token || ! $email) {
+        if (! $email || $email !== $verifiedEmail) {
             return redirect()->route('password.request')
-                ->with('error', 'Invalid password reset link.');
+                ->with('error', 'Please verify your email first.');
         }
 
-        return view('auth.reset-password', compact('token', 'email'));
+        return view('auth.reset-password', compact('email'));
     }
 
     public function reset(Request $request)
     {
         $request->validate([
-            'token' => 'required|string',
             'email' => 'required|email',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $token = $request->input('token');
         $email = $request->input('email');
         $password = $request->input('password');
+        
+        // Verify session just before reset
+        if ($email !== $request->session()->get('otp_verified_email')) {
+             return redirect()->route('password.request')
+                ->with('error', 'Authentication expired. Please try again.');
+        }
 
         $passwordValidation = $this->resetService->validatePasswordStrength($password);
         if (! $passwordValidation['valid']) {
             return redirect()->back()
                 ->withInput($request->except('password', 'password_confirmation'))
                 ->with('error', implode(' ', $passwordValidation['errors']));
-        }
-
-        $verified = $this->resetService->verifyToken($token, $email);
-
-        if (! $verified) {
-            return redirect()->back()
-                ->withInput($request->except('password', 'password_confirmation'))
-                ->with('error', 'Invalid or expired reset token.');
         }
 
         $agent = Agent::where('email', $email)->first();
@@ -76,6 +72,8 @@ class ResetPasswordController extends Controller
                     ->orWhere('email', $agent->email)
                     ->update(['password_hash' => $newHash]);
             }
+
+            $request->session()->forget('otp_verified_email');
 
             return redirect()->route('login')
                 ->with('success', 'Password has been reset successfully. You can now log in.');
